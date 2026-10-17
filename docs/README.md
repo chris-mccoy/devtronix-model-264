@@ -152,6 +152,9 @@ KryoFlux streams or HFE files into sector images.
 
 ## References
 
+- [devtronix.org](https://devtronix.org/), Dominic Cheshire's Devtronix organ fan site and
+  repository: the place for everything Devtronix that is not in this project (the company's
+  history, products and documentation).
 - Cameron Kaiser, "Refurb weekend double header: Alpha Micro AM-1000E and AM-1200",
   Old Vintage Computing Research, 21 March 2026:
   <https://oldvcr.blogspot.com/2026/03/refurb-weekend-double-header-alpha.html>. A hands-on account of the Alpha Micro 68000 machines the 264 is built

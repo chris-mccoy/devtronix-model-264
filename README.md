@@ -19,6 +19,11 @@ found, with links to the detailed write-ups:
 - [system-monitor/](system-monitor/README.md): the operating software, the file system,
   the Track, Definition and Combination file formats, and the tools that read them
 
+## Links
+
+- [devtronix.org](https://devtronix.org/): Dominic Cheshire's Devtronix organ fan site and repository.
+- [Alpha Micro AM-1000E and AM-1200 refurb](https://oldvcr.blogspot.com/2026/03/refurb-weekend-double-header-alpha.html): Cameron Kaiser's hands-on account of the computer the 264 is built on.
+
 ## What is not in this repository
 
 The floppy disk images, the flux dumps, the HFE images, the decoded sector images
