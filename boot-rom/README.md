@@ -16,7 +16,7 @@ relay. Everything here was derived from the Bus Pirate ROM dump in
 | `disasm.py` | Linear-sweep 68000 disassembler (capstone) with data-range support |
 | `devdisk.py` | Reads a floppy image the way the ROM does; parses boot block, file header, extents |
 
-Python tooling lives in `../.venv` (`capstone`, `pypdf`). Run scripts with `../.venv/bin/python`.
+Python dependencies are declared in `../pyproject.toml` and locked in `../uv.lock`; run scripts with `uv run` from anywhere in the project.
 
 ## Headline facts
 
@@ -143,7 +143,7 @@ clear to end of screen, `$C2` clear to end of line.
 `devdisk.py` reproduces this and extracts the monitor:
 
 ```
-../.venv/bin/python devdisk.py ../disk-images/system-monitor-v189/system-monitor-v189_s0 \
+uv run devdisk.py ../disk-images/system-monitor-v189/system-monitor-v189_s0 \
     ../disk-images/system-monitor-v189/system-monitor-v189_s1 --extract monitor.bin
 ```
 

@@ -26,7 +26,7 @@ the format of the music on the disks in `../disk-images/`.
 | `monitor-189.*` | The same for "System Monitor Ver 189" (`A2` of the v189 disk), see the comparison section |
 
 Rebuild the listing with
-`../.venv/bin/python mdisasm.py monitor-183.bin --sym monitor-183.sym --speculate -o monitor-183.asm`.
+`uv run mdisasm.py monitor-183.bin --sym monitor-183.sym --speculate -o monitor-183.asm`.
 Of the 74752 bytes, 45.8 KB are traced as code; the rest is tables, help text
 and screen layouts, which the listing shows as data.
 
@@ -300,12 +300,12 @@ first named link or function of the stop.
 ### devdef.py and dev2midi.py
 
 ```
-../.venv/bin/python devdef.py SIDE0 SIDE1 -d D1                 # keyboards, channels, named stops
-../.venv/bin/python devdef.py SIDE0 SIDE1 -d D1 --list Fnc      # one list (Kbd Rnk Unt Stp Lnk Fnc ... or all)
-../.venv/bin/python devdef.py SIDE0 SIDE1 -d D1 --item Stp 2    # every field of one item, like /STP2 in the editor
-../.venv/bin/python devdef.py --file def.bin --list Kbd         # from bytes extracted with devfs.py
-../.venv/bin/python dev2midi.py SIDE0 SIDE1 -t T8 -d D1 -o danny-boy.mid           # one MIDI channel per keyboard
-../.venv/bin/python dev2midi.py SIDE0 SIDE1 -t T8 -d D1 --ranks -o danny-boy-ranks.mid   # through stops and ranks
+uv run devdef.py SIDE0 SIDE1 -d D1                 # keyboards, channels, named stops
+uv run devdef.py SIDE0 SIDE1 -d D1 --list Fnc      # one list (Kbd Rnk Unt Stp Lnk Fnc ... or all)
+uv run devdef.py SIDE0 SIDE1 -d D1 --item Stp 2    # every field of one item, like /STP2 in the editor
+uv run devdef.py --file def.bin --list Kbd         # from bytes extracted with devfs.py
+uv run dev2midi.py SIDE0 SIDE1 -t T8 -d D1 -o danny-boy.mid           # one MIDI channel per keyboard
+uv run dev2midi.py SIDE0 SIDE1 -t T8 -d D1 --ranks -o danny-boy-ranks.mid   # through stops and ranks
 ```
 
 `dev2midi.py` writes a format-1 file with 96 ticks per beat (one tick per
@@ -375,19 +375,19 @@ its sectors hold a definition fragment (stop names), i.e. a stale directory
 entry over reused sectors.
 
 ```
-../.venv/bin/python devcomb.py SIDE0 SIDE1 -c C1 [-d D1]      # one line per piston
-../.venv/bin/python devcomb.py SIDE0 SIDE1 -c C1 --piston 2   # the stops one piston draws
-../.venv/bin/python devcomb.py SIDE0 SIDE1 -c C1 --all        # every piston's ON stops
-../.venv/bin/python devcomb.py --file c.bin --def-file d.bin
+uv run devcomb.py SIDE0 SIDE1 -c C1 [-d D1]      # one line per piston
+uv run devcomb.py SIDE0 SIDE1 -c C1 --piston 2   # the stops one piston draws
+uv run devcomb.py SIDE0 SIDE1 -c C1 --all        # every piston's ON stops
+uv run devcomb.py --file c.bin --def-file d.bin
 ```
 
 ## devfs.py
 
 ```
-../.venv/bin/python devfs.py ../disk-images/58-note-01/58-note-1_s0 ../disk-images/58-note-01/58-note-1_s1 [--check]
-../.venv/bin/python devfs.py SIDE0 SIDE1 --events T1 -n 40        # decode a track
-../.venv/bin/python devfs.py SIDE0 SIDE1 --extract T1 t1.bin      # raw file bytes
-../.venv/bin/python devfs.py SIDE0 SIDE1 --header T1              # hex dump of the header sector
+uv run devfs.py ../disk-images/58-note-01/58-note-1_s0 ../disk-images/58-note-01/58-note-1_s1 [--check]
+uv run devfs.py SIDE0 SIDE1 --events T1 -n 40        # decode a track
+uv run devfs.py SIDE0 SIDE1 --extract T1 t1.bin      # raw file bytes
+uv run devfs.py SIDE0 SIDE1 --header T1              # hex dump of the header sector
 ```
 
 It also accepts a single 819200-byte `.img`. The `jerrystour` folder holds only
@@ -413,7 +413,7 @@ system disks.
 ## render_all.py: the whole collection
 
 ```
-../.venv/bin/python render_all.py            # ~2 minutes; writes ../renders/
+uv run render_all.py            # ~2 minutes; writes ../renders/
 ```
 
 Walks `../disk-images/` and, when it exists, `../decoded-images/` (every
@@ -450,8 +450,8 @@ ending and is not reported.
 ## fluxdecode.py: the flux dumps
 
 ```
-../.venv/bin/python fluxdecode.py --all                 # ~15 s; writes ../decoded-images/
-../.venv/bin/python fluxdecode.py ../disk-images/58-note-07 out/58-note-07 \
+uv run fluxdecode.py --all                 # ~15 s; writes ../decoded-images/
+uv run fluxdecode.py ../disk-images/58-note-07 out/58-note-07 \
         --ref ../disk-images/58-note-07/58-note-07_s0.raw ../disk-images/58-note-07/58-note-07_s1.raw
 ```
 

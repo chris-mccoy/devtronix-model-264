@@ -15,7 +15,7 @@ write-ups are linked from each section. Work done 16 October 2026.
 | `../renders/INDEX.md` | Catalogue of every recording, rendered to MIDI (not in the public repository) |
 | `../decoded-images/` | Sector images decoded from the flux dumps, plus every HFE image (not in the public repository) |
 
-Python tools run with `../.venv/bin/python` (capstone and pypdf are installed there).
+Python tools run with `uv run script.py ...` (dependencies are in `../pyproject.toml`, locked in `../uv.lock`; `uv sync` creates the environment).
 The disk images (`disk-images/`), decoded images and renders are kept out of the
 public repository until the recordings can be published; the write-ups refer to them
 as they exist in a local copy. Nothing under `disk-images/` is ever modified.

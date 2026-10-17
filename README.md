@@ -22,8 +22,10 @@ and the rendered MIDI files are deliberately left out (`disk-images/`,
 settled. Links into those folders from the write-ups will not resolve here. The
 tools work on a local copy that has them.
 
-The tools are Python 3; `capstone` is needed for the disassemblers:
+The tools are Python 3, managed with [uv](https://docs.astral.sh/uv/): dependencies are in
+`pyproject.toml` and locked in `uv.lock`.
 
 ```
-python3 -m venv .venv && .venv/bin/pip install capstone
+uv sync                                   # one-time: create .venv with the locked packages
+uv run system-monitor/devfs.py SIDE0 SIDE1   # run any tool
 ```
