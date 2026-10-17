@@ -558,6 +558,42 @@ which is how the crescendo pedal draws stops in sequence.
 scanner with `sys_scanner_setup` (`$C64A`) and the `scan_describe_*` routines to
 name whichever input moved.
 
+## Modem mode: a BBS terminal with YMODEM
+
+`Modem [baud]` (`sub_0282C`, `$282C`; default 2400, up to 9600 from the table
+at `$3292`) opens "MODEM CONNECT MODE" on DUART channel B: keystrokes go to
+the modem, and what comes back is passed through an **ANSI parser**
+(`$29F4`–`$2B2E`: `ESC [` with `A B C D H f J K n`) and translated into the
+local terminal's own cursor and clear codes, so a VT100/ANSI BBS displays
+correctly on the TeleVideo or Wyse console. Three ESCs within a second leave
+the mode.
+
+**Control-D download** (`$2B30`) and **Control-U upload** (`$2D3E`) are
+**YMODEM batch with 1K blocks**, not XMODEM:
+
+- The receiver starts and re-arms with `C` (CRC mode) and accepts both `SOH`
+  128-byte and `STX` 1024-byte packets: block number, its complement, data,
+  CRC-16 high byte first (`sys_crc16`, table at `$3092`). Good packet → `ACK`;
+  bad CRC or wrong block number → `NAK` and the "Errors:" counter; a key press
+  → `CAN`; 10 s of silence → abort.
+- Block 0 is the YMODEM header: file name, NUL, decimal file size. The name is
+  shown as "Download <name>", the size is used to truncate the last block, and
+  the file is created in a `Z` slot ("Fileslot:") with the name
+  "Download <name>" (`$2EDC`). `EOT` closes the file and the receiver sends
+  `C` again; an empty block 0 ends the batch.
+- The sender prompts for the Devtronix file ID and "the filename to be used on
+  the BBS", waits for `C`, sends block 0 with name and size, then the file in
+  1 KB `STX` blocks padded with zeros, `EOT`, and a final empty block 0. It
+  sends two NUL bytes before and after every packet, which YMODEM receivers
+  ignore.
+
+So the 264 could dial Devtronix's BBS, and files travelled as ordinary YMODEM
+transfers. The `Topc`/`Frompc`/`Pcdisk` commands are a different thing: the PC
+link protocol handled by the PCL task over the same port.
+
+The boot ROM's "download across modem" is a third, much simpler protocol of its
+own (`../boot-rom/README.md`): `SOH`, 1024 bytes, 8-bit sum, `G`/`E` replies.
+
 ## devfs.py
 
 ```
