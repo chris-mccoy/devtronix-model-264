@@ -483,6 +483,20 @@ project's note numbering came from:
   Great a MIDI address, and the `main` disk's D20/D30 switch one stop from MIDI
   note 32 on channel 4.
 
+**Input or output is decided by the field, not the address.** The same
+`M`-range word means "note *n* on channel *c*" wherever it appears. In an input
+field (key, stop contact, piston, control button, channel input) it is kept out
+of the scan table and hooked into `midi_map`, so a note-on from channel B presses
+it and a note-off or velocity-0 note-on releases it; in an output field (rank
+pipe, unit, indicator, magnet) it goes through the normal output use count and
+`output_midi` sends `9n note velocity` / `9n note 0` instead of writing the
+scanner. Velocity is a per-channel value set by function type 22; program
+changes and controllers (types 19–21) are sent from their own fields without
+addresses. MIDI channels with no mapped inputs are passed through: while
+recording their messages are stored raw as `$F7` events and `play_event` sends
+them out again, so an instrument recorded alongside the organ is reproduced
+although the relay never interpreted it.
+
 In the editor, putting the marker on a MIDI output address sends that note
 (`$F79A`) the way it energises a magnet for a board address.
 
