@@ -481,3 +481,120 @@ F3C4 edit_hash_table   ; {hash.w, descriptor.l, ?.w} ...
 129C6 help_text
 129C6 ;; Help text (H = heading, C = command, L = line)
 132DC drv030_entry     ; Dimension-030 driver (called via (a5) with function in d7)
+
+# ------------------------------------------------------------- relay: scanner, keys, stops, outputs
+# Variables
+=011A key_delay        ; Spf "panel up/down speed": key events delayed this many ticks (0 = immediate)
+=0120 transpose        ; semitones added to every key number (transposer functions)
+=012E out_console_cnt  ; -> byte per console output address: use count (B-series boards, control word $3C00)
+=0132 out_chamber_cnt  ; -> byte per chamber output address: use count (C/D boards, control word $3300)
+=0168 midi_out_cnt     ; -> byte per MIDI output address ($6001+): use count
+=016C out_console_max  ; highest console output address seen (Tstotp)
+=016E out_chamber_max
+=0170 midi_out_max
+=0182 scan_timing      ; Spf "scan timing": settle loops per input (+4 on a fast CPU)
+=0194 key_time_us      ; PTM T3 measurement of the last key event ("Key time was %t microseconds")
+=0196 stop_time_us
+=01EF transposer_on
+=06A8 console_polarity ; Spf: 0 = ground-active inputs (control $1160), else $21E6
+=06BA kbd_states       ; per keyboard {+0 -> 124 key-state bytes (bit per source: 0 = the key), +4 hooks "keyboard changed"}
+=06BE kbd_divisions    ; -> {count.w, division ptr...}: the note sets, see division_base
+=06C2 division_base    ; d5 = this value; (a5,d5) divisions, $4(a5,d5) ctl states, $8(a5,d5) link states, $c(a5,d5) function blocks
+=06C6 num_keyboards
+=06D2 rank_tbl         ; -> pointer per rank to its 121 output addresses (Rnk body + $A)
+=06D6 unit_tbl         ; -> pointer per unit to {use.w, body ptr}
+=06E6 piz_tbl
+=06EA rit_tbl
+=06F2 fnc_tbl          ; -> {count.l, pointer per function to its Fnc body}
+=06F6 fnc_tbl_base
+=06FA lnk_tbl          ; -> {count.l, pointer per link to its Lnk body}
+=06FE lnk_state        ; byte per link: last evaluated truth value
+=0702 stop_inactive    ; byte per stop: nonzero = stop ignores events (combination status inactive)
+=08A2 comb_table       ; piston rows {OFF bitmap, ON bitmap}, see README "Combination files"
+=08A6 set_mode         ; Set piston held
+=08A7 range_mode       ; Range piston held
+=08A8 num_pistons
+=08AA comb_rowbytes    ; bytes per bitmap = (stops+8)/8
+=08AE magnet_pulse     ; Spf "magnet pulse time" in ms (default 80): dual-magnet stops are pulsed this long
+=0A9A midi_rx_ring     ; 1 KB ring of 4-byte MIDI messages received on DUART channel B
+=0A9E midi_rx_in
+=0AA0 midi_rx_out
+=0AA2 midi_tx_ring     ; 1 KB ring of MIDI bytes to send on channel B
+=0AA6 midi_tx_in
+=0AB6 midi_counts      ; -> long per status nibble: received message counts ("Midi Input Message Map")
+=0ABA midi_map         ; -> [16 channels] -> [128 notes] -> hook list (console inputs with address >= $6001)
+=0AC0 midi_velocity    ; byte per MIDI channel: velocity*2 for note-on outputs (function type 21)
+# Scanner
+9664 scan_setup_spf     ; Spf -> scan_control (console polarity), scan_timing
+9758 relay_build_scan   ; build scan_table + scan_handlers from Kbd keys, Pst, Cin, Stp contacts, Ctl, Spf
+97A4 scan_collect       ; d0 = 0: add every key, piston, channel input, stop contact, control button; else count them
+9916 scan_add_input     ; console address d1 -> scan entry (state in bit 15) + hook node; debounce d5 ms adds a timer hook; >= $6001 goes to midi_map
+99CE build_keyboards    ; kbd_states: key-state bytes per keyboard
+9A0A build_divisions    ; a note set per keyboard: {+0 counts (count.w + byte per note), +4 next, +8 handler note_offset_hook, +$C second counts, +$12 low note, +$14 high note}
+9A66 build_ranks        ; rank_tbl, and clear every rank output
+9A9A build_piz_rit
+9AE8 build_units        ; unit_tbl, and clear every unit output
+9B50 build_stops        ; stop_state (all off), stop_inactive, stop_norecord, stop_table {body, links, handler, functions}; clear magnet and indicator outputs
+9BE6 link_direct_stops  ; a stop whose only link is itself and has no expression calls link_functions directly
+9C28 build_links        ; lnk_tbl, lnk_state, per-stop list of the links that mention it
+9CC2 build_functions    ; fnc_tbl; rank-output functions remember their division
+9D3A build_fn_blocks    ; a run-time block per function (fn_block_by_type); modifiers (13, 14) after the rest
+9D8C fn_block_by_type   ; jump table on Fnc type: 1 coupler $28 bytes, 3 rank output $1E, 4 trap $10, 5 unit, 6 unison off, 7/8/18 sustain/legato/sostenuto, 9 transposer, 12 multiplier, 13/14 piz/rit, 15/16 channel, 17 reverser
+A0BC build_comb_table   ; combination table sized from Pst and Stp counts
+A0F8 build_channels     ; chan_list: per channel {.., +$A value, +$E output list}
+A140 build_chan_inputs  ; analog channel inputs (Cin with sensitivity) -> scan_pending list for analog_sample
+A196 build_chan_outputs ; Cot: sorted into the channel's output list {next, +4 value, +6 function}
+A1E2 build_spf          ; Spf: Set, Range, tempo button/control, metronome, play/record switch inputs; magnet_pulse; beat/measure units
+A836 scan_pass          ; one pass over scan_table: write address to $FF80, read state back in bit 15, dispatch changes, then analog_sample one pending input
+A88C scan_changed       ; input changed: flip its state bit, d4 = +1 on / -1 off, call its hook list
+A8A8 midi_dispatch      ; MIDI note/control d1 ($6001+) -> midi_map[channel][note] hooks
+A8D4 hook_key           ; scan hook: key_event(kbd, key)
+A8E0 hook_piston        ; scan hook: piston_press (on press only)
+A8EC hook_chan_input    ; scan hook: chan_input_event(channel, value)
+A8F4 hook_stop_contact  ; scan hook: stop contact (stop, side) -> stop_contact_change
+A8FC hook_control       ; scan hook: Spf control inputs 1 Set 2 Range 3 tap tempo 4 play/record switch 5 metronome
+A942 hook_ctl_button    ; scan hook: Ctl control button -> CTL task command
+A56E debounce_hook      ; scan hook with debounce: start timer, pass the change on when it expires
+A592 debounce_expired
+# Keys
+AB6A key_state_update   ; key-state byte of (kbd, key): set/clear bit d0; on 0<->nonzero call key_to_division
+AB9E key_to_division    ; add transpose, record, then note_set_change on the keyboard's division (after key_delay if set)
+AC28 replay_all_divisions
+AC48 release_all_keys   ; every held key on every keyboard off then on (transposer change)
+AC7E coupler_keys       ; keys a coupler feeds into a keyboard: bit d0 of the key-state byte
+AD12 note_offset_hook   ; hook: note d3 + offset, within [low, high] -> note_set_change on the target set
+AD2C note_set_change    ; per-note use count in the set; on 0<->1 call the set's hooks (couplers, rank outputs, units)
+AD6C stop_contact_change; hardware types 1/3/4: new stop state, record, indicator output, then the stop's link handler
+ADFE stop_eval_links    ; re-evaluate every link that mentions the stop; on change activate/release its functions
+AE34 link_eval          ; RPN over stop states ($4000+n = control button): and/or/not
+AE86 link_functions     ; up to 8 functions of a link -> function_use
+AED4 function_use       ; use count per function; 0->1 activates, 1->0 releases (fn_activate)
+AF74 fn_activate        ; jump table on Fnc type (tbl_0AF80_n)
+B168 fn_needs_division  ; byte per Fnc type: 1 = only when its division is a keyboard
+B192 unit_use           ; use count per unit; 0<->1 drives the unit by type (unit_type_table)
+B1C8 unit_type_table    ; 1 output, 2 timed one-shot, 3 reiterate (timer), 4 analog-threshold, 5 MIDI note
+~B440
+B440 rank_out_hook      ; hook: key -> rank pipe (key - offset within count) -> output_console/output_chamber
+B450 output_console     ; console output d1: use count; 0<->1 writes ~addr to $FF80 with control $3C00 (bit 15 clear = on)
+B48C output_chamber     ; chamber/pipe output d1: as above with control $3300; >= $6001 -> output_midi
+B4C2 output_midi        ; MIDI note on/off on channel B: 9n note velocity
+B51A output_console_direct ; no use count (editor, tests); tracks the highest address
+B54C output_chamber_direct
+B57E analog_sample      ; successive-approximation read of one analog input (control $31xx), compare with sensitivity, chan_input_event
+B68A piston_press       ; see README "Combination files"
+B6D6 piston_apply
+B704 piston_set_range
+B742 piston_set
+B78C piston_show_range
+BBBA chan_input_event   ; channel d2 input value d3 on/off: keep a sorted list of active inputs; highest wins
+BC08 channels_poll      ; every 100 ms: for each channel whose value changed: record, fire Cot outputs crossing the value, update graph
+C480 scan_describe_key  ; editor "beep in": describe the input that just changed
+C4A4 scan_describe_piston
+C4B0 scan_describe_switch
+C4D4 scan_describe_stop
+C4E0 scan_describe_spf
+C4EC scan_describe_ctl
+C6E6 scan_port          ; a1 = $FFFFFF80 (a dummy word when the console is on channel B and there is no scanner)
+C716 coupler_activate   ; activate/release a coupler or rank-output block: link its hook into the source set, replay the notes already held
+C7F0 hook_link          ; add (d4 > 0) or remove node a4 from the hook list at a0
+A7FA ;; SCN task: console scanner.  See README.md "The relay".

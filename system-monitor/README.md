@@ -419,6 +419,145 @@ uv run devcomb.py SIDE0 SIDE1 -c C1 --all        # every piston's ON stops
 uv run devcomb.py --file c.bin --def-file d.bin
 ```
 
+## The relay: scanner, keys, stops and outputs
+
+This is the part of the monitor that makes the organ play: the SCN task
+(`task_scn`, `$A7FA`), the run-time tables it builds from the definition at
+`Run` time (`relay_build_scan`, `$9758`, and the `build_*` routines before
+it), and the event chain from a console contact to a magnet. Everything below
+is named in `monitor-183.sym`, so the listing can be read alongside.
+
+### Console scanner hardware (`$FFFFFF80`–`$FFFFFF86`)
+
+Two 16-bit ports, data at `$FF80` and control at `$FF82`, drive the console
+and chamber I/O boards (the `AA`..`PP` boards and `A1`..`P8` pins of the
+definition). Every operation is "write a control word, write an address word,
+read a word back":
+
+| Control word | Operation | Data word written | Result |
+|---|---|---|---|
+| `$1160` or `$21E6` (`scan_control`, from Spf "Console polarity") | scan an input | address − 1, with the last known state in bit 15 | read back: bit 15 = contact open |
+| `$31xx` | analog read, successive approximation | input address | bit 15 = comparator (DAC value `xx` ≥ input) |
+| `$3C00` | console (B-series) output | `~(address − 1)`, bit 15 clear = on, set = off | — |
+| `$3300` | chamber (C/D-series) output | same | — |
+| `$1100` | idle / reset the bus | 0 | — |
+| `$11FB` `$2103` `$15FE` `$0300` `$0F00` | the `Tstadr`/`Tstinp`/`Tstotp` board tests | | |
+
+Addresses are the definition's encoding (`board1<<11 | board2<<7 | pin<<3 |
+digit`, 1-based). `$FF84` and `$FF86` are cleared by the 1 ms tick while
+`pulse_hold` counts down: a watchdog or strobe for the output latches, armed
+for 1 s whenever a scan entry is created. A scan of one input costs
+`scan_timing` settle loops (Spf "scan timing"); the swell shoes are read by
+eight comparisons of a DAC value against the input (`analog_sample`, `$B57E`,
+also `read_analog` for the tempo control), with interrupts off around each read.
+
+MIDI uses DUART channel B: received messages are queued by the interrupt
+handler as 4-byte records (`midi_rx_ring`) and turned into input events with
+the pseudo address `$6001 + channel×128 + note` (`midi_dispatch`, `$A8A8`),
+so a MIDI note is just another console input; outputs with an address ≥
+`$6001` are sent as note on/off on channel B (`output_midi`, `$B4C2`).
+
+### The scan loop
+
+`relay_build_scan` walks the definition once and makes two parallel arrays:
+`scan_table`, one word per console input (the address with the current state
+in bit 15), and `scan_handlers`, a **hook list** per input. Keys (every key of
+every keyboard with an address), pistons, channel inputs, stop contacts (both
+contacts of a dual-contact drawknob), control buttons and the Spf inputs (Set,
+Range, tempo button, play/record switch, metronome) all land here. Inputs with
+a debounce time get a timer node in front of their hook. The SCN task then
+loops for ever: one pass over the table (`scan_pass`), every pending MIDI
+event, one analog input, yield. `scan_rate` counts passes per second and
+`worst_delay` the longest gap, both shown on the Run screen.
+
+A **hook list** is the relay's universal mechanism: a chain of
+`{next.l, handler.l, args...}` nodes called by `call_hooks` (`$BF3E`) with
+A0 at the args and D4 = +1 (on) or −1 (off). Scan entries, keyboards, note
+sets, stops and units all own one, and activating a function means linking a
+node into somebody's list (`hook_link`, `$C7F0`).
+
+### Keys: from contact to pipe
+
+1. `key_event` (`$AB1C`): keyboard d2, key d3 (1–121, note 25 = 8' C). The
+   **key-state byte** of that key (`kbd_states`) gets bit 0 set or cleared;
+   couplers that feed this keyboard use the other bits, so a note stays on
+   while any source holds it. On 0↔nonzero the key goes to the keyboard's
+   **note set** (`key_to_division`), after `transpose` is added, after
+   `rec_key` if recording, and after `key_delay` ticks if the Spf "panel
+   up/down speed" is set.
+2. A **note set** (`build_divisions`, one per keyboard, more for ranks) is
+   `{use count per note, hook list, low, high}`. `note_set_change` (`$AD2C`)
+   bumps the note's count and calls the hooks only on 0↔1.
+3. The hooks are the active functions. A **rank output** function (type 3)
+   hangs `rank_out_hook` (`$B440`) on its division's set: note − offset, within
+   the function's note limits, indexes the rank's 121 output addresses and the
+   pipe's address goes to `output_chamber`. A **divisional coupler** (type 1)
+   hangs `note_offset_hook` (`$AD12`): note + pitch offset, within limits, into
+   the *target* keyboard's note set, so couplers chain naturally and a coupled
+   note counts like a played one. The "melody"/"bass" special couplers use
+   `spec_0B7D6`..`spec_0B906` instead, which track the highest or lowest held
+   note. Traps and units (type 4, 5) hang `unit_use` (`$B192`), which drives the
+   unit by its type: plain output, timed one-shot (timer wheel), reiterating
+   (timer with the Piz/Rit tables), analog threshold, or MIDI note.
+4. `output_chamber` / `output_console` (`$B48C` / `$B450`) keep a **use count
+   per output address**, so a pipe shared by several stops or couplers turns
+   on once and off when the last user releases it, and write the board on the
+   0↔1 transitions.
+
+The whole chain runs inside the SCN task with interrupts off only around the
+bus accesses; the "Key time was %t microseconds" message, when enabled, is the
+PTM T3 measurement of one key event end to end.
+
+### Stops: links and functions
+
+`stop_event` (`$B5F4`) dispatches on the stop's **hardware type**: a
+dual-magnet stop (type 2) pulses its ON or OFF magnet for `magnet_pulse` ms
+(Spf, default 80) through a timer node and does nothing else, since the moving
+tab's contact will report the new state; types 1, 3 (reversible: each press
+toggles) and 4 (dual contact: each contact sets a state) go through
+`stop_contact_change` (`$AD6C`): store `stop_state`, record, drive the
+indicator output, then `stop_eval_links`.
+
+`stop_eval_links` (`$ADFE`) re-evaluates every **link** that mentions the stop
+(`link_eval` runs the link's RPN expression over `stop_state`, with `$4000+n`
+reading control button *n*). When a link's truth value changes, each of its up
+to 8 **functions** gets `function_use` ±1 (`$AED4`); a function with a use
+count going 0→1 is activated and 1→0 released (`fn_activate`, by type). For
+couplers and rank outputs activation is `coupler_activate` (`$C716`): link the
+hook into the source note set and replay every note already held there, so
+drawing a stop while keys are down sounds immediately. Function types: 1
+divisional coupler, 3 rank output, 4 trap, 5 direct unit, 6 unison off, 7/8/18
+sustain/legato/sostenuto, 9 transposer (re-plays all keys), 12 multiplier
+(activates 8 more functions), 13/14 pizzicato/reiterate modifiers, 15/16
+channel coupler/output, 17 stop reverser (toggles 4 stops), 19–22 MIDI program
+change, controllers and velocity. A link whose only term is its own stop skips
+the evaluator (`link_direct_stops`).
+
+Pistons are handled by `piston_press` (`$B68A`) as described under
+"Combination files"; every stop it changes goes through `stop_event` like a
+hand-drawn one.
+
+### Channels (swell shoes, crescendo)
+
+Channel inputs are either contacts, each worth a value (`chan_input_event`
+keeps a sorted list of the active contacts; the highest value wins), or analog
+(`analog_sample`, with the Cin "sensitivity" as the dead band). `channels_poll`
+(`$BC08`), every 100 ms from the STS task, notices a changed channel value,
+records it (`rec_channel`), and fires the channel's **outputs** (Cot items
+sorted by value): each output's function is activated for the values it covers,
+which is how the crescendo pedal draws stops in sequence.
+
+### Set-up and tear-down
+
+`Run` builds everything from the loaded definition: `build_keyboards`,
+`build_divisions`, `build_ranks` (and clears all rank outputs), `build_units`,
+`build_stops` (all stops off, magnets and indicators cleared), `build_links`,
+`build_functions`, `build_fn_blocks`, `build_comb_table`, `build_channels`,
+`build_chan_inputs`, `build_chan_outputs`, `build_spf`, then
+`relay_build_scan`. `Stop` frees it all. The editor's "beep in" uses the same
+scanner with `sys_scanner_setup` (`$C64A`) and the `scan_describe_*` routines to
+name whichever input moved.
+
 ## devfs.py
 
 ```
@@ -647,9 +786,9 @@ shows:
    model traps/units, tremulants, expression or pizzicato/reiterate timing.
 2. ~~Confirm the tempo assumption on a real recording.~~ Done: the renders have
    been listened to and sound right at 120 BPM (192 pulses/s).
-3. The scanner side (`task_scn`, `key_event`, `stop_event` and the output
-   tables at `$C5B4`) is traced but not annotated in depth; it is where the
-   relay logic lives.
+3. The relay (scanner, keys, stops, outputs) is now annotated, see "The relay".
+   Not followed in detail: the melody/bass coupler variants, the pizzicato and
+   reiterate timing, and the board test routines (`Tstadr`, `Tstinp`, `Tstotp`).
 4. `monitor-183.asm` has 32 `spec_` routines reached only through data
    structures; a few hundred bytes of the editor may still be data mistaken for
    code or vice versa.

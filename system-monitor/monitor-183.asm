@@ -5850,10 +5850,10 @@
 055EE  7E35                   moveq   #$35,d7
 055F0  4E40                   trap    #$0                    ; sys $35 sys_message
 055F2                         dc.b    'Saving combination file',$00
-0560A  226D 08A2              movea.l $8a2(a5),a1
-0560E  362D 08A8              move.w  $8a8(a5),d3
+0560A  226D 08A2              movea.l comb_table(a5),a1
+0560E  362D 08A8              move.w  num_pistons(a5),d3
 05612  382D 0118              move.w  num_stops(a5),d4
-05616  3A2D 08AA              move.w  $8aa(a5),d5
+05616  3A2D 08AA              move.w  comb_rowbytes(a5),d5
 0561A  3203                   move.w  d3,d1
 0561C  7E15                   moveq   #$15,d7
 0561E  4E41                   trap    #$1                    ; dsk $15 dsk_putword
@@ -5909,7 +5909,7 @@
 05694  7E35                   moveq   #$35,d7
 05696  4E40                   trap    #$0                    ; sys $35 sys_message
 05698                         dc.b    'Loading combination file',$00,$00
-056B2  226D 08A2              movea.l $8a2(a5),a1
+056B2  226D 08A2              movea.l comb_table(a5),a1
 056B6  7E11                   moveq   #$11,d7
 056B8  4E41                   trap    #$1                    ; dsk $11 dsk_getword
 056BA  3601                   move.w  d1,d3
@@ -5921,7 +5921,7 @@
 056C6  3A01                   move.w  d1,d5
 056C8                         L_056C8:
 056C8  2449                   movea.l a1,a2
-056CA  D2ED 08AA              adda.w  $8aa(a5),a1
+056CA  D2ED 08AA              adda.w  comb_rowbytes(a5),a1
 056CE  3405                   move.w  d5,d2
 056D0                         L_056D0:
 056D0  7E10                   moveq   #$10,d7
@@ -5930,7 +5930,7 @@
 056D6  5342                   subq.w  #$1,d2
 056D8  66F6                   bne.b   L_056D0
 056DA  2449                   movea.l a1,a2
-056DC  D2ED 08AA              adda.w  $8aa(a5),a1
+056DC  D2ED 08AA              adda.w  comb_rowbytes(a5),a1
 056E0  3405                   move.w  d5,d2
 056E2                         L_056E2:
 056E2  7E10                   moveq   #$10,d7
@@ -9790,7 +9790,7 @@
 088C6  9E8E                   sub.l   a6,d7
 088C8  2B47 0110              move.l  d7,free_ram(a5)
 088CC  2F2D 0110              move.l  free_ram(a5),-(a7)
-088D0  426D 011A              clr.w   $11a(a5)
+088D0  426D 011A              clr.w   key_delay(a5)
 088D4  2B7C 7FFF FFFF 073E    move.l  #$7fffffff,next_event_time(a5)
 088DC  50ED 01EE              st.b    $1ee(a5)
 088E0  4278 FF84              clr.w   $ff84.w
@@ -9802,7 +9802,7 @@
 088F2                         dc.b    'Scanner Initialized',$00
 08906  343C 0078              move.w  #$78,d2
 0890A  4EBA 518C              jsr     set_tempo(pc)
-0890E  426D 0120              clr.w   $120(a5)
+0890E  426D 0120              clr.w   transpose(a5)
 08912  4238 0048              clr.b   $48.w
 08916  426D 0684              clr.w   ticks_since_switch(a5)
 0891A  426D 0686              clr.w   worst_delay(a5)
@@ -10004,11 +10004,11 @@
 08B56                         dc.b    'Delay must be less than 999',$00
 08B72  4E75                   rts     
 08B74                         L_08B74:
-08B74  3B43 011A              move.w  d3,$11a(a5)
+08B74  3B43 011A              move.w  d3,key_delay(a5)
 08B78  4E75                   rts     
 08B7A                         sub_08B7A:
-08B7A  2C6D 012E              movea.l $12e(a5),a6
-08B7E  3C2D 016C              move.w  $16c(a5),d6
+08B7A  2C6D 012E              movea.l out_console_cnt(a5),a6
+08B7E  3C2D 016C              move.w  out_console_max(a5),d6
 08B82                         L_08B82:
 08B82  4A1E                   tst.b   (a6)+
 08B84  6622                   bne.b   L_08BA8
@@ -10122,19 +10122,19 @@
 08D4C  2C3C 0000 0400         move.l  #$400,d6
 08D52  7E08                   moveq   #$8,d7
 08D54  4E40                   trap    #$0                    ; sys $08 sys_malloc
-08D56  2B4E 0A9A              move.l  a6,$a9a(a5)
-08D5A  426D 0A9E              clr.w   $a9e(a5)
-08D5E  426D 0AA0              clr.w   $aa0(a5)
+08D56  2B4E 0A9A              move.l  a6,midi_rx_ring(a5)
+08D5A  426D 0A9E              clr.w   midi_rx_in(a5)
+08D5E  426D 0AA0              clr.w   midi_rx_out(a5)
 08D62  2C3C 0000 0400         move.l  #$400,d6
 08D68  7E08                   moveq   #$8,d7
 08D6A  4E40                   trap    #$0                    ; sys $08 sys_malloc
-08D6C  2B4E 0AA2              move.l  a6,$aa2(a5)
-08D70  426D 0AA6              clr.w   $aa6(a5)
+08D6C  2B4E 0AA2              move.l  a6,midi_tx_ring(a5)
+08D70  426D 0AA6              clr.w   midi_tx_in(a5)
 08D74  426D 0AA8              clr.w   $aa8(a5)
 08D78  2C3C 0000 0080         move.l  #$80,d6
 08D7E  7E08                   moveq   #$8,d7
 08D80  4E40                   trap    #$0                    ; sys $08 sys_malloc
-08D82  2B4E 0ABA              move.l  a6,$aba(a5)
+08D82  2B4E 0ABA              move.l  a6,midi_map(a5)
 08D86  4E75                   rts     
 08D88                         sub_08D88:
 08D88  48E7 C000              movem.l d0-d1,-(a7)
@@ -10249,11 +10249,11 @@
 08E8C  2C3C 0000 0200         move.l  #$200,d6
 08E92  7E08                   moveq   #$8,d7
 08E94  4E40                   trap    #$0                    ; sys $08 sys_malloc
-08E96  2B4E 0AB6              move.l  a6,$ab6(a5)
+08E96  2B4E 0AB6              move.l  a6,midi_counts(a5)
 08E9A  4DFA 0404              lea.l   dat_092A0(pc),a6
 08E9E  7E00                   moveq   #$0,d7
 08EA0  4E40                   trap    #$0                    ; sys $00 sys_puts
-08EA2  206D 0AB6              movea.l $ab6(a5),a0
+08EA2  206D 0AB6              movea.l midi_counts(a5),a0
 08EA6  303C 0080              move.w  #$80,d0
 08EAA                         L_08EAA:
 08EAA  5488                   addq.l  #$2,a0
@@ -10283,7 +10283,7 @@
 08EE4  4EBA 009E              jsr     sub_08F84(pc)
 08EE8  66FA                   bne.b   L_08EE4
 08EEA                         L_08EEA:
-08EEA  206D 0AB6              movea.l $ab6(a5),a0
+08EEA  206D 0AB6              movea.l midi_counts(a5),a0
 08EEE  4280                   clr.l   d0
 08EF0  4281                   clr.l   d1
 08EF2                         L_08EF2:
@@ -10324,8 +10324,8 @@
 08F46  4E40                   trap    #$0                    ; sys $37 sys_getkey
 08F48  6A94                   bpl.b   L_08EDE
 08F4A  4EBA 0026              jsr     sub_08F72(pc)
-08F4E  2C6D 0AB6              movea.l $ab6(a5),a6
-08F52  42AD 0AB6              clr.l   $ab6(a5)
+08F4E  2C6D 0AB6              movea.l midi_counts(a5),a6
+08F52  42AD 0AB6              clr.l   midi_counts(a5)
 08F56  7E09                   moveq   #$9,d7
 08F58  4E40                   trap    #$0                    ; sys $09 sys_free
 08F5A  4DD4                   lea.l   (a4),a6
@@ -10353,7 +10353,7 @@
 08F88  4281                   clr.l   d1
 08F8A  4EBA 00B4              jsr     sub_09040(pc)
 08F8E  6762                   beq.b   L_08FF2
-08F90  2E2D 0AB6              move.l  $ab6(a5),d7
+08F90  2E2D 0AB6              move.l  midi_counts(a5),d7
 08F94  671E                   beq.b   L_08FB4
 08F96  2C47                   movea.l d7,a6
 08F98  1E10                   move.b  (a0),d7
@@ -10373,7 +10373,7 @@
 08FBC  64CA                   bcc.b   L_08F88
 08FBE  4A2D 0BEA              tst.b   recording(a5)
 08FC2  6718                   beq.b   L_08FDC
-08FC4  2C6D 0ABA              movea.l $aba(a5),a6
+08FC4  2C6D 0ABA              movea.l midi_map(a5),a6
 08FC8  3C07                   move.w  d7,d6
 08FCA  0246 000F              andi.w  #$f,d6
 08FCE  E54E                   lsl.w   #$2,d6
@@ -10425,14 +10425,14 @@
 0903C  7801                   moveq   #$1,d4
 0903E  4E75                   rts     
 09040                         sub_09040:
-09040  3E2D 0AA0              move.w  $aa0(a5),d7
-09044  BE6D 0A9E              cmp.w   $a9e(a5),d7
+09040  3E2D 0AA0              move.w  midi_rx_out(a5),d7
+09044  BE6D 0A9E              cmp.w   midi_rx_in(a5),d7
 09048  6712                   beq.b   L_0905C
-0904A  206D 0A9A              movea.l $a9a(a5),a0
+0904A  206D 0A9A              movea.l midi_rx_ring(a5),a0
 0904E  D0C7                   adda.w  d7,a0
 09050  5847                   addq.w  #$4,d7
 09052  0247 03FF              andi.w  #$3ff,d7
-09056  3B47 0AA0              move.w  d7,$aa0(a5)
+09056  3B47 0AA0              move.w  d7,midi_rx_out(a5)
 0905A  7EFF                   moveq   #$ff,d7
 0905C                         L_0905C:
 0905C  4E75                   rts     
@@ -10450,12 +10450,12 @@
 09076                         sub_09076:
 09076  40E7                   move.w  sr,-(a7)
 09078  46FC 2700              move.w  #$2700,sr
-0907C  2C6D 0AA2              movea.l $aa2(a5),a6
-09080  3E2D 0AA6              move.w  $aa6(a5),d7
+0907C  2C6D 0AA2              movea.l midi_tx_ring(a5),a6
+09080  3E2D 0AA6              move.w  midi_tx_in(a5),d7
 09084  1D81 7000              move.b  d1,(a6,d7.w)
 09088  5247                   addq.w  #$1,d7
 0908A  0247 03FF              andi.w  #$3ff,d7
-0908E  3B47 0AA6              move.w  d7,$aa6(a5)
+0908E  3B47 0AA6              move.w  d7,midi_tx_in(a5)
 09092  7E38                   moveq   #$38,d7
 09094  4E40                   trap    #$0                    ; sys $38 sys_txenable_b
 09096  4E73                   rte     
@@ -10515,12 +10515,12 @@
 0911A                         L_0911A:
 0911A  1B41 0AB4              move.b  d1,$ab4(a5)
 0911E                         L_0911E:
-0911E  2C6D 0A9A              movea.l $a9a(a5),a6
-09122  3E2D 0A9E              move.w  $a9e(a5),d7
+0911E  2C6D 0A9A              movea.l midi_rx_ring(a5),a6
+09122  3E2D 0A9E              move.w  midi_rx_in(a5),d7
 09126  2DAD 0AB2 7000         move.l  $ab2(a5),(a6,d7.w)
 0912C  5847                   addq.w  #$4,d7
 0912E  0247 03FF              andi.w  #$3ff,d7
-09132  3B47 0A9E              move.w  d7,$a9e(a5)
+09132  3B47 0A9E              move.w  d7,midi_rx_in(a5)
 09136  4E75                   rts     
 09138                         tbl_090B6_14:
 09138  526D 0AAA              addq.w  #$1,$aaa(a5)
@@ -10532,12 +10532,12 @@
 0914A                         spec_0914A:
 0914A  4281                   clr.l   d1
 0914C  3E2D 0AA8              move.w  $aa8(a5),d7
-09150  BE6D 0AA6              cmp.w   $aa6(a5),d7
+09150  BE6D 0AA6              cmp.w   midi_tx_in(a5),d7
 09154  6604                   bne.b   L_0915A
 09156  72FF                   moveq   #$ff,d1
 09158  4E75                   rts     
 0915A                         L_0915A:
-0915A  2C6D 0AA2              movea.l $aa2(a5),a6
+0915A  2C6D 0AA2              movea.l midi_tx_ring(a5),a6
 0915E  1236 7000              move.b  (a6,d7.w),d1
 09162  5247                   addq.w  #$1,d7
 09164  0247 03FF              andi.w  #$3ff,d7
@@ -10579,80 +10579,80 @@
 0934E  0181 0000                                |....|
 09352                         sub_09352:
 09352  42AD 0696              clr.l   scan_pending(a5)
-09356  426D 016C              clr.w   $16c(a5)
-0935A  426D 016E              clr.w   $16e(a5)
-0935E  426D 0170              clr.w   $170(a5)
+09356  426D 016C              clr.w   out_console_max(a5)
+0935A  426D 016E              clr.w   out_chamber_max(a5)
+0935E  426D 0170              clr.w   midi_out_max(a5)
 09362  7C03                   moveq   #$3,d6
 09364  7E35                   moveq   #$35,d7
 09366  4E40                   trap    #$0                    ; sys $35 sys_message
 09368                         dc.b    'Initializing SIGINI',$00
-0937C  4EBA 03DA              jsr     sub_09758(pc)
+0937C  4EBA 03DA              jsr     relay_build_scan(pc)
 09380  3B7C 0400 0192         move.w  #$400,pulse_hold(a5)
 09386  7C03                   moveq   #$3,d6
 09388  7E35                   moveq   #$35,d7
 0938A  4E40                   trap    #$0                    ; sys $35 sys_message
 0938C                         dc.b    'Initializing DIVINI',$00
-093A0  4EBA 062C              jsr     sub_099CE(pc)
+093A0  4EBA 062C              jsr     build_keyboards(pc)
 093A4  3B7C 0400 0192         move.w  #$400,pulse_hold(a5)
 093AA  7C03                   moveq   #$3,d6
 093AC  7E35                   moveq   #$35,d7
 093AE  4E40                   trap    #$0                    ; sys $35 sys_message
 093B0                         dc.b    'Initializing RNKINI',$00
-093C4  4EBA 06A0              jsr     sub_09A66(pc)
+093C4  4EBA 06A0              jsr     build_ranks(pc)
 093C8  3B7C 0400 0192         move.w  #$400,pulse_hold(a5)
 093CE  7C03                   moveq   #$3,d6
 093D0  7E35                   moveq   #$35,d7
 093D2  4E40                   trap    #$0                    ; sys $35 sys_message
 093D4                         dc.b    'Initializing UNTINI',$00
-093E8  4EBA 06FE              jsr     sub_09AE8(pc)
+093E8  4EBA 06FE              jsr     build_units(pc)
 093EC  3B7C 0400 0192         move.w  #$400,pulse_hold(a5)
 093F2  7C03                   moveq   #$3,d6
 093F4  7E35                   moveq   #$35,d7
 093F6  4E40                   trap    #$0                    ; sys $35 sys_message
 093F8                         dc.b    'Initializing MODINI',$00
-0940C  4EBA 068C              jsr     sub_09A9A(pc)
+0940C  4EBA 068C              jsr     build_piz_rit(pc)
 09410  3B7C 0400 0192         move.w  #$400,pulse_hold(a5)
 09416  7C03                   moveq   #$3,d6
 09418  7E35                   moveq   #$35,d7
 0941A  4E40                   trap    #$0                    ; sys $35 sys_message
 0941C                         dc.b    'Initializing STPINI',$00
-09430  4EBA 071E              jsr     sub_09B50(pc)
+09430  4EBA 071E              jsr     build_stops(pc)
 09434  3B7C 0400 0192         move.w  #$400,pulse_hold(a5)
 0943A  7C03                   moveq   #$3,d6
 0943C  7E35                   moveq   #$35,d7
 0943E  4E40                   trap    #$0                    ; sys $35 sys_message
 09440                         dc.b    'Initializing LNKINI',$00
-09454  4EBA 07D2              jsr     sub_09C28(pc)
+09454  4EBA 07D2              jsr     build_links(pc)
 09458  3B7C 0400 0192         move.w  #$400,pulse_hold(a5)
 0945E  7C03                   moveq   #$3,d6
 09460  7E35                   moveq   #$35,d7
 09462  4E40                   trap    #$0                    ; sys $35 sys_message
 09464                         dc.b    'Initializing FNCINI',$00
-09478  4EBA 0848              jsr     sub_09CC2(pc)
+09478  4EBA 0848              jsr     build_functions(pc)
 0947C  3B7C 0400 0192         move.w  #$400,pulse_hold(a5)
 09482  7C03                   moveq   #$3,d6
 09484  7E35                   moveq   #$35,d7
 09486  4E40                   trap    #$0                    ; sys $35 sys_message
 09488                         dc.b    'Initializing CMBINI',$00
-0949C  4EBA 0C1E              jsr     sub_0A0BC(pc)
+0949C  4EBA 0C1E              jsr     build_comb_table(pc)
 094A0  3B7C 0400 0192         move.w  #$400,pulse_hold(a5)
 094A6  7C03                   moveq   #$3,d6
 094A8  7E35                   moveq   #$35,d7
 094AA  4E40                   trap    #$0                    ; sys $35 sys_message
 094AC                         dc.b    'Initializing CHNINI',$00
-094C0  4EBA 0C36              jsr     sub_0A0F8(pc)
+094C0  4EBA 0C36              jsr     build_channels(pc)
 094C4  3B7C 0400 0192         move.w  #$400,pulse_hold(a5)
 094CA  7C03                   moveq   #$3,d6
 094CC  7E35                   moveq   #$35,d7
 094CE  4E40                   trap    #$0                    ; sys $35 sys_message
 094D0                         dc.b    'Initializing CININI',$00
-094E4  4EBA 0C5A              jsr     sub_0A140(pc)
+094E4  4EBA 0C5A              jsr     build_chan_inputs(pc)
 094E8  3B7C 0400 0192         move.w  #$400,pulse_hold(a5)
 094EE  7C03                   moveq   #$3,d6
 094F0  7E35                   moveq   #$35,d7
 094F2  4E40                   trap    #$0                    ; sys $35 sys_message
 094F4                         dc.b    'Initializing COTINI',$00
-09508  4EBA 0C8C              jsr     sub_0A196(pc)
+09508  4EBA 0C8C              jsr     build_chan_outputs(pc)
 0950C  3B7C 0400 0192         move.w  #$400,pulse_hold(a5)
 09512  7C03                   moveq   #$3,d6
 09514  7E35                   moveq   #$35,d7
@@ -10664,55 +10664,55 @@
 09538  7E35                   moveq   #$35,d7
 0953A  4E40                   trap    #$0                    ; sys $35 sys_message
 0953C                         dc.b    'Initializing STPSCN',$00
-09550  4EBA 0694              jsr     sub_09BE6(pc)
+09550  4EBA 0694              jsr     link_direct_stops(pc)
 09554  3B7C 0400 0192         move.w  #$400,pulse_hold(a5)
 0955A  4286                   clr.l   d6
-0955C  3C2D 016C              move.w  $16c(a5),d6
+0955C  3C2D 016C              move.w  out_console_max(a5),d6
 09560  0646 0080              addi.w  #$80,d6
 09564  0246 FF80              andi.w  #$ff80,d6
 09568  7E08                   moveq   #$8,d7
 0956A  4E40                   trap    #$0                    ; sys $08 sys_malloc
-0956C  2B4E 012E              move.l  a6,$12e(a5)
+0956C  2B4E 012E              move.l  a6,out_console_cnt(a5)
 09570  4286                   clr.l   d6
-09572  3C2D 016E              move.w  $16e(a5),d6
+09572  3C2D 016E              move.w  out_chamber_max(a5),d6
 09576  0646 0080              addi.w  #$80,d6
 0957A  0246 FF80              andi.w  #$ff80,d6
 0957E  7E08                   moveq   #$8,d7
 09580  4E40                   trap    #$0                    ; sys $08 sys_malloc
-09582  2B4E 0132              move.l  a6,$132(a5)
+09582  2B4E 0132              move.l  a6,out_chamber_cnt(a5)
 09586  4286                   clr.l   d6
-09588  3C2D 0170              move.w  $170(a5),d6
+09588  3C2D 0170              move.w  midi_out_max(a5),d6
 0958C  0241 07FF              andi.w  #$7ff,d1
 09590  0646 0080              addi.w  #$80,d6
 09594  0246 FF80              andi.w  #$ff80,d6
 09598  7E08                   moveq   #$8,d7
 0959A  4E40                   trap    #$0                    ; sys $08 sys_malloc
-0959C  2B4E 0168              move.l  a6,$168(a5)
+0959C  2B4E 0168              move.l  a6,midi_out_cnt(a5)
 095A0  7C10                   moveq   #$10,d6
 095A2  7E08                   moveq   #$8,d7
 095A4  4E40                   trap    #$0                    ; sys $08 sys_malloc
 095A6  284E                   movea.l a6,a4
 095A8  9DCD                   suba.l  a5,a6
-095AA  2B4E 06C2              move.l  a6,$6c2(a5)
-095AE  28ED 06BE              move.l  $6be(a5),(a4)+
+095AA  2B4E 06C2              move.l  a6,division_base(a5)
+095AE  28ED 06BE              move.l  kbd_divisions(a5),(a4)+
 095B2  28ED 06EE              move.l  stop_state(a5),(a4)+
-095B6  28ED 06FE              move.l  $6fe(a5),(a4)+
-095BA  28ED 06F6              move.l  $6f6(a5),(a4)+
-095BE  4DED 0AC0              lea.l   $ac0(a5),a6
+095B6  28ED 06FE              move.l  lnk_state(a5),(a4)+
+095BA  28ED 06F6              move.l  fnc_tbl_base(a5),(a4)+
+095BE  4DED 0AC0              lea.l   midi_velocity(a5),a6
 095C2  7C04                   moveq   #$4,d6
 095C4  7EFF                   moveq   #$ff,d7
 095C6                         L_095C6:
 095C6  2CC7                   move.l  d7,(a6)+
 095C8  5346                   subq.w  #$1,d6
 095CA  66FA                   bne.b   L_095C6
-095CC  2A2D 06C2              move.l  $6c2(a5),d5
+095CC  2A2D 06C2              move.l  division_base(a5),d5
 095D0  7C03                   moveq   #$3,d6
 095D2  7E35                   moveq   #$35,d7
 095D4  4E40                   trap    #$0                    ; sys $35 sys_message
 095D6                         dc.b    'Building Function Blocks',$00,$00
-095F0  4EBA 0748              jsr     sub_09D3A(pc)
+095F0  4EBA 0748              jsr     build_fn_blocks(pc)
 095F4  7801                   moveq   #$1,d4
-095F6  4EBA 1630              jsr     sub_0AC28(pc)
+095F6  4EBA 1630              jsr     replay_all_divisions(pc)
 095FA  7EFF                   moveq   #$ff,d7
 095FC  2B47 073E              move.l  d7,next_event_time(a5)
 09600  487A 3EA0              pea.l   play_tick(pc)
@@ -10738,15 +10738,15 @@
 0965E  62F6                   bhi.b   L_09656
 09660  221F                   move.l  (a7)+,d1
 09662  4E75                   rts     
-09664                         sub_09664:
-09664  3C3C 7946              move.w  #$7946,d6
+09664                         scan_setup_spf:
+09664  3C3C 7946              move.w  #$7946,d6              ; Spf -> scan_control (console polarity), scan_timing
 09668  7E2E                   moveq   #$2e,d7
 0966A  4E40                   trap    #$0                    ; sys $2E sys_listhead
 0966C  2C56                   movea.l (a6),a6
 0966E  508E                   addq.l  #$8,a6
 09670  DCFC 0012              adda.w  #$12,a6
 09674  3C3C 1160              move.w  #$1160,d6
-09678  3B5E 06A8              move.w  (a6)+,$6a8(a5)
+09678  3B5E 06A8              move.w  (a6)+,console_polarity(a5)
 0967C  6704                   beq.b   L_09682
 0967E  3C3C 21E6              move.w  #L_021E6,d6
 09682                         L_09682:
@@ -10761,7 +10761,7 @@
 09694  6702                   beq.b   L_09698
 09696  5847                   addq.w  #$4,d7
 09698                         L_09698:
-09698  3B47 0182              move.w  d7,$182(a5)
+09698  3B47 0182              move.w  d7,scan_timing(a5)
 0969C  4E75                   rts     
 0969E                         sub_0969E:
 0969E  2E2D 0180              move.l  scan_count(a5),d7
@@ -10788,7 +10788,7 @@
 096CA  3CD9                   move.w  (a1)+,(a6)+
 096CC  5347                   subq.w  #$1,d7
 096CE  66FA                   bne.b   L_096CA
-096D0  4A6D 06A8              tst.w   $6a8(a5)
+096D0  4A6D 06A8              tst.w   console_polarity(a5)
 096D4  6718                   beq.b   L_096EE
 096D6  2C48                   movea.l a0,a6
 096D8                         L_096D8:
@@ -10843,19 +10843,19 @@
 09748  6A08                   bpl.b   L_09752
 0974A  4A51                   tst.w   (a1)
 0974C  5AC8 FFF0              dbpl    d0,L_0973E
-09750  6006                   bra.b   sub_09758
+09750  6006                   bra.b   relay_build_scan
 09752                         L_09752:
 09752  4A51                   tst.w   (a1)
 09754  5BC8 FFE8              dbmi    d0,L_0973E
-09758                         sub_09758:
-09758  2C6D 0ABA              movea.l $aba(a5),a6
+09758                         relay_build_scan:
+09758  2C6D 0ABA              movea.l midi_map(a5),a6        ; build scan_table + scan_handlers from Kbd keys, Pst, Cin, Stp contacts, Ctl, Spf
 0975C  7E20                   moveq   #$20,d7
 0975E                         L_0975E:
 0975E  429E                   clr.l   (a6)+
 09760  5347                   subq.w  #$1,d7
 09762  66FA                   bne.b   L_0975E
 09764  7014                   moveq   #$14,d0
-09766  4EBA 003C              jsr     sub_097A4(pc)
+09766  4EBA 003C              jsr     scan_collect(pc)
 0976A  E380                   asl.l   #$1,d0
 0976C  2C00                   move.l  d0,d6
 0976E  7E08                   moveq   #$8,d7
@@ -10867,8 +10867,8 @@
 0977C  4E40                   trap    #$0                    ; sys $08 sys_malloc
 0977E  2B4E 0692              move.l  a6,scan_handlers(a5)
 09782  4280                   clr.l   d0
-09784  4EBA 001E              jsr     sub_097A4(pc)
-09788  4EBA 0A58              jsr     sub_0A1E2(pc)
+09784  4EBA 001E              jsr     scan_collect(pc)
+09788  4EBA 0A58              jsr     build_spf(pc)
 0978C  2C6D 0688              movea.l scan_table(a5),a6
 09790                         L_09790:
 09790  4A5E                   tst.w   (a6)+
@@ -10879,8 +10879,8 @@
 0979C  5387                   subq.l  #$1,d7
 0979E  3B47 068E              move.w  d7,scan_words(a5)
 097A2  4E75                   rts     
-097A4                         sub_097A4:
-097A4  3C3C 4514              move.w  #$4514,d6
+097A4                         scan_collect:
+097A4  3C3C 4514              move.w  #$4514,d6              ; d0 = 0: add every key, piston, channel input, stop contact, control button; else count them
 097A8  7E2E                   moveq   #$2e,d7
 097AA  4E40                   trap    #$0                    ; sys $2E sys_listhead
 097AC  224E                   movea.l a6,a1
@@ -10901,9 +10901,9 @@
 097C8  6012                   bra.b   L_097DC
 097CA                         L_097CA:
 097CA  4285                   clr.l   d5
-097CC  4EBA 0148              jsr     sub_09916(pc)
+097CC  4EBA 0148              jsr     scan_add_input(pc)
 097D0  429C                   clr.l   (a4)+
-097D2  487A 1100              pea.l   sub_0A8D4(pc)
+097D2  487A 1100              pea.l   hook_key(pc)
 097D6  28DF                   move.l  (a7)+,(a4)+
 097D8  38C4                   move.w  d4,(a4)+
 097DA  38C2                   move.w  d2,(a4)+
@@ -10931,9 +10931,9 @@
 09806  60EA                   bra.b   L_097F2
 09808                         L_09808:
 09808  3A29 000A              move.w  $a(a1),d5
-0980C  4EBA 0108              jsr     sub_09916(pc)
+0980C  4EBA 0108              jsr     scan_add_input(pc)
 09810  429C                   clr.l   (a4)+
-09812  487A 10CC              pea.l   sub_0A8E0(pc)
+09812  487A 10CC              pea.l   hook_piston(pc)
 09816  28DF                   move.l  (a7)+,(a4)+
 09818  38C3                   move.w  d3,(a4)+
 0981A  60D6                   bra.b   L_097F2
@@ -10958,9 +10958,9 @@
 09842  60E2                   bra.b   L_09826
 09844                         L_09844:
 09844  3A29 000E              move.w  $e(a1),d5
-09848  4EBA 00CC              jsr     sub_09916(pc)
+09848  4EBA 00CC              jsr     scan_add_input(pc)
 0984C  429C                   clr.l   (a4)+
-0984E  487A 109C              pea.l   sub_0A8EC(pc)
+0984E  487A 109C              pea.l   hook_chan_input(pc)
 09852  28DF                   move.l  (a7)+,(a4)+
 09854  28C2                   move.l  d2,(a4)+
 09856  60CE                   bra.b   L_09826
@@ -10997,9 +10997,9 @@
 0989A  6012                   bra.b   tbl_09884_0
 0989C                         L_0989C:
 0989C  3A2A 0010              move.w  $10(a2),d5
-098A0  4EBA 0074              jsr     sub_09916(pc)
+098A0  4EBA 0074              jsr     scan_add_input(pc)
 098A4  429C                   clr.l   (a4)+
-098A6  487A 104C              pea.l   sub_0A8F4(pc)
+098A6  487A 104C              pea.l   hook_stop_contact(pc)
 098AA  28DF                   move.l  (a7)+,(a4)+
 098AC  38C3                   move.w  d3,(a4)+
 098AE                         tbl_09884_0:
@@ -11016,9 +11016,9 @@
 098C6  6016                   bra.b   L_098DE
 098C8                         L_098C8:
 098C8  3A2A 0010              move.w  $10(a2),d5
-098CC  4EBA 0048              jsr     sub_09916(pc)
+098CC  4EBA 0048              jsr     scan_add_input(pc)
 098D0  429C                   clr.l   (a4)+
-098D2  487A 1020              pea.l   sub_0A8F4(pc)
+098D2  487A 1020              pea.l   hook_stop_contact(pc)
 098D6  28DF                   move.l  (a7)+,(a4)+
 098D8  38C3                   move.w  d3,(a4)+
 098DA  38FC FFFF              move.w  #$ffff,(a4)+
@@ -11041,16 +11041,16 @@
 098FC  60EC                   bra.b   L_098EA
 098FE                         L_098FE:
 098FE  3A29 000C              move.w  $c(a1),d5
-09902  4EBA 0012              jsr     sub_09916(pc)
+09902  4EBA 0012              jsr     scan_add_input(pc)
 09906  429C                   clr.l   (a4)+
-09908  487A 1038              pea.l   sub_0A942(pc)
+09908  487A 1038              pea.l   hook_ctl_button(pc)
 0990C  28DF                   move.l  (a7)+,(a4)+
 0990E  38E9 0008              move.w  $8(a1),(a4)+
 09912  60D6                   bra.b   L_098EA
 09914                         L_09914:
 09914  4E75                   rts     
-09916                         sub_09916:
-09916  5341                   subq.w  #$1,d1
+09916                         scan_add_input:
+09916  5341                   subq.w  #$1,d1                 ; console address d1 -> scan entry (state in bit 15) + hook node; debounce d5 ms adds a timer hook; >= $6001 goes to midi_map
 09918  B27C 6001              cmp.w   #$6001,d1
 0991C  6458                   bcc.b   L_09976
 0991E  4641                   not.w   d1
@@ -11079,10 +11079,10 @@
 0994A  284E                   movea.l a6,a4
 0994C  208C                   move.l  a4,(a0)
 0994E  429C                   clr.l   (a4)+
-09950  487A 0C1C              pea.l   spec_0A56E(pc)
+09950  487A 0C1C              pea.l   debounce_hook(pc)
 09954  28DF                   move.l  (a7)+,(a4)+
 09956  429C                   clr.l   (a4)+
-09958  487A 0C38              pea.l   spec_0A592(pc)
+09958  487A 0C38              pea.l   debounce_expired(pc)
 0995C  28DF                   move.l  (a7)+,(a4)+
 0995E  204C                   movea.l a4,a0
 09960  3945 0006              move.w  d5,$6(a4)
@@ -11095,14 +11095,14 @@
 0996E  3B7C 03E8 0192         move.w  #$3e8,pulse_hold(a5)
 09974  4E75                   rts     
 09976                         L_09976:
-09976  206D 0ABA              movea.l $aba(a5),a0
+09976  206D 0ABA              movea.l midi_map(a5),a0
 0997A  3E01                   move.w  d1,d7
 0997C  EA4F                   lsr.w   #$5,d7
 0997E  0247 007C              andi.w  #$7c,d7
 09982  D0C7                   adda.w  d7,a0
 09984  4A90                   tst.l   (a0)
 09986  6626                   bne.b   L_099AE
-09988  286D 0ABA              movea.l $aba(a5),a4
+09988  286D 0ABA              movea.l midi_map(a5),a4
 0998C  0247 003C              andi.w  #$3c,d7
 09990  D8C7                   adda.w  d7,a4
 09992  2C3C 0000 0200         move.l  #$200,d6
@@ -11132,21 +11132,21 @@
 099C8  284E                   movea.l a6,a4
 099CA  208C                   move.l  a4,(a0)
 099CC  4E75                   rts     
-099CE                         sub_099CE:
-099CE  3C3C 4514              move.w  #$4514,d6
+099CE                         build_keyboards:
+099CE  3C3C 4514              move.w  #$4514,d6              ; kbd_states: key-state bytes per keyboard
 099D2  7E2D                   moveq   #$2d,d7
 099D4  4E40                   trap    #$0                    ; sys $2D sys_listlen
 099D6  2006                   move.l  d6,d0
 099D8  5280                   addq.l  #$1,d0
-099DA  3B40 06C6              move.w  d0,$6c6(a5)
-099DE  4EBA 002A              jsr     sub_09A0A(pc)
-099E2  2B4C 06BE              move.l  a4,$6be(a5)
+099DA  3B40 06C6              move.w  d0,num_keyboards(a5)
+099DE  4EBA 002A              jsr     build_divisions(pc)
+099E2  2B4C 06BE              move.l  a4,kbd_divisions(a5)
 099E6  2C00                   move.l  d0,d6
 099E8  E786                   asl.l   #$3,d6
 099EA  7E08                   moveq   #$8,d7
 099EC  4E40                   trap    #$0                    ; sys $08 sys_malloc
 099EE  204E                   movea.l a6,a0
-099F0  2B48 06BA              move.l  a0,$6ba(a5)
+099F0  2B48 06BA              move.l  a0,kbd_states(a5)
 099F4                         L_099F4:
 099F4  7C7C                   moveq   #$7c,d6
 099F6  7E08                   moveq   #$8,d7
@@ -11157,8 +11157,8 @@
 09A04  5340                   subq.w  #$1,d0
 09A06  66EC                   bne.b   L_099F4
 09A08  4E75                   rts     
-09A0A                         sub_09A0A:
-09A0A  48E7 80E0              movem.l d0/a0-a2,-(a7)
+09A0A                         build_divisions:
+09A0A  48E7 80E0              movem.l d0/a0-a2,-(a7)         ; a note set per keyboard: {+0 counts (count.w + byte per note), +4 next, +8 handler note_offset_hook, +$C second counts, +$12 low note, +$14 high note}
 09A0E  2C00                   move.l  d0,d6
 09A10  5286                   addq.l  #$1,d6
 09A12  E586                   asl.l   #$2,d6
@@ -11183,7 +11183,7 @@
 09A3E  7E08                   moveq   #$8,d7
 09A40  4E40                   trap    #$0                    ; sys $08 sys_malloc
 09A42  294E 000C              move.l  a6,$c(a4)
-09A46  487A 12CA              pea.l   sub_0AD12(pc)
+09A46  487A 12CA              pea.l   note_offset_hook(pc)
 09A4A  295F 0008              move.l  (a7)+,$8(a4)
 09A4E  397C 0001 0012         move.w  #$1,$12(a4)
 09A54  397C 0079 0014         move.w  #$79,$14(a4)
@@ -11193,11 +11193,11 @@
 09A60                         L_09A60:
 09A60  4CDF 0701              movem.l (a7)+,d0/a0-a2
 09A64  4E75                   rts     
-09A66                         sub_09A66:
-09A66  2C3C 0000 72BB         move.l  #$72bb,d6
+09A66                         build_ranks:
+09A66  2C3C 0000 72BB         move.l  #$72bb,d6              ; rank_tbl, and clear every rank output
 09A6C  7E1F                   moveq   #$1f,d7
 09A6E  4E40                   trap    #$0                    ; sys $1F sys_alloc_array
-09A70  2B4C 06D2              move.l  a4,$6d2(a5)
+09A70  2B4C 06D2              move.l  a4,rank_tbl(a5)
 09A74  3C3C 72BB              move.w  #$72bb,d6
 09A78  7E2E                   moveq   #$2e,d7
 09A7A  4E40                   trap    #$0                    ; sys $2E sys_listhead
@@ -11211,17 +11211,17 @@
 09A8A  7479                   moveq   #$79,d2
 09A8C                         L_09A8C:
 09A8C  321A                   move.w  (a2)+,d1
-09A8E  4EBA 1A8A              jsr     L_0B51A(pc)
+09A8E  4EBA 1A8A              jsr     output_console_direct(pc)
 09A92  5342                   subq.w  #$1,d2
 09A94  66F6                   bne.b   L_09A8C
 09A96  60E6                   bra.b   L_09A7E
 09A98                         L_09A98:
 09A98  4E75                   rts     
-09A9A                         sub_09A9A:
+09A9A                         build_piz_rit:
 09A9A  2C3C 0000 6582         move.l  #$6582,d6
 09AA0  7E1F                   moveq   #$1f,d7
 09AA2  4E40                   trap    #$0                    ; sys $1F sys_alloc_array
-09AA4  2B4C 06E6              move.l  a4,$6e6(a5)
+09AA4  2B4C 06E6              move.l  a4,piz_tbl(a5)
 09AA8  3C3C 6582              move.w  #$6582,d6
 09AAC  7E2E                   moveq   #$2e,d7
 09AAE  4E40                   trap    #$0                    ; sys $2E sys_listhead
@@ -11237,7 +11237,7 @@
 09AC0  2C3C 0000 71FC         move.l  #$71fc,d6
 09AC6  7E1F                   moveq   #$1f,d7
 09AC8  4E40                   trap    #$0                    ; sys $1F sys_alloc_array
-09ACA  2B4C 06EA              move.l  a4,$6ea(a5)
+09ACA  2B4C 06EA              move.l  a4,rit_tbl(a5)
 09ACE  3C3C 71FC              move.w  #$71fc,d6
 09AD2  7E2E                   moveq   #$2e,d7
 09AD4  4E40                   trap    #$0                    ; sys $2E sys_listhead
@@ -11251,11 +11251,11 @@
 09AE4  60F2                   bra.b   L_09AD8
 09AE6                         L_09AE6:
 09AE6  4E75                   rts     
-09AE8                         sub_09AE8:
-09AE8  2C3C 0000 8584         move.l  #$8584,d6
+09AE8                         build_units:
+09AE8  2C3C 0000 8584         move.l  #$8584,d6              ; unit_tbl, and clear every unit output
 09AEE  7E1F                   moveq   #$1f,d7
 09AF0  4E40                   trap    #$0                    ; sys $1F sys_alloc_array
-09AF2  2B4C 06D6              move.l  a4,$6d6(a5)
+09AF2  2B4C 06D6              move.l  a4,unit_tbl(a5)
 09AF6  3C3C 8584              move.w  #$8584,d6
 09AFA  7E2E                   moveq   #$2e,d7
 09AFC  4E40                   trap    #$0                    ; sys $2E sys_listhead
@@ -11273,10 +11273,10 @@
 09B14  294A 0002              move.l  a2,$2(a4)
 09B18  301A                   move.w  (a2)+,d0
 09B1A  67E4                   beq.b   L_09B00
-09B1C  47FA 19FC              lea.l   L_0B51A(pc),a3
+09B1C  47FA 19FC              lea.l   output_console_direct(pc),a3
 09B20  0C5A 0002              cmpi.w  #$2,(a2)+
 09B24  6604                   bne.b   L_09B2A
-09B26  47FA 1A24              lea.l   L_0B54C(pc),a3
+09B26  47FA 1A24              lea.l   output_chamber_direct(pc),a3
 09B2A                         L_09B2A:
 09B2A  B07C 0004              cmp.w   #$4,d0
 09B2E  660C                   bne.b   L_09B3C
@@ -11297,8 +11297,8 @@
 09B4C  60B2                   bra.b   L_09B00
 09B4E                         L_09B4E:
 09B4E  4E75                   rts     
-09B50                         sub_09B50:
-09B50  3C3C 79F0              move.w  #$79f0,d6
+09B50                         build_stops:
+09B50  3C3C 79F0              move.w  #$79f0,d6              ; stop_state (all off), stop_inactive, stop_norecord, stop_table {body, links, handler, functions}; clear magnet and indicator outputs
 09B54  7E2D                   moveq   #$2d,d7
 09B56  4E40                   trap    #$0                    ; sys $2D sys_listlen
 09B58  2006                   move.l  d6,d0
@@ -11317,7 +11317,7 @@
 09B72  7E08                   moveq   #$8,d7
 09B74  4E40                   trap    #$0                    ; sys $08 sys_malloc
 09B76  244E                   movea.l a6,a2
-09B78  2B4A 0702              move.l  a2,$702(a5)
+09B78  2B4A 0702              move.l  a2,stop_inactive(a5)
 09B7C  528A                   addq.l  #$1,a2
 09B7E  2C00                   move.l  d0,d6
 09B80  7E08                   moveq   #$8,d7
@@ -11342,24 +11342,24 @@
 09BAE  2E09                   move.l  a1,d7
 09BB0  6732                   beq.b   L_09BE4
 09BB2  3229 000E              move.w  $e(a1),d1
-09BB6  4EBA 1994              jsr     L_0B54C(pc)
+09BB6  4EBA 1994              jsr     output_chamber_direct(pc)
 09BBA  3229 0014              move.w  $14(a1),d1
-09BBE  4EBA 198C              jsr     L_0B54C(pc)
+09BBE  4EBA 198C              jsr     output_chamber_direct(pc)
 09BC2  3229 0016              move.w  $16(a1),d1
-09BC6  4EBA 1984              jsr     L_0B54C(pc)
+09BC6  4EBA 1984              jsr     output_chamber_direct(pc)
 09BCA  14E9 001A              move.b  $1a(a1),(a2)+
 09BCE  16E9 001C              move.b  $1c(a1),(a3)+
 09BD2  4DE9 0008              lea.l   $8(a1),a6
 09BD6  20CE                   move.l  a6,(a0)+
 09BD8  4298                   clr.l   (a0)+
-09BDA  487A 1222              pea.l   spec_0ADFE(pc)
+09BDA  487A 1222              pea.l   stop_eval_links(pc)
 09BDE  20DF                   move.l  (a7)+,(a0)+
 09BE0  4298                   clr.l   (a0)+
 09BE2  60C8                   bra.b   L_09BAC
 09BE4                         L_09BE4:
 09BE4  4E75                   rts     
-09BE6                         sub_09BE6:
-09BE6  206D 06DA              movea.l stop_table(a5),a0
+09BE6                         link_direct_stops:
+09BE6  206D 06DA              movea.l stop_table(a5),a0      ; a stop whose only link is itself and has no expression calls link_functions directly
 09BEA  2010                   move.l  (a0),d0
 09BEC  6738                   beq.b   L_09C26
 09BEE  4283                   clr.l   d3
@@ -11372,11 +11372,11 @@
 09BFE  4A51                   tst.w   (a1)
 09C00  6620                   bne.b   L_09C22
 09C02  E547                   asl.w   #$2,d7
-09C04  2C6D 06FA              movea.l $6fa(a5),a6
+09C04  2C6D 06FA              movea.l lnk_tbl(a5),a6
 09C08  2676 7000              movea.l (a6,d7.w),a3
 09C0C  4A6B 0002              tst.w   $2(a3)
 09C10  6610                   bne.b   L_09C22
-09C12  487A 1272              pea.l   sub_0AE86(pc)
+09C12  487A 1272              pea.l   link_functions(pc)
 09C16  215F 0008              move.l  (a7)+,$8(a0)
 09C1A  D6FC 001E              adda.w  #$1e,a3
 09C1E  214B 000C              move.l  a3,$c(a0)
@@ -11385,11 +11385,11 @@
 09C24  66CA                   bne.b   L_09BF0
 09C26                         L_09C26:
 09C26  4E75                   rts     
-09C28                         sub_09C28:
-09C28  2C3C 0000 4D3B         move.l  #$4d3b,d6
+09C28                         build_links:
+09C28  2C3C 0000 4D3B         move.l  #$4d3b,d6              ; lnk_tbl, lnk_state, per-stop list of the links that mention it
 09C2E  7E1F                   moveq   #$1f,d7
 09C30  4E40                   trap    #$0                    ; sys $1F sys_alloc_array
-09C32  2B4C 06FA              move.l  a4,$6fa(a5)
+09C32  2B4C 06FA              move.l  a4,lnk_tbl(a5)
 09C36  3C3C 4D3B              move.w  #$4d3b,d6
 09C3A  7E2E                   moveq   #$2e,d7
 09C3C  4E40                   trap    #$0                    ; sys $2E sys_listhead
@@ -11402,13 +11402,13 @@
 09C4A  20CE                   move.l  a6,(a0)+
 09C4C  60F2                   bra.b   L_09C40
 09C4E                         L_09C4E:
-09C4E  2C6D 06FA              movea.l $6fa(a5),a6
+09C4E  2C6D 06FA              movea.l lnk_tbl(a5),a6
 09C52  2016                   move.l  (a6),d0
 09C54  5280                   addq.l  #$1,d0
 09C56  2C00                   move.l  d0,d6
 09C58  7E08                   moveq   #$8,d7
 09C5A  4E40                   trap    #$0                    ; sys $08 sys_malloc
-09C5C  2B4E 06FE              move.l  a6,$6fe(a5)
+09C5C  2B4E 06FE              move.l  a6,lnk_state(a5)
 09C60                         L_09C60:
 09C60  50DE                   st.b    (a6)+
 09C62  5340                   subq.w  #$1,d0
@@ -11426,7 +11426,7 @@
 09C80  5243                   addq.w  #$1,d3
 09C82  284A                   movea.l a2,a4
 09C84  7C01                   moveq   #$1,d6
-09C86  226D 06FA              movea.l $6fa(a5),a1
+09C86  226D 06FA              movea.l lnk_tbl(a5),a1
 09C8A  2819                   move.l  (a1)+,d4
 09C8C  6716                   beq.b   L_09CA4
 09C8E  4282                   clr.l   d2
@@ -11459,15 +11459,15 @@
 09CBE  66BC                   bne.b   L_09C7C
 09CC0                         L_09CC0:
 09CC0  4E75                   rts     
-09CC2                         sub_09CC2:
-09CC2  2C3C 0000 27B3         move.l  #$27b3,d6
+09CC2                         build_functions:
+09CC2  2C3C 0000 27B3         move.l  #$27b3,d6              ; fnc_tbl; rank-output functions remember their division
 09CC8  7E1F                   moveq   #$1f,d7
 09CCA  4E40                   trap    #$0                    ; sys $1F sys_alloc_array
-09CCC  2B4C 06F6              move.l  a4,$6f6(a5)
+09CCC  2B4C 06F6              move.l  a4,fnc_tbl_base(a5)
 09CD0  2C3C 0000 27B3         move.l  #$27b3,d6
 09CD6  7E1F                   moveq   #$1f,d7
 09CD8  4E40                   trap    #$0                    ; sys $1F sys_alloc_array
-09CDA  2B4C 06F2              move.l  a4,$6f2(a5)
+09CDA  2B4C 06F2              move.l  a4,fnc_tbl(a5)
 09CDE  3C3C 27B3              move.w  #$27b3,d6
 09CE2  7E2E                   moveq   #$2e,d7
 09CE4  4E40                   trap    #$0                    ; sys $2E sys_listhead
@@ -11486,7 +11486,7 @@
 09D00  426E 0010              clr.w   $10(a6)
 09D04  60E2                   bra.b   L_09CE8
 09D06                         L_09D06:
-09D06  206D 06F2              movea.l $6f2(a5),a0
+09D06  206D 06F2              movea.l fnc_tbl(a5),a0
 09D0A  2018                   move.l  (a0)+,d0
 09D0C  672A                   beq.b   L_09D38
 09D0E  7601                   moveq   #$1,d3
@@ -11497,7 +11497,7 @@
 09D18  0C51 000E              cmpi.w  #$e,(a1)
 09D1C  6614                   bne.b   L_09D32
 09D1E                         L_09D1E:
-09D1E  2C6D 06F2              movea.l $6f2(a5),a6
+09D1E  2C6D 06F2              movea.l fnc_tbl(a5),a6
 09D22  3E29 0002              move.w  $2(a1),d7
 09D26  670A                   beq.b   L_09D32
 09D28  E547                   asl.w   #$2,d7
@@ -11509,10 +11509,10 @@
 09D36  66D8                   bne.b   L_09D10
 09D38                         L_09D38:
 09D38  4E75                   rts     
-09D3A                         sub_09D3A:
-09D3A  48E7 FCF8              movem.l d0-d5/a0-a4,-(a7)
+09D3A                         build_fn_blocks:
+09D3A  48E7 FCF8              movem.l d0-d5/a0-a4,-(a7)      ; a run-time block per function (fn_block_by_type); modifiers (13, 14) after the rest
 09D3E  2075 580C              movea.l $c(a5,d5.l),a0
-09D42  266D 06F2              movea.l $6f2(a5),a3
+09D42  266D 06F2              movea.l fnc_tbl(a5),a3
 09D46  281B                   move.l  (a3)+,d4
 09D48                         L_09D48:
 09D48  5888                   addq.l  #$4,a0
@@ -11522,12 +11522,12 @@
 09D52  670A                   beq.b   L_09D5E
 09D54  B27C 000E              cmp.w   #$e,d1
 09D58  6704                   beq.b   L_09D5E
-09D5A  4EBA 0030              jsr     sub_09D8C(pc)
+09D5A  4EBA 0030              jsr     fn_block_by_type(pc)
 09D5E                         L_09D5E:
 09D5E  5344                   subq.w  #$1,d4
 09D60  66E6                   bne.b   L_09D48
 09D62  2075 580C              movea.l $c(a5,d5.l),a0
-09D66  266D 06F2              movea.l $6f2(a5),a3
+09D66  266D 06F2              movea.l fnc_tbl(a5),a3
 09D6A  281B                   move.l  (a3)+,d4
 09D6C                         L_09D6C:
 09D6C  5888                   addq.l  #$4,a0
@@ -11538,14 +11538,14 @@
 09D78  B27C 000E              cmp.w   #$e,d1
 09D7C  6604                   bne.b   L_09D82
 09D7E                         L_09D7E:
-09D7E  4EBA 000C              jsr     sub_09D8C(pc)
+09D7E  4EBA 000C              jsr     fn_block_by_type(pc)
 09D82                         L_09D82:
 09D82  5344                   subq.w  #$1,d4
 09D84  66E6                   bne.b   L_09D6C
 09D86  4CDF 1F3F              movem.l (a7)+,d0-d5/a0-a4
 09D8A  4E75                   rts     
-09D8C                         sub_09D8C:
-09D8C  3E01                   move.w  d1,d7
+09D8C                         fn_block_by_type:
+09D8C  3E01                   move.w  d1,d7                  ; jump table on Fnc type: 1 coupler $28 bytes, 3 rank output $1E, 4 trap $10, 5 unit, 6 unison off, 7/8/18 sustain/legato/sostenuto, 9 transposer, 12 multiplier, 13/14 piz/rit, 15/16 channel, 17 reverser
 09D8E  E347                   asl.w   #$1,d7
 09D90  3E3B 7006              move.w  $9d98(pc,d7.w),d7
 09D94  4EFB 7002              jmp     $9d98(pc,d7.w)         ; word-offset jump table
@@ -11608,7 +11608,7 @@
 09E0A  208C                   move.l  a4,(a0)
 09E0C  4EBA 016E              jsr     sub_09F7C(pc)
 09E10  429C                   clr.l   (a4)+
-09E12  487A 162C              pea.l   $b440(pc)
+09E12  487A 162C              pea.l   rank_out_hook(pc)
 09E16  28DF                   move.l  (a7)+,(a4)+
 09E18  4EBA 017A              jsr     sub_09F94(pc)
 09E1C  2464                   movea.l -(a4),a2
@@ -11802,7 +11802,7 @@
 09F98  670C                   beq.b   L_09FA6
 09F9A  3E19                   move.w  (a1)+,d7
 09F9C  E547                   asl.w   #$2,d7
-09F9E  2C6D 06D2              movea.l $6d2(a5),a6
+09F9E  2C6D 06D2              movea.l rank_tbl(a5),a6
 09FA2  28F6 7000              move.l  (a6,d7.w),(a4)+
 09FA6                         L_09FA6:
 09FA6  4E75                   rts     
@@ -11850,7 +11850,7 @@
 0A006  4E75                   rts     
 0A008                         L_0A008:
 0A008  429C                   clr.l   (a4)+
-0A00A  487A 0D06              pea.l   sub_0AD12(pc)
+0A00A  487A 0D06              pea.l   note_offset_hook(pc)
 0A00E  28DF                   move.l  (a7)+,(a4)+
 0A010  4E75                   rts     
 0A012                         sub_0A012:
@@ -11868,7 +11868,7 @@
 0A02C  670C                   beq.b   L_0A03A
 0A02E  3E19                   move.w  (a1)+,d7
 0A030  E547                   asl.w   #$2,d7
-0A032  2C6D 06D6              movea.l $6d6(a5),a6
+0A032  2C6D 06D6              movea.l unit_tbl(a5),a6
 0A036  28F6 7000              move.l  (a6,d7.w),(a4)+
 0A03A                         L_0A03A:
 0A03A  4E75                   rts     
@@ -11877,7 +11877,7 @@
 0A040  670C                   beq.b   L_0A04E
 0A042  3E19                   move.w  (a1)+,d7
 0A044  E547                   asl.w   #$2,d7
-0A046  2C6D 06E6              movea.l $6e6(a5),a6
+0A046  2C6D 06E6              movea.l piz_tbl(a5),a6
 0A04A  28F6 7000              move.l  (a6,d7.w),(a4)+
 0A04E                         L_0A04E:
 0A04E  4E75                   rts     
@@ -11886,7 +11886,7 @@
 0A054  670C                   beq.b   L_0A062
 0A056  3E19                   move.w  (a1)+,d7
 0A058  E547                   asl.w   #$2,d7
-0A05A  2C6D 06EA              movea.l $6ea(a5),a6
+0A05A  2C6D 06EA              movea.l rit_tbl(a5),a6
 0A05E  28F6 7000              move.l  (a6,d7.w),(a4)+
 0A062                         L_0A062:
 0A062  4E75                   rts     
@@ -11921,7 +11921,7 @@
 0A09C                         sub_0A09C:
 0A09C  48E7 8080              movem.l d0/a0,-(a7)
 0A0A0  2075 580C              movea.l $c(a5,d5.l),a0
-0A0A4  2C6D 06F2              movea.l $6f2(a5),a6
+0A0A4  2C6D 06F2              movea.l fnc_tbl(a5),a6
 0A0A8  2016                   move.l  (a6),d0
 0A0AA                         L_0A0AA:
 0A0AA  5888                   addq.l  #$4,a0
@@ -11932,12 +11932,12 @@
 0A0B4  66F4                   bne.b   L_0A0AA
 0A0B6  4CDF 0101              movem.l (a7)+,d0/a0
 0A0BA  4E75                   rts     
-0A0BC                         sub_0A0BC:
-0A0BC  3C3C 670C              move.w  #$670c,d6
+0A0BC                         build_comb_table:
+0A0BC  3C3C 670C              move.w  #$670c,d6              ; combination table sized from Pst and Stp counts
 0A0C0  7E2D                   moveq   #$2d,d7
 0A0C2  4E40                   trap    #$0                    ; sys $2D sys_listlen
 0A0C4  2006                   move.l  d6,d0
-0A0C6  3B40 08A8              move.w  d0,$8a8(a5)
+0A0C6  3B40 08A8              move.w  d0,num_pistons(a5)
 0A0CA  3C3C 79F0              move.w  #$79f0,d6
 0A0CE  7E2D                   moveq   #$2d,d7
 0A0D0  4E40                   trap    #$0                    ; sys $2D sys_listlen
@@ -11946,19 +11946,19 @@
 0A0D8  5241                   addq.w  #$1,d1
 0A0DA  5E41                   addq.w  #$7,d1
 0A0DC  E689                   lsr.l   #$3,d1
-0A0DE  3B41 08AA              move.w  d1,$8aa(a5)
+0A0DE  3B41 08AA              move.w  d1,comb_rowbytes(a5)
 0A0E2  C0C1                   mulu.w  d1,d0
 0A0E4  E340                   asl.w   #$1,d0
 0A0E6  670A                   beq.b   L_0A0F2
 0A0E8  2C00                   move.l  d0,d6
 0A0EA  7E08                   moveq   #$8,d7
 0A0EC  4E40                   trap    #$0                    ; sys $08 sys_malloc
-0A0EE  2B4E 08A2              move.l  a6,$8a2(a5)
+0A0EE  2B4E 08A2              move.l  a6,comb_table(a5)
 0A0F2                         L_0A0F2:
-0A0F2  426D 08A6              clr.w   $8a6(a5)
+0A0F2  426D 08A6              clr.w   set_mode(a5)
 0A0F6  4E75                   rts     
-0A0F8                         sub_0A0F8:
-0A0F8  2C3C 0000 140E         move.l  #$140e,d6
+0A0F8                         build_channels:
+0A0F8  2C3C 0000 140E         move.l  #$140e,d6              ; chan_list: per channel {.., +$A value, +$E output list}
 0A0FE  7E1F                   moveq   #$1f,d7
 0A100  4E40                   trap    #$0                    ; sys $1F sys_alloc_array
 0A102  2B4C 06E2              move.l  a4,chan_list(a5)
@@ -11989,8 +11989,8 @@
 0A13C  60D2                   bra.b   L_0A110
 0A13E                         L_0A13E:
 0A13E  4E75                   rts     
-0A140                         sub_0A140:
-0A140  3C3C 1436              move.w  #$1436,d6
+0A140                         build_chan_inputs:
+0A140  3C3C 1436              move.w  #$1436,d6              ; analog channel inputs (Cin with sensitivity) -> scan_pending list for analog_sample
 0A144  7E2E                   moveq   #$2e,d7
 0A146  4E40                   trap    #$0                    ; sys $2E sys_listhead
 0A148  224E                   movea.l a6,a1
@@ -12029,8 +12029,8 @@
 0A192  60B6                   bra.b   L_0A14A
 0A194                         L_0A194:
 0A194  4E75                   rts     
-0A196                         sub_0A196:
-0A196  3C3C 152C              move.w  #$152c,d6
+0A196                         build_chan_outputs:
+0A196  3C3C 152C              move.w  #$152c,d6              ; Cot: sorted into the channel's output list {next, +4 value, +6 function}
 0A19A  7E2E                   moveq   #$2e,d7
 0A19C  4E40                   trap    #$0                    ; sys $2E sys_listhead
 0A19E  224E                   movea.l a6,a1
@@ -12063,8 +12063,8 @@
 0A1DE  60C0                   bra.b   L_0A1A0
 0A1E0                         L_0A1E0:
 0A1E0  4E75                   rts     
-0A1E2                         sub_0A1E2:
-0A1E2  3C3C 7946              move.w  #$7946,d6
+0A1E2                         build_spf:
+0A1E2  3C3C 7946              move.w  #$7946,d6              ; Spf: Set, Range, tempo button/control, metronome, play/record switch inputs; magnet_pulse; beat/measure units
 0A1E6  7E2E                   moveq   #$2e,d7
 0A1E8  4E40                   trap    #$0                    ; sys $2E sys_listhead
 0A1EA  224E                   movea.l a6,a1
@@ -12073,25 +12073,25 @@
 0A1F0  4285                   clr.l   d5
 0A1F2  3219                   move.w  (a1)+,d1
 0A1F4  6710                   beq.b   L_0A206
-0A1F6  4EBA F71E              jsr     sub_09916(pc)
+0A1F6  4EBA F71E              jsr     scan_add_input(pc)
 0A1FA  429C                   clr.l   (a4)+
-0A1FC  487A 06FE              pea.l   sub_0A8FC(pc)
+0A1FC  487A 06FE              pea.l   hook_control(pc)
 0A200  28DF                   move.l  (a7)+,(a4)+
 0A202  38FC 0001              move.w  #$1,(a4)+
 0A206                         L_0A206:
 0A206  3219                   move.w  (a1)+,d1
 0A208  6710                   beq.b   L_0A21A
-0A20A  4EBA F70A              jsr     sub_09916(pc)
+0A20A  4EBA F70A              jsr     scan_add_input(pc)
 0A20E  429C                   clr.l   (a4)+
-0A210  487A 06EA              pea.l   sub_0A8FC(pc)
+0A210  487A 06EA              pea.l   hook_control(pc)
 0A214  28DF                   move.l  (a7)+,(a4)+
 0A216  38FC 0002              move.w  #$2,(a4)+
 0A21A                         L_0A21A:
 0A21A  3219                   move.w  (a1)+,d1
 0A21C  6710                   beq.b   L_0A22E
-0A21E  4EBA F6F6              jsr     sub_09916(pc)
+0A21E  4EBA F6F6              jsr     scan_add_input(pc)
 0A222  429C                   clr.l   (a4)+
-0A224  487A 06D6              pea.l   sub_0A8FC(pc)
+0A224  487A 06D6              pea.l   hook_control(pc)
 0A228  28DF                   move.l  (a7)+,(a4)+
 0A22A  38FC 0003              move.w  #$3,(a4)+
 0A22E                         L_0A22E:
@@ -12111,7 +12111,7 @@
 0A24C  429E                   clr.l   (a6)+
 0A24E  487A 38D6              pea.l   spec_0DB26(pc)
 0A252  2CDF                   move.l  (a7)+,(a6)+
-0A254  286D 06D6              movea.l $6d6(a5),a4
+0A254  286D 06D6              movea.l unit_tbl(a5),a4
 0A258  E541                   asl.w   #$2,d1
 0A25A  2CB4 1000              move.l  (a4,d1.w),(a6)
 0A25E                         L_0A25E:
@@ -12125,31 +12125,31 @@
 0A270  429E                   clr.l   (a6)+
 0A272  487A 38B2              pea.l   spec_0DB26(pc)
 0A276  2CDF                   move.l  (a7)+,(a6)+
-0A278  286D 06D6              movea.l $6d6(a5),a4
+0A278  286D 06D6              movea.l unit_tbl(a5),a4
 0A27C  E541                   asl.w   #$2,d1
 0A27E  2CB4 1000              move.l  (a4,d1.w),(a6)
 0A282                         L_0A282:
 0A282  3219                   move.w  (a1)+,d1
 0A284  6710                   beq.b   L_0A296
-0A286  4EBA F68E              jsr     sub_09916(pc)
+0A286  4EBA F68E              jsr     scan_add_input(pc)
 0A28A  429C                   clr.l   (a4)+
-0A28C  487A 066E              pea.l   sub_0A8FC(pc)
+0A28C  487A 066E              pea.l   hook_control(pc)
 0A290  28DF                   move.l  (a7)+,(a4)+
 0A292  38FC 0004              move.w  #$4,(a4)+
 0A296                         L_0A296:
-0A296  3B59 08AE              move.w  (a1)+,$8ae(a5)
+0A296  3B59 08AE              move.w  (a1)+,magnet_pulse(a5)
 0A29A  6606                   bne.b   L_0A2A2
-0A29C  3B7C 0050 08AE         move.w  #$50,$8ae(a5)
+0A29C  3B7C 0050 08AE         move.w  #$50,magnet_pulse(a5)
 0A2A2                         L_0A2A2:
 0A2A2  3B59 0172              move.w  (a1)+,$172(a5)
-0A2A6  4EBA F3BC              jsr     sub_09664(pc)
+0A2A6  4EBA F3BC              jsr     scan_setup_spf(pc)
 0A2AA  5049                   addq.w  #$8,a1
 0A2AC                         L_0A2AC:
 0A2AC  3219                   move.w  (a1)+,d1
 0A2AE  67FC                   beq.b   L_0A2AC
-0A2B0  4EBA F664              jsr     sub_09916(pc)
+0A2B0  4EBA F664              jsr     scan_add_input(pc)
 0A2B4  429C                   clr.l   (a4)+
-0A2B6  487A 0644              pea.l   sub_0A8FC(pc)
+0A2B6  487A 0644              pea.l   hook_control(pc)
 0A2BA  28DF                   move.l  (a7)+,(a4)+
 0A2BC  38FC 0005              move.w  #$5,(a4)+
 0A2C0  4E75                   rts     
@@ -12389,12 +12389,12 @@
 0A55A  6710                   beq.b   L_0A56C
 0A55C  4DF8 FE1D              lea.l   $fe1d.w,a6
 0A560  0F0E 0000              movep.w $0(a6),d7
-0A564  3B47 0194              move.w  d7,$194(a5)
+0A564  3B47 0194              move.w  d7,key_time_us(a5)
 0A568  46FC 2000              move.w  #$2000,sr
 0A56C                         L_0A56C:
 0A56C  4E75                   rts     
-0A56E                         spec_0A56E:
-0A56E  1144 000C              move.b  d4,$c(a0)
+0A56E                         debounce_hook:
+0A56E  1144 000C              move.b  d4,$c(a0)              ; scan hook with debounce: start timer, pass the change on when it expires
 0A572  4A28 000D              tst.b   $d(a0)
 0A576  6618                   bne.b   L_0A590
 0A578  4A04                   tst.b   d4
@@ -12408,7 +12408,7 @@
 0A58C  4EBA 19B0              jsr     call_hooks(pc)
 0A590                         L_0A590:
 0A590  4E75                   rts     
-0A592                         spec_0A592:
+0A592                         debounce_expired:
 0A592  4228 0005              clr.b   $5(a0)
 0A596  1828 0004              move.b  $4(a0),d4
 0A59A  6E06                   bgt.b   L_0A5A2
@@ -12596,6 +12596,7 @@
 
 ; -----------------------------------------------------------------------------
 ; SCN task: console scanner
+; SCN task: console scanner.  See README.md "The relay".
 ; -----------------------------------------------------------------------------
 0A7FA                         task_scn:
 0A7FA  3E2D 0684              move.w  ticks_since_switch(a5),d7 ; SCN task: scan console input boards, dispatch changes
@@ -12609,11 +12610,11 @@
 0A812  206D 0688              movea.l scan_table(a5),a0
 0A816  302D 068E              move.w  scan_words(a5),d0
 0A81A  5340                   subq.w  #$1,d0
-0A81C  4EBA 0018              jsr     sub_0A836(pc)
+0A81C  4EBA 0018              jsr     scan_pass(pc)
 0A820                         L_0A820:
 0A820  4EBA E762              jsr     sub_08F84(pc)
 0A824  6706                   beq.b   L_0A82C
-0A826  4EBA 0080              jsr     sub_0A8A8(pc)
+0A826  4EBA 0080              jsr     midi_dispatch(pc)
 0A82A  60F4                   bra.b   L_0A820
 0A82C                         L_0A82C:
 0A82C  526D 068C              addq.w  #$1,scan_rate(a5)
@@ -12621,8 +12622,8 @@
 0A830  7E29                   moveq   #$29,d7
 0A832  4E40                   trap    #$0                    ; sys $29 sys_yield
 0A834  60C4                   bra.b   task_scn
-0A836                         sub_0A836:
-0A836  2A2D 06C2              move.l  $6c2(a5),d5
+0A836                         scan_pass:
+0A836  2A2D 06C2              move.l  division_base(a5),d5   ; one pass over scan_table: write address to $FF80, read state back in bit 15, dispatch changes, then analog_sample one pending input
 0A83A  227C FFFF FF80         movea.l #$ffffff80,a1
 0A840  336D 0690 0002         move.w  scan_control(a5),$2(a1)
 0A846  2C2D 0180              move.l  scan_count(a5),d6
@@ -12641,20 +12642,20 @@
 0A866  4A40                   tst.w   d0
 0A868  6B10                   bmi.b   L_0A87A
 0A86A  48E7 8080              movem.l d0/a0,-(a7)
-0A86E  4EBA 001C              jsr     sub_0A88C(pc)
+0A86E  4EBA 001C              jsr     scan_changed(pc)
 0A872  4CDF 0101              movem.l (a7)+,d0/a0
 0A876  5340                   subq.w  #$1,d0
-0A878  6ABC                   bpl.b   sub_0A836
+0A878  6ABC                   bpl.b   scan_pass
 0A87A                         L_0A87A:
 0A87A  206D 0696              movea.l scan_pending(a5),a0
 0A87E  2E08                   move.l  a0,d7
 0A880  6708                   beq.b   L_0A88A
 0A882  2B58 0696              move.l  (a0)+,scan_pending(a5)
-0A886  4EBA 0CF6              jsr     sub_0B57E(pc)
+0A886  4EBA 0CF6              jsr     analog_sample(pc)
 0A88A                         L_0A88A:
 0A88A  4E75                   rts     
-0A88C                         sub_0A88C:
-0A88C  78FF                   moveq   #$ff,d4
+0A88C                         scan_changed:
+0A88C  78FF                   moveq   #$ff,d4                ; input changed: flip its state bit, d4 = +1 on / -1 off, call its hook list
 0A88E  0A60 8000              eori.w  #$8000,-(a0)
 0A892  6B02                   bmi.b   L_0A896
 0A894  7801                   moveq   #$1,d4
@@ -12665,9 +12666,9 @@
 0A8A0  2050                   movea.l (a0),a0
 0A8A2  4EBA 169A              jsr     call_hooks(pc)
 0A8A6  4E75                   rts     
-0A8A8                         sub_0A8A8:
-0A8A8  5341                   subq.w  #$1,d1
-0A8AA  206D 0ABA              movea.l $aba(a5),a0
+0A8A8                         midi_dispatch:
+0A8A8  5341                   subq.w  #$1,d1                 ; MIDI note/control d1 ($6001+) -> midi_map[channel][note] hooks
+0A8AA  206D 0ABA              movea.l midi_map(a5),a0
 0A8AE  3E01                   move.w  d1,d7
 0A8B0  EA4F                   lsr.w   #$5,d7
 0A8B2  0247 007C              andi.w  #$7c,d7
@@ -12685,29 +12686,29 @@
 0A8CE  4EBA 166E              jsr     call_hooks(pc)
 0A8D2                         L_0A8D2:
 0A8D2  4E75                   rts     
-0A8D4                         sub_0A8D4:
-0A8D4  4282                   clr.l   d2
+0A8D4                         hook_key:
+0A8D4  4282                   clr.l   d2                     ; scan hook: key_event(kbd, key)
 0A8D6  3418                   move.w  (a0)+,d2
 0A8D8  4283                   clr.l   d3
 0A8DA  3618                   move.w  (a0)+,d3
 0A8DC  4EFA 023E              jmp     key_event(pc)
-0A8E0                         sub_0A8E0:
-0A8E0  4A04                   tst.b   d4
+0A8E0                         hook_piston:
+0A8E0  4A04                   tst.b   d4                     ; scan hook: piston_press (on press only)
 0A8E2  6B06                   bmi.b   L_0A8EA
 0A8E4  3610                   move.w  (a0),d3
-0A8E6  4EFA 0DA2              jmp     sub_0B68A(pc)
+0A8E6  4EFA 0DA2              jmp     piston_press(pc)
 0A8EA                         L_0A8EA:
 0A8EA  4E75                   rts     
-0A8EC                         sub_0A8EC:
-0A8EC  3418                   move.w  (a0)+,d2
+0A8EC                         hook_chan_input:
+0A8EC  3418                   move.w  (a0)+,d2               ; scan hook: chan_input_event(channel, value)
 0A8EE  3618                   move.w  (a0)+,d3
-0A8F0  4EFA 12C8              jmp     sub_0BBBA(pc)
-0A8F4                         sub_0A8F4:
-0A8F4  3618                   move.w  (a0)+,d3
+0A8F0  4EFA 12C8              jmp     chan_input_event(pc)
+0A8F4                         hook_stop_contact:
+0A8F4  3618                   move.w  (a0)+,d3               ; scan hook: stop contact (stop, side) -> stop_contact_change
 0A8F6  3418                   move.w  (a0)+,d2
-0A8F8  4EFA 0472              jmp     tbl_0B628_1(pc)
-0A8FC                         sub_0A8FC:
-0A8FC  3E18                   move.w  (a0)+,d7
+0A8F8  4EFA 0472              jmp     stop_contact_change(pc)
+0A8FC                         hook_control:
+0A8FC  3E18                   move.w  (a0)+,d7               ; scan hook: Spf control inputs 1 Set 2 Range 3 tap tempo 4 play/record switch 5 metronome
 0A8FE  E347                   asl.w   #$1,d7
 0A900  3E3B 7006              move.w  $a908(pc,d7.w),d7
 0A904  4EFB 7002              jmp     $a908(pc,d7.w)         ; word-offset jump table
@@ -12719,12 +12720,12 @@
 0A912  0032                   dc.w    tbl_0A908_5-$0A908  ;  5 ($05)
 0A914                         tbl_0A908_1:
 0A914  4A04                   tst.b   d4
-0A916  5EED 08A6              sgt.b   $8a6(a5)
+0A916  5EED 08A6              sgt.b   set_mode(a5)
 0A91A                         tbl_0A908_0:
 0A91A  4E75                   rts     
 0A91C                         tbl_0A908_2:
 0A91C  4A04                   tst.b   d4
-0A91E  5EED 08A7              sgt.b   $8a7(a5)
+0A91E  5EED 08A7              sgt.b   range_mode(a5)
 0A922  4E75                   rts     
 0A924                         tbl_0A908_3:
 0A924  4EBA 30A8              jsr     tap_tempo(pc)
@@ -12741,8 +12742,8 @@
 0A93A  4A04                   tst.b   d4
 0A93C  5EED 0205              sgt.b   metronome(a5)
 0A940  4E75                   rts     
-0A942                         sub_0A942:
-0A942  3610                   move.w  (a0),d3
+0A942                         hook_ctl_button:
+0A942  3610                   move.w  (a0),d3                ; scan hook: Ctl control button -> CTL task command
 0A944  4EFA 1F3A              jmp     L_0C880(pc)
 0A948                         task_sts:
 0A948  222D 0110              move.l  free_ram(a5),d1        ; STS task: status display (Free ram, Disk, File ...)
@@ -12769,28 +12770,28 @@
 0A982  202D 0656              move.l  ticks(a5),d0
 0A986  B0AD 069E              cmp.l   $69e(a5),d0
 0A98A  651A                   bcs.b   L_0A9A6
-0A98C  2A2D 06C2              move.l  $6c2(a5),d5
-0A990  4EBA 1276              jsr     sub_0BC08(pc)
+0A98C  2A2D 06C2              move.l  division_base(a5),d5
+0A990  4EBA 1276              jsr     channels_poll(pc)
 0A994  06AD 0000 0064 069E    addi.l  #$64,$69e(a5)
 0A99C  322D 0BCC              move.w  $bcc(a5),d1
 0A9A0  6704                   beq.b   L_0A9A6
 0A9A2  4EBA 3076              jsr     read_analog(pc)
 0A9A6                         L_0A9A6:
-0A9A6  322D 0194              move.w  $194(a5),d1
+0A9A6  322D 0194              move.w  key_time_us(a5),d1
 0A9AA  6728                   beq.b   L_0A9D4
 0A9AC  7C03                   moveq   #$3,d6
 0A9AE  7E35                   moveq   #$35,d7
 0A9B0  4E40                   trap    #$0                    ; sys $35 sys_message
 0A9B2                         dc.b    'Key time was %t microseconds',$00,$00
-0A9D0  426D 0194              clr.w   $194(a5)
+0A9D0  426D 0194              clr.w   key_time_us(a5)
 0A9D4                         L_0A9D4:
-0A9D4  322D 0196              move.w  $196(a5),d1
+0A9D4  322D 0196              move.w  stop_time_us(a5),d1
 0A9D8  6728                   beq.b   L_0AA02
 0A9DA  7C03                   moveq   #$3,d6
 0A9DC  7E35                   moveq   #$35,d7
 0A9DE  4E40                   trap    #$0                    ; sys $35 sys_message
 0A9E0                         dc.b    'Stop time was %t microseconds',$00
-0A9FE  426D 0196              clr.w   $196(a5)
+0A9FE  426D 0196              clr.w   stop_time_us(a5)
 0AA02                         L_0AA02:
 0AA02  B0AD 0144              cmp.l   $144(a5),d0
 0AA06  6500 00C0              bcs.w   L_0AAC8
@@ -12890,18 +12891,18 @@
 0AB16  4E40                   trap    #$0                    ; sys $29 sys_yield
 0AB18  4EFA FE2E              jmp     task_sts(pc)
 0AB1C                         key_event:
-0AB1C  4A2D 01EF              tst.b   $1ef(a5)               ; key d3 on keyboard d2 changed, d4 = +1 on / -1 off
+0AB1C  4A2D 01EF              tst.b   transposer_on(a5)      ; key d3 on keyboard d2 changed, d4 = +1 on / -1 off
 0AB20  6F30                   ble.b   L_0AB52
 0AB22  4A04                   tst.b   d4
 0AB24  6B2C                   bmi.b   L_0AB52
 0AB26  78FF                   moveq   #$ff,d4
-0AB28  4EBA 011E              jsr     sub_0AC48(pc)
-0AB2C  3B43 0120              move.w  d3,$120(a5)
-0AB30  046D 0031 0120         subi.w  #$31,$120(a5)
+0AB28  4EBA 011E              jsr     release_all_keys(pc)
+0AB2C  3B43 0120              move.w  d3,transpose(a5)
+0AB30  046D 0031 0120         subi.w  #$31,transpose(a5)
 0AB36  7801                   moveq   #$1,d4
-0AB38  4EBA 010E              jsr     sub_0AC48(pc)
+0AB38  4EBA 010E              jsr     release_all_keys(pc)
 0AB3C  78FF                   moveq   #$ff,d4
-0AB3E  4A6D 0120              tst.w   $120(a5)
+0AB3E  4A6D 0120              tst.w   transpose(a5)
 0AB42  6608                   bne.b   L_0AB4C
 0AB44  7C0D                   moveq   #$d,d6
 0AB46  7E28                   moveq   #$28,d7
@@ -12913,16 +12914,16 @@
 0AB50  4E40                   trap    #$0                    ; sys $28 sys_indicator
 0AB52                         L_0AB52:
 0AB52  4280                   clr.l   d0
-0AB54  4EBA 0014              jsr     sub_0AB6A(pc)
-0AB58  2C6D 06BA              movea.l $6ba(a5),a6
+0AB54  4EBA 0014              jsr     key_state_update(pc)
+0AB58  2C6D 06BA              movea.l kbd_states(a5),a6
 0AB5C  3E02                   move.w  d2,d7
 0AB5E  E747                   asl.w   #$3,d7
 0AB60  2076 7004              movea.l $4(a6,d7.w),a0
 0AB64  4EBA 13D8              jsr     call_hooks(pc)
 0AB68  4E75                   rts     
-0AB6A                         sub_0AB6A:
-0AB6A  48E7 2020              movem.l d2/a2,-(a7)
-0AB6E  2C6D 06BA              movea.l $6ba(a5),a6
+0AB6A                         key_state_update:
+0AB6A  48E7 2020              movem.l d2/a2,-(a7)            ; key-state byte of (kbd, key): set/clear bit d0; on 0<->nonzero call key_to_division
+0AB6E  2C6D 06BA              movea.l kbd_states(a5),a6
 0AB72  3E02                   move.w  d2,d7
 0AB74  E747                   asl.w   #$3,d7
 0AB76  2476 7000              movea.l (a6,d7.w),a2
@@ -12941,13 +12942,13 @@
 0AB90  4A01                   tst.b   d1
 0AB92  6604                   bne.b   L_0AB98
 0AB94                         L_0AB94:
-0AB94  4EBA 0008              jsr     sub_0AB9E(pc)
+0AB94  4EBA 0008              jsr     key_to_division(pc)
 0AB98                         L_0AB98:
 0AB98  4CDF 0404              movem.l (a7)+,d2/a2
 0AB9C  4E75                   rts     
-0AB9E                         sub_0AB9E:
-0AB9E  48E7 3020              movem.l d2-d3/a2,-(a7)
-0ABA2  D66D 0120              add.w   $120(a5),d3
+0AB9E                         key_to_division:
+0AB9E  48E7 3020              movem.l d2-d3/a2,-(a7)         ; add transpose, record, then note_set_change on the keyboard's division (after key_delay if set)
+0ABA2  D66D 0120              add.w   transpose(a5),d3
 0ABA6  4A2D 0BEA              tst.b   recording(a5)
 0ABAA  6704                   beq.b   L_0ABB0
 0ABAC  4EBA 2424              jsr     rec_key(pc)
@@ -12957,7 +12958,7 @@
 0ABB6  E547                   asl.w   #$2,d7
 0ABB8  2C76 7000              movea.l (a6,d7.w),a6
 0ABBC  2456                   movea.l (a6),a2
-0ABBE  322D 011A              move.w  $11a(a5),d1
+0ABBE  322D 011A              move.w  key_delay(a5),d1
 0ABC2  6630                   bne.b   L_0ABF4
 0ABC4  4A38 0048              tst.b   $48.w
 0ABC8  670E                   beq.b   L_0ABD8
@@ -12966,12 +12967,12 @@
 0ABD2  7EFF                   moveq   #$ff,d7
 0ABD4  0F8E 0000              movep.w d7,$0(a6)
 0ABD8                         L_0ABD8:
-0ABD8  4EBA 0152              jsr     sub_0AD2C(pc)
+0ABD8  4EBA 0152              jsr     note_set_change(pc)
 0ABDC  4A38 0048              tst.b   $48.w
 0ABE0  6710                   beq.b   L_0ABF2
 0ABE2  4DF8 FE1D              lea.l   $fe1d.w,a6
 0ABE6  0F0E 0000              movep.w $0(a6),d7
-0ABEA  3B47 0194              move.w  d7,$194(a5)
+0ABEA  3B47 0194              move.w  d7,key_time_us(a5)
 0ABEE  46FC 2000              move.w  #$2000,sr
 0ABF2                         L_0ABF2:
 0ABF2  601C                   bra.b   L_0AC10
@@ -12999,8 +13000,8 @@
 0AC1C  4DE8 FFF0              lea.l   -$10(a0),a6
 0AC20  7E09                   moveq   #$9,d7
 0AC22  4E40                   trap    #$0                    ; sys $09 sys_free
-0AC24  4EFA 0106              jmp     sub_0AD2C(pc)
-0AC28                         sub_0AC28:
+0AC24  4EFA 0106              jmp     note_set_change(pc)
+0AC28                         replay_all_divisions:
 0AC28  48E7 FCF8              movem.l d0-d5/a0-a4,-(a7)
 0AC2C  2075 5800              movea.l (a5,d5.l),a0
 0AC30  2018                   move.l  (a0)+,d0
@@ -13009,18 +13010,18 @@
 0AC34  2858                   movea.l (a0)+,a4
 0AC36  2E0C                   move.l  a4,d7
 0AC38  6704                   beq.b   L_0AC3E
-0AC3A  4EBA 1ADA              jsr     tbl_0AF80_4(pc)
+0AC3A  4EBA 1ADA              jsr     coupler_activate(pc)
 0AC3E                         L_0AC3E:
 0AC3E  5340                   subq.w  #$1,d0
 0AC40  66F2                   bne.b   L_0AC34
 0AC42                         L_0AC42:
 0AC42  4CDF 1F3F              movem.l (a7)+,d0-d5/a0-a4
 0AC46  4E75                   rts     
-0AC48                         sub_0AC48:
-0AC48  48E7 B400              movem.l d0/d2-d3/d5,-(a7)
+0AC48                         release_all_keys:
+0AC48  48E7 B400              movem.l d0/d2-d3/d5,-(a7)      ; every held key on every keyboard off then on (transposer change)
 0AC4C  4282                   clr.l   d2
 0AC4E                         L_0AC4E:
-0AC4E  2C6D 06BA              movea.l $6ba(a5),a6
+0AC4E  2C6D 06BA              movea.l kbd_states(a5),a6
 0AC52  2E02                   move.l  d2,d7
 0AC54  E747                   asl.w   #$3,d7
 0AC56  2476 7000              movea.l (a6,d7.w),a2
@@ -13031,19 +13032,19 @@
 0AC62  6B0A                   bmi.b   L_0AC6E
 0AC64  260A                   move.l  a2,d3
 0AC66  9697                   sub.l   (a7),d3
-0AC68  4EBA FF34              jsr     sub_0AB9E(pc)
+0AC68  4EBA FF34              jsr     key_to_division(pc)
 0AC6C  60F0                   bra.b   L_0AC5E
 0AC6E                         L_0AC6E:
 0AC6E  588F                   addq.l  #$4,a7
 0AC70  5242                   addq.w  #$1,d2
-0AC72  B46D 06C6              cmp.w   $6c6(a5),d2
+0AC72  B46D 06C6              cmp.w   num_keyboards(a5),d2
 0AC76  65D6                   bcs.b   L_0AC4E
 0AC78  4CDF 002D              movem.l (a7)+,d0/d2-d3/d5
 0AC7C  4E75                   rts     
-0AC7E                         L_0AC7E:
-0AC7E  342C 000A              move.w  $a(a4),d2
+0AC7E                         coupler_keys:
+0AC7E  342C 000A              move.w  $a(a4),d2              ; keys a coupler feeds into a keyboard: bit d0 of the key-state byte
 0AC82  302C 000C              move.w  $c(a4),d0
-0AC86  2C6D 06BA              movea.l $6ba(a5),a6
+0AC86  2C6D 06BA              movea.l kbd_states(a5),a6
 0AC8A  3E02                   move.w  d2,d7
 0AC8C  E747                   asl.w   #$3,d7
 0AC8E  2476 7000              movea.l (a6,d7.w),a2
@@ -13058,7 +13059,7 @@
 0ACA4  66F4                   bne.b   L_0AC9A
 0ACA6  260A                   move.l  a2,d3
 0ACA8  9697                   sub.l   (a7),d3
-0ACAA  4EBA FEF2              jsr     sub_0AB9E(pc)
+0ACAA  4EBA FEF2              jsr     key_to_division(pc)
 0ACAE  60EA                   bra.b   L_0AC9A
 0ACB0                         L_0ACB0:
 0ACB0  50E2                   st.b    -(a2)
@@ -13079,20 +13080,20 @@
 0ACE6  6628 3F03 486A 0001 78FF 011A 67FC 1E2A  |(f.?jH...x...g*.|
 0ACF6  FFFF 6B10 0807 0000 66F0 260A 9697 4EBA  |...k.....f.&...N|
 0AD06  FE64 60E6 588F 361F 7801 4E75            |d..`.X.6.xuN|
-0AD12                         sub_0AD12:
-0AD12  48E7 9000              movem.l d0/d3,-(a7)
+0AD12                         note_offset_hook:
+0AD12  48E7 9000              movem.l d0/d3,-(a7)            ; hook: note d3 + offset, within [low, high] -> note_set_change on the target set
 0AD16  2458                   movea.l (a0)+,a2
 0AD18  D658                   add.w   (a0)+,d3
 0AD1A  B658                   cmp.w   (a0)+,d3
 0AD1C  6508                   bcs.b   L_0AD26
 0AD1E  B658                   cmp.w   (a0)+,d3
 0AD20  6204                   bhi.b   L_0AD26
-0AD22  4EBA 0008              jsr     sub_0AD2C(pc)
+0AD22  4EBA 0008              jsr     note_set_change(pc)
 0AD26                         L_0AD26:
 0AD26  4CDF 0009              movem.l (a7)+,d0/d3
 0AD2A  4E75                   rts     
-0AD2C                         sub_0AD2C:
-0AD2C  B67C 0079              cmp.w   #$79,d3
+0AD2C                         note_set_change:
+0AD2C  B67C 0079              cmp.w   #$79,d3                ; per-note use count in the set; on 0<->1 call the set's hooks (couplers, rank outputs, units)
 0AD30  621A                   bhi.b   L_0AD4C
 0AD32  205A                   movea.l (a2)+,a0
 0AD34  D932 3002              add.b   d4,$2(a2,d3.w)
@@ -13120,8 +13121,8 @@
 0AD68  66FC                   bne.b   L_0AD66
 0AD6A                         L_0AD6A:
 0AD6A  4E75                   rts     
-0AD6C                         tbl_0B628_1:
-0AD6C  48E7 1070              movem.l d3/a1-a3,-(a7)
+0AD6C                         stop_contact_change:
+0AD6C  48E7 1070              movem.l d3/a1-a3,-(a7)         ; hardware types 1/3/4: new stop state, record, indicator output, then the stop's link handler
 0AD70  4A38 0048              tst.b   $48.w
 0AD74  670E                   beq.b   L_0AD84
 0AD76  46FC 2700              move.w  #$2700,sr
@@ -13144,7 +13145,7 @@
 0ADA6  6710                   beq.b   L_0ADB8
 0ADA8  4DF8 FE1D              lea.l   $fe1d.w,a6
 0ADAC  0F0E 0000              movep.w $0(a6),d7
-0ADB0  3B47 0196              move.w  d7,$196(a5)
+0ADB0  3B47 0196              move.w  d7,stop_time_us(a5)
 0ADB4  46FC 2000              move.w  #$2000,sr
 0ADB8                         L_0ADB8:
 0ADB8  4CDF 0E08              movem.l (a7)+,d3/a1-a3
@@ -13176,7 +13177,7 @@
 0ADEA                         L_0ADEA:
 0ADEA  322B 0006              move.w  $6(a3),d1
 0ADEE  6704                   beq.b   L_0ADF4
-0ADF0  4EBA 069A              jsr     L_0B48C(pc)
+0ADF0  4EBA 069A              jsr     output_chamber(pc)
 0ADF4                         L_0ADF4:
 0ADF4  225A                   movea.l (a2)+,a1
 0ADF6  2C5A                   movea.l (a2)+,a6
@@ -13184,28 +13185,28 @@
 0ADFA  4E96                   jsr     (a6)
 0ADFC                         L_0ADFC:
 0ADFC  4E75                   rts     
-0ADFE                         spec_0ADFE:
-0ADFE  48E7 FCF8              movem.l d0-d5/a0-a4,-(a7)
+0ADFE                         stop_eval_links:
+0ADFE  48E7 FCF8              movem.l d0-d5/a0-a4,-(a7)      ; re-evaluate every link that mentions the stop; on change activate/release its functions
 0AE02                         L_0AE02:
 0AE02  3619                   move.w  (a1)+,d3
 0AE04  6728                   beq.b   L_0AE2E
 0AE06  3E03                   move.w  d3,d7
 0AE08  E547                   asl.w   #$2,d7
-0AE0A  2C6D 06FA              movea.l $6fa(a5),a6
+0AE0A  2C6D 06FA              movea.l lnk_tbl(a5),a6
 0AE0E  2676 7000              movea.l (a6,d7.w),a3
-0AE12  4EBA 0020              jsr     sub_0AE34(pc)
+0AE12  4EBA 0020              jsr     link_eval(pc)
 0AE16  2C75 5808              movea.l $8(a5,d5.l),a6
 0AE1A  B836 3000              cmp.b   (a6,d3.w),d4
 0AE1E  67E2                   beq.b   L_0AE02
 0AE20  1D84 3000              move.b  d4,(a6,d3.w)
 0AE24  D6FC 001E              adda.w  #$1e,a3
-0AE28  4EBA 005C              jsr     sub_0AE86(pc)
+0AE28  4EBA 005C              jsr     link_functions(pc)
 0AE2C  60D4                   bra.b   L_0AE02
 0AE2E                         L_0AE2E:
 0AE2E  4CDF 1F3F              movem.l (a7)+,d0-d5/a0-a4
 0AE32  4E75                   rts     
-0AE34                         sub_0AE34:
-0AE34  48E7 0050              movem.l a1/a3,-(a7)
+0AE34                         link_eval:
+0AE34  48E7 0050              movem.l a1/a3,-(a7)            ; RPN over stop states ($4000+n = control button): and/or/not
 0AE38  2075 5804              movea.l $4(a5,d5.l),a0
 0AE3C  2275 5808              movea.l $8(a5,d5.l),a1
 0AE40  45FA 0090              lea.l   dat_0AED2(pc),a2
@@ -13245,38 +13246,38 @@
 0AE80                         L_0AE80:
 0AE80  4CDF 0A00              movem.l (a7)+,a1/a3
 0AE84  4E75                   rts     
-0AE86                         sub_0AE86:
-0AE86  361B                   move.w  (a3)+,d3
+0AE86                         link_functions:
+0AE86  361B                   move.w  (a3)+,d3               ; up to 8 functions of a link -> function_use
 0AE88  673C                   beq.b   L_0AEC6
-0AE8A  4EBA 0048              jsr     sub_0AED4(pc)
+0AE8A  4EBA 0048              jsr     function_use(pc)
 0AE8E  361B                   move.w  (a3)+,d3
 0AE90  6734                   beq.b   L_0AEC6
-0AE92  4EBA 0040              jsr     sub_0AED4(pc)
+0AE92  4EBA 0040              jsr     function_use(pc)
 0AE96  361B                   move.w  (a3)+,d3
 0AE98  672C                   beq.b   L_0AEC6
-0AE9A  4EBA 0038              jsr     sub_0AED4(pc)
+0AE9A  4EBA 0038              jsr     function_use(pc)
 0AE9E  361B                   move.w  (a3)+,d3
 0AEA0  6724                   beq.b   L_0AEC6
-0AEA2  4EBA 0030              jsr     sub_0AED4(pc)
+0AEA2  4EBA 0030              jsr     function_use(pc)
 0AEA6  361B                   move.w  (a3)+,d3
 0AEA8  671C                   beq.b   L_0AEC6
-0AEAA  4EBA 0028              jsr     sub_0AED4(pc)
+0AEAA  4EBA 0028              jsr     function_use(pc)
 0AEAE  361B                   move.w  (a3)+,d3
 0AEB0  6714                   beq.b   L_0AEC6
-0AEB2  4EBA 0020              jsr     sub_0AED4(pc)
+0AEB2  4EBA 0020              jsr     function_use(pc)
 0AEB6  361B                   move.w  (a3)+,d3
 0AEB8  670C                   beq.b   L_0AEC6
-0AEBA  4EBA 0018              jsr     sub_0AED4(pc)
+0AEBA  4EBA 0018              jsr     function_use(pc)
 0AEBE  361B                   move.w  (a3)+,d3
 0AEC0  6704                   beq.b   L_0AEC6
-0AEC2  4EBA 0010              jsr     sub_0AED4(pc)
+0AEC2  4EBA 0010              jsr     function_use(pc)
 0AEC6                         L_0AEC6:
 0AEC6  4E75                   rts     
 0AEC8                         dc.b    $00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 0AED2                         dat_0AED2:
 0AED2  0000                                     |..|
-0AED4                         sub_0AED4:
-0AED4  48E7 FCF8              movem.l d0-d5/a0-a4,-(a7)
+0AED4                         function_use:
+0AED4  48E7 FCF8              movem.l d0-d5/a0-a4,-(a7)      ; use count per function; 0->1 activates, 1->0 releases (fn_activate)
 0AED8  3E03                   move.w  d3,d7
 0AEDA  6700 0092              beq.w   L_0AF6E
 0AEDE  2075 580C              movea.l $c(a5,d5.l),a0
@@ -13285,13 +13286,13 @@
 0AEE6  D0C7                   adda.w  d7,a0
 0AEE8  4A90                   tst.l   (a0)
 0AEEA  6700 0082              beq.w   L_0AF6E
-0AEEE  2C6D 06F2              movea.l $6f2(a5),a6
+0AEEE  2C6D 06F2              movea.l fnc_tbl(a5),a6
 0AEF2  DCC7                   adda.w  d7,a6
 0AEF4  2256                   movea.l (a6),a1
 0AEF6  3219                   move.w  (a1)+,d1
-0AEF8  BCAD 06F6              cmp.l   $6f6(a5),d6
+0AEF8  BCAD 06F6              cmp.l   fnc_tbl_base(a5),d6
 0AEFC  670C                   beq.b   L_0AF0A
-0AEFE  4DFA 0268              lea.l   dat_0B168(pc),a6
+0AEFE  4DFA 0268              lea.l   fn_needs_division(pc),a6
 0AF02  4A36 1000              tst.b   (a6,d1.w)
 0AF06  6700 0066              beq.w   L_0AF6E
 0AF0A                         L_0AF0A:
@@ -13315,12 +13316,12 @@
 0AF62  0C28 0001 0001         cmpi.b  #$1,$1(a0)
 0AF68  6604                   bne.b   L_0AF6E
 0AF6A                         L_0AF6A:
-0AF6A  4EBA 0008              jsr     sub_0AF74(pc)
+0AF6A  4EBA 0008              jsr     fn_activate(pc)
 0AF6E                         L_0AF6E:
 0AF6E  4CDF 1F3F              movem.l (a7)+,d0-d5/a0-a4
 0AF72  4E75                   rts     
-0AF74                         sub_0AF74:
-0AF74  3E01                   move.w  d1,d7
+0AF74                         fn_activate:
+0AF74  3E01                   move.w  d1,d7                  ; jump table on Fnc type (tbl_0AF80_n)
 0AF76  E347                   asl.w   #$1,d7
 0AF78  3E3B 7006              move.w  $af80(pc,d7.w),d7
 0AF7C  4EFB 7002              jmp     $af80(pc,d7.w)         ; word-offset jump table
@@ -13328,7 +13329,7 @@
 0AF82  0036                   dc.w    tbl_0AF80_1-$0AF80  ;  1 ($01)
 0AF84  002E                   dc.w    tbl_0AF80_0-$0AF80  ;  2 ($02)
 0AF86  0030                   dc.w    tbl_0AF80_3-$0AF80  ;  3 ($03)
-0AF88  1796                   dc.w    tbl_0AF80_4-$0AF80  ;  4 ($04)
+0AF88  1796                   dc.w    coupler_activate-$0AF80  ;  4 ($04)
 0AF8A  0094                   dc.w    tbl_0AF80_5-$0AF80  ;  5 ($05)
 0AF8C  00A8                   dc.w    tbl_0AF80_6-$0AF80  ;  6 ($06)
 0AF8E  00C2                   dc.w    tbl_0AF80_7-$0AF80  ;  7 ($07)
@@ -13350,10 +13351,10 @@
 0AFAE                         tbl_0AF80_0:
 0AFAE  4E75                   rts     
 0AFB0                         tbl_0AF80_3:
-0AFB0  4EBA 1764              jsr     tbl_0AF80_4(pc)
+0AFB0  4EBA 1764              jsr     coupler_activate(pc)
 0AFB4  4E75                   rts     
 0AFB6                         tbl_0AF80_1:
-0AFB6  4EBA 175E              jsr     tbl_0AF80_4(pc)
+0AFB6  4EBA 175E              jsr     coupler_activate(pc)
 0AFBA  4A69 000C              tst.w   $c(a1)
 0AFBE  6704                   beq.b   L_0AFC4
 0AFC0  4EBA 07FA              jsr     sub_0B7BC(pc)
@@ -13382,18 +13383,18 @@
 0B000  4E75                   rts     
 0B002                         L_0B002:
 0B002  78FF                   moveq   #$ff,d4
-0B004  4EBA 1710              jsr     tbl_0AF80_4(pc)
+0B004  4EBA 1710              jsr     coupler_activate(pc)
 0B008  294A 0008              move.l  a2,$8(a4)
 0B00C  7801                   moveq   #$1,d4
-0B00E  4EBA 1706              jsr     tbl_0AF80_4(pc)
+0B00E  4EBA 1706              jsr     coupler_activate(pc)
 0B012  4E75                   rts     
 0B014                         tbl_0AF80_5:
 0B014  3E19                   move.w  (a1)+,d7
 0B016  670E                   beq.b   L_0B026
 0B018  E547                   asl.w   #$2,d7
-0B01A  2C6D 06D6              movea.l $6d6(a5),a6
+0B01A  2C6D 06D6              movea.l unit_tbl(a5),a6
 0B01E  2276 7000              movea.l (a6,d7.w),a1
-0B022  4EFA 016E              jmp     sub_0B192(pc)
+0B022  4EFA 016E              jmp     unit_use(pc)
 0B026                         L_0B026:
 0B026  4E75                   rts     
 0B028                         tbl_0AF80_6:
@@ -13403,33 +13404,33 @@
 0B030  E547                   asl.w   #$2,d7
 0B032  2876 7000              movea.l (a6,d7.w),a4
 0B036  4404                   neg.b   d4
-0B038  4EBA 16DC              jsr     tbl_0AF80_4(pc)
+0B038  4EBA 16DC              jsr     coupler_activate(pc)
 0B03C  4404                   neg.b   d4
 0B03E  285F                   movea.l (a7)+,a4
 0B040  4E75                   rts     
 0B042                         tbl_0AF80_7:
 0B042  4EBA 16B8              jsr     sub_0C6FC(pc)
-0B046  4EFA FC36              jmp     L_0AC7E(pc)
+0B046  4EFA FC36              jmp     coupler_keys(pc)
 0B04A                         tbl_0AF80_9:
 0B04A  301C                   move.w  (a4)+,d0
 0B04C  B07C 0003              cmp.w   #$3,d0
 0B050  6606                   bne.b   L_0B058
-0B052  1B44 01EF              move.b  d4,$1ef(a5)
+0B052  1B44 01EF              move.b  d4,transposer_on(a5)
 0B056  4E75                   rts     
 0B058                         L_0B058:
 0B058  4A04                   tst.b   d4
 0B05A  6F2E                   ble.b   L_0B08A
 0B05C  78FF                   moveq   #$ff,d4
-0B05E  4EBA FBE8              jsr     sub_0AC48(pc)
+0B05E  4EBA FBE8              jsr     release_all_keys(pc)
 0B062  5340                   subq.w  #$1,d0
 0B064  6604                   bne.b   L_0B06A
-0B066  426D 0120              clr.w   $120(a5)
+0B066  426D 0120              clr.w   transpose(a5)
 0B06A                         L_0B06A:
 0B06A  3E1C                   move.w  (a4)+,d7
-0B06C  DF6D 0120              add.w   d7,$120(a5)
+0B06C  DF6D 0120              add.w   d7,transpose(a5)
 0B070  7801                   moveq   #$1,d4
-0B072  4EBA FBD4              jsr     sub_0AC48(pc)
-0B076  4A6D 0120              tst.w   $120(a5)
+0B072  4EBA FBD4              jsr     release_all_keys(pc)
+0B076  4A6D 0120              tst.w   transpose(a5)
 0B07A  6608                   bne.b   L_0B084
 0B07C  7C0D                   moveq   #$d,d6
 0B07E  7E28                   moveq   #$28,d7
@@ -13446,7 +13447,7 @@
 0B08E                         L_0B08E:
 0B08E  361C                   move.w  (a4)+,d3
 0B090  6704                   beq.b   L_0B096
-0B092  4EBA FE40              jsr     sub_0AED4(pc)
+0B092  4EBA FE40              jsr     function_use(pc)
 0B096                         L_0B096:
 0B096  5340                   subq.w  #$1,d0
 0B098  66F4                   bne.b   L_0B08E
@@ -13454,7 +13455,7 @@
 0B09C                         tbl_0AF80_16:
 0B09C  361C                   move.w  (a4)+,d3
 0B09E  341C                   move.w  (a4)+,d2
-0B0A0  4EFA 0B18              jmp     sub_0BBBA(pc)
+0B0A0  4EFA 0B18              jmp     chan_input_event(pc)
 0B0A4                         tbl_0AF80_17:
 0B0A4  4A04                   tst.b   d4
 0B0A6  6F20                   ble.b   L_0B0C8
@@ -13536,18 +13537,18 @@
 0B156  64F8                   bcc.b   L_0B150
 0B158  1407                   move.b  d7,d2
 0B15A                         L_0B15A:
-0B15A  4DED 0AC0              lea.l   $ac0(a5),a6
+0B15A  4DED 0AC0              lea.l   midi_velocity(a5),a6
 0B15E  DCC1                   adda.w  d1,a6
 0B160  1C82                   move.b  d2,(a6)
 0B162                         L_0B162:
 0B162  4CDF 0006              movem.l (a7)+,d1-d2
 0B166  4E75                   rts     
-0B168                         dat_0B168:
-0B168  0100 0101 0101 0001 0000 0100 0101 0001  |................|
+0B168                         fn_needs_division:
+0B168  0100 0101 0101 0001 0000 0100 0101 0001  |................| ; byte per Fnc type: 1 = only when its division is a keyboard
 0B178  0001 0100 0100 0101 0101 0101 0101 6E2B  |..............+n|
 0B188  6E6E 2D00 6E6E 006E 2250                 |nn.-nnn.P"|
-0B192                         sub_0B192:
-0B192  4A04                   tst.b   d4
+0B192                         unit_use:
+0B192  4A04                   tst.b   d4                     ; use count per unit; 0<->1 drives the unit by type (unit_type_table)
 0B194  6E06                   bgt.b   L_0B19C
 0B196  5359                   subq.w  #$1,(a1)+
 0B198  670A                   beq.b   L_0B1A4
@@ -13562,21 +13563,22 @@
 0B1A6  3E1A                   move.w  (a2)+,d7
 0B1A8  BE7C 0005              cmp.w   #$5,d7
 0B1AC  670E                   beq.b   L_0B1BC
-0B1AE  41FA 02A0              lea.l   L_0B450(pc),a0
+0B1AE  41FA 02A0              lea.l   output_console(pc),a0
 0B1B2  0C5A 0002              cmpi.w  #$2,(a2)+
 0B1B6  6604                   bne.b   L_0B1BC
-0B1B8  41FA 02D2              lea.l   L_0B48C(pc),a0
+0B1B8  41FA 02D2              lea.l   output_chamber(pc),a0
 0B1BC                         L_0B1BC:
 0B1BC  321A                   move.w  (a2)+,d1
 0B1BE  E347                   asl.w   #$1,d7
-0B1C0  3E3B 7006              move.w  $b1c8(pc,d7.w),d7
-0B1C4  4EFB 7002              jmp     $b1c8(pc,d7.w)         ; word-offset jump table
-0B1C8  000E                   dc.w    tbl_0B1C8_0-$0B1C8  ;  0 ($00)
-0B1CA  000C                   dc.w    tbl_0B1C8_1-$0B1C8  ;  1 ($01)
-0B1CC  0010                   dc.w    tbl_0B1C8_2-$0B1C8  ;  2 ($02)
-0B1CE  00A6                   dc.w    tbl_0B1C8_3-$0B1C8  ;  3 ($03)
-0B1D0  0162                   dc.w    tbl_0B1C8_4-$0B1C8  ;  4 ($04)
-0B1D2  018C                   dc.w    tbl_0B1C8_5-$0B1C8  ;  5 ($05)
+0B1C0  3E3B 7006              move.w  unit_type_table(pc,d7.w),d7
+0B1C4  4EFB 7002              jmp     unit_type_table(pc,d7.w) ; word-offset jump table
+0B1C8                         unit_type_table:
+0B1C8  000E                   dc.w    tbl_0B1C8_0-unit_type_table  ;  0 ($00)
+0B1CA  000C                   dc.w    tbl_0B1C8_1-unit_type_table  ;  1 ($01)
+0B1CC  0010                   dc.w    tbl_0B1C8_2-unit_type_table  ;  2 ($02)
+0B1CE  00A6                   dc.w    tbl_0B1C8_3-unit_type_table  ;  3 ($03)
+0B1D0  0162                   dc.w    tbl_0B1C8_4-unit_type_table  ;  4 ($04)
+0B1D2  018C                   dc.w    tbl_0B1C8_5-unit_type_table  ;  5 ($05)
 0B1D4                         tbl_0B1C8_1:
 0B1D4  4E90                   jsr     (a0)
 0B1D6                         tbl_0B1C8_0:
@@ -13724,16 +13726,16 @@
 0B306  3226                   move.w  -(a6),d1
 0B308  0C66 0002              cmpi.w  #$2,-(a6)
 0B30C  6604                   bne.b   L_0B312
-0B30E  4EFA 017C              jmp     L_0B48C(pc)
+0B30E  4EFA 017C              jmp     output_chamber(pc)
 0B312                         L_0B312:
-0B312  4EFA 013C              jmp     L_0B450(pc)
+0B312  4EFA 013C              jmp     output_console(pc)
 0B316                         sub_0B316:
 0B316  322A 0004              move.w  $4(a2),d1
 0B31A  0C6A 0002 FFFC         cmpi.w  #$2,-$4(a2)
 0B320  6604                   bne.b   L_0B326
-0B322  4EFA 0168              jmp     L_0B48C(pc)
+0B322  4EFA 0168              jmp     output_chamber(pc)
 0B326                         L_0B326:
-0B326  4EFA 0128              jmp     L_0B450(pc)
+0B326  4EFA 0128              jmp     output_console(pc)
 0B32A                         tbl_0B1C8_4:
 0B32A  48E7 3C00              movem.l d2-d5,-(a7)
 0B32E  4A04                   tst.b   d4
@@ -13797,7 +13799,7 @@
 0B3A8  1C84                   move.b  d4,(a6)
 0B3AA  B63C 0002              cmp.b   #$2,d3
 0B3AE  6314                   bls.b   L_0B3C4
-0B3B0  4EBA 00DA              jsr     L_0B48C(pc)
+0B3B0  4EBA 00DA              jsr     output_chamber(pc)
 0B3B4  4A2D 01F8              tst.b   $1f8(a5)
 0B3B8  6704                   beq.b   L_0B3BE
 0B3BA  4EBA 0A6E              jsr     sub_0BE2A(pc)
@@ -13834,7 +13836,7 @@
 0B3F0  670A                   beq.b   L_0B3FC
 0B3F2  2F01                   move.l  d1,-(a7)
 0B3F4  D242                   add.w   d2,d1
-0B3F6  4EBA 0094              jsr     L_0B48C(pc)
+0B3F6  4EBA 0094              jsr     output_chamber(pc)
 0B3FA  221F                   move.l  (a7)+,d1
 0B3FC                         L_0B3FC:
 0B3FC  4A2D 01F8              tst.b   $1f8(a5)
@@ -13848,18 +13850,24 @@
 0B412  4E75                   rts     
 0B414                         dat_0B414:
 0B414                         dc.b    '0w1$2]3m4.5k6{7%8',$7F,'9o-',$08,'A?BzCSD|E[F',$1B,'H>P',$1F,'Uv=I',$00,$00
-0B440                         dc.b    $03,'>X',$9E,'X',$BE,'BbP,G',$DE,'62',$00
-0B44F                         dc.b    'p'
-0B450                         L_0B450:
-0B450  3E01                   move.w  d1,d7
+0B440                         rank_out_hook:
+0B440  3E03                   move.w  d3,d7                  ; hook: key -> rank pipe (key - offset within count) -> output_console/output_chamber
+0B442  9E58                   sub.w   (a0)+,d7
+0B444  BE58                   cmp.w   (a0)+,d7
+0B446  6242                   bhi.b   L_0B48A
+0B448  2C50                   movea.l (a0),a6
+0B44A  DE47                   add.w   d7,d7
+0B44C  3236 7000              move.w  (a6,d7.w),d1
+0B450                         output_console:
+0B450  3E01                   move.w  d1,d7                  ; console output d1: use count; 0<->1 writes ~addr to $FF80 with control $3C00 (bit 15 clear = on)
 0B452  6E06                   bgt.b   L_0B45A
 0B454  6734                   beq.b   L_0B48A
 0B456  0887 000F              bclr.b  #$f,d7
 0B45A                         L_0B45A:
 0B45A  BE7C 6001              cmp.w   #$6001,d7
-0B45E  6400 0062              bcc.w   L_0B4C2
+0B45E  6400 0062              bcc.w   output_midi
 0B462  5341                   subq.w  #$1,d1
-0B464  2C6D 012E              movea.l $12e(a5),a6
+0B464  2C6D 012E              movea.l out_console_cnt(a5),a6
 0B468  D936 7000              add.b   d4,(a6,d7.w)
 0B46C  6E0E                   bgt.b   L_0B47C
 0B46E  4641                   not.w   d1
@@ -13872,13 +13880,13 @@
 0B486  31C1 FF80              move.w  d1,$ff80.w
 0B48A                         L_0B48A:
 0B48A  4E75                   rts     
-0B48C                         L_0B48C:
-0B48C  3E01                   move.w  d1,d7
+0B48C                         output_chamber:
+0B48C  3E01                   move.w  d1,d7                  ; chamber/pipe output d1: as above with control $3300; >= $6001 -> output_midi
 0B48E  6E06                   bgt.b   L_0B496
 0B490  672E                   beq.b   L_0B4C0
 0B492  0887 000F              bclr.b  #$f,d7
 0B496                         L_0B496:
-0B496  2C6D 0132              movea.l $132(a5),a6
+0B496  2C6D 0132              movea.l out_chamber_cnt(a5),a6
 0B49A  D936 7000              add.b   d4,(a6,d7.w)
 0B49E  6E10                   bgt.b   L_0B4B0
 0B4A0  5341                   subq.w  #$1,d1
@@ -13893,8 +13901,8 @@
 0B4BC  31C1 FF80              move.w  d1,$ff80.w
 0B4C0                         L_0B4C0:
 0B4C0  4E75                   rts     
-0B4C2                         L_0B4C2:
-0B4C2  2C6D 0168              movea.l $168(a5),a6
+0B4C2                         output_midi:
+0B4C2  2C6D 0168              movea.l midi_out_cnt(a5),a6    ; MIDI note on/off on channel B: 9n note velocity
 0B4C6  0241 07FF              andi.w  #$7ff,d1
 0B4CA  DCC1                   adda.w  d1,a6
 0B4CC  4A04                   tst.b   d4
@@ -13921,7 +13929,7 @@
 0B500  4281                   clr.l   d1
 0B502  4A04                   tst.b   d4
 0B504  6F0A                   ble.b   L_0B510
-0B506  4DED 0AC0              lea.l   $ac0(a5),a6
+0B506  4DED 0AC0              lea.l   midi_velocity(a5),a6
 0B50A  DCC3                   adda.w  d3,a6
 0B50C  1216                   move.b  (a6),d1
 0B50E  E209                   lsr.b   #$1,d1
@@ -13930,14 +13938,14 @@
 0B514  4CDF 000E              movem.l (a7)+,d1-d3
 0B518                         L_0B518:
 0B518  4E75                   rts     
-0B51A                         L_0B51A:
-0B51A  3C01                   move.w  d1,d6
+0B51A                         output_console_direct:
+0B51A  3C01                   move.w  d1,d6                  ; no use count (editor, tests); tracks the highest address
 0B51C  0246 7FFF              andi.w  #$7fff,d6
 0B520  6728                   beq.b   L_0B54A
-0B522  4DED 016C              lea.l   $16c(a5),a6
+0B522  4DED 016C              lea.l   out_console_max(a5),a6
 0B526  BC7C 6001              cmp.w   #$6001,d6
 0B52A  6504                   bcs.b   L_0B530
-0B52C  4DED 0170              lea.l   $170(a5),a6
+0B52C  4DED 0170              lea.l   midi_out_max(a5),a6
 0B530                         L_0B530:
 0B530  BC56                   cmp.w   (a6),d6
 0B532  6302                   bls.b   L_0B536
@@ -13951,14 +13959,14 @@
 0B546  31C6 FF80              move.w  d6,$ff80.w
 0B54A                         L_0B54A:
 0B54A  4E75                   rts     
-0B54C                         L_0B54C:
+0B54C                         output_chamber_direct:
 0B54C  3C01                   move.w  d1,d6
 0B54E  0246 7FFF              andi.w  #$7fff,d6
 0B552  6728                   beq.b   L_0B57C
-0B554  4DED 016E              lea.l   $16e(a5),a6
+0B554  4DED 016E              lea.l   out_chamber_max(a5),a6
 0B558  BC7C 6001              cmp.w   #$6001,d6
 0B55C  6504                   bcs.b   L_0B562
-0B55E  4DED 0170              lea.l   $170(a5),a6
+0B55E  4DED 0170              lea.l   midi_out_max(a5),a6
 0B562                         L_0B562:
 0B562  BC56                   cmp.w   (a6),d6
 0B564  6302                   bls.b   L_0B568
@@ -13972,8 +13980,8 @@
 0B578  31C6 FF80              move.w  d6,$ff80.w
 0B57C                         L_0B57C:
 0B57C  4E75                   rts     
-0B57E                         sub_0B57E:
-0B57E  46FC 2700              move.w  #$2700,sr
+0B57E                         analog_sample:
+0B57E  46FC 2700              move.w  #$2700,sr              ; successive-approximation read of one analog input (control $31xx), compare with sensitivity, chan_input_event
 0B582  43F8 FF80              lea.l   $ff80.w,a1
 0B586  45F8 FF82              lea.l   $ff82.w,a2
 0B58A  4251                   clr.w   (a1)
@@ -14023,16 +14031,16 @@
 0B5E0  3020                   move.w  -(a0),d0
 0B5E2  30C3                   move.w  d3,(a0)+
 0B5E4  7801                   moveq   #$1,d4
-0B5E6  4EBA 05D2              jsr     sub_0BBBA(pc)
+0B5E6  4EBA 05D2              jsr     chan_input_event(pc)
 0B5EA  3600                   move.w  d0,d3
 0B5EC  78FF                   moveq   #$ff,d4
-0B5EE  4EBA 05CA              jsr     sub_0BBBA(pc)
+0B5EE  4EBA 05CA              jsr     chan_input_event(pc)
 0B5F2                         L_0B5F2:
 0B5F2  4E75                   rts     
 0B5F4                         stop_event:
 0B5F4  B66D 0118              cmp.w   num_stops(a5),d3       ; stop d3 changed, d4 = +1/-1
 0B5F8  622C                   bhi.b   L_0B626
-0B5FA  2C6D 0702              movea.l $702(a5),a6
+0B5FA  2C6D 0702              movea.l stop_inactive(a5),a6
 0B5FE  4A36 3000              tst.b   (a6,d3.w)
 0B602  6622                   bne.b   L_0B626
 0B604  2C6D 06EE              movea.l stop_state(a5),a6
@@ -14050,7 +14058,7 @@
 0B626  4E75                   rts     
 0B628                         stop_type_table:
 0B628  49D8                   dc.w    tbl_0B628_0-stop_type_table  ;  0 ($00)
-0B62A  F744                   dc.w    tbl_0B628_1-stop_type_table  ;  1 ($01)
+0B62A  F744                   dc.w    stop_contact_change-stop_type_table  ;  1 ($01)
 0B62C  000A                   dc.w    tbl_0B628_2-stop_type_table  ;  2 ($02)
 0B62E  0042                   dc.w    tbl_0B628_3-stop_type_table  ;  3 ($03)
 0B630  0048                   dc.w    tbl_0B628_4-stop_type_table  ;  4 ($04)
@@ -14064,7 +14072,7 @@
 0B640                         L_0B640:
 0B640  48E7 4800              movem.l d1/d4,-(a7)
 0B644  7801                   moveq   #$1,d4
-0B646  4EBA FE44              jsr     L_0B48C(pc)
+0B646  4EBA FE44              jsr     output_chamber(pc)
 0B64A  4CDF 0012              movem.l (a7)+,d1/d4
 0B64E  7C0A                   moveq   #$a,d6
 0B650  7E08                   moveq   #$8,d7
@@ -14075,55 +14083,55 @@
 0B65C  2CDF                   move.l  (a7)+,(a6)+
 0B65E  3CC1                   move.w  d1,(a6)+
 0B660  4DD4                   lea.l   (a4),a6
-0B662  3C2D 08AE              move.w  $8ae(a5),d6
+0B662  3C2D 08AE              move.w  magnet_pulse(a5),d6
 0B666  4E43                   trap    #$3
 0B668  4E75                   rts     
 0B66A                         tbl_0B628_3:
 0B66A  7801                   moveq   #$1,d4
-0B66C  4EFA F6FE              jmp     tbl_0B628_1(pc)
+0B66C  4EFA F6FE              jmp     stop_contact_change(pc)
 0B670                         tbl_0B628_4:
 0B670  2404                   move.l  d4,d2
 0B672  7801                   moveq   #$1,d4
-0B674  4EFA F6F6              jmp     tbl_0B628_1(pc)
+0B674  4EFA F6F6              jmp     stop_contact_change(pc)
 0B678                         spec_0B678:
 0B678  3210                   move.w  (a0),d1
 0B67A  4DE8 FFF8              lea.l   -$8(a0),a6
 0B67E  7E09                   moveq   #$9,d7
 0B680  4E40                   trap    #$0                    ; sys $09 sys_free
 0B682  78FF                   moveq   #$ff,d4
-0B684  4EBA FE06              jsr     L_0B48C(pc)
+0B684  4EBA FE06              jsr     output_chamber(pc)
 0B688  4E75                   rts     
-0B68A                         sub_0B68A:
-0B68A  48E7 1800              movem.l d3-d4,-(a7)
-0B68E  206D 08A2              movea.l $8a2(a5),a0
+0B68A                         piston_press:
+0B68A  48E7 1800              movem.l d3-d4,-(a7)            ; see README "Combination files"
+0B68E  206D 08A2              movea.l comb_table(a5),a0
 0B692  5343                   subq.w  #$1,d3
-0B694  C6ED 08AA              mulu.w  $8aa(a5),d3
+0B694  C6ED 08AA              mulu.w  comb_rowbytes(a5),d3
 0B698  E343                   asl.w   #$1,d3
 0B69A  D0C3                   adda.w  d3,a0
-0B69C  4A2D 08A6              tst.b   $8a6(a5)
+0B69C  4A2D 08A6              tst.b   set_mode(a5)
 0B6A0  6716                   beq.b   L_0B6B8
 0B6A2  50ED 0201              st.b    output_dirty(a5)
-0B6A6  4A2D 08A7              tst.b   $8a7(a5)
+0B6A6  4A2D 08A7              tst.b   range_mode(a5)
 0B6AA  6706                   beq.b   L_0B6B2
-0B6AC  4EBA 0056              jsr     sub_0B704(pc)
+0B6AC  4EBA 0056              jsr     piston_set_range(pc)
 0B6B0  601E                   bra.b   L_0B6D0
 0B6B2                         L_0B6B2:
-0B6B2  4EBA 008E              jsr     sub_0B742(pc)
+0B6B2  4EBA 008E              jsr     piston_set(pc)
 0B6B6  6018                   bra.b   L_0B6D0
 0B6B8                         L_0B6B8:
-0B6B8  4A2D 08A7              tst.b   $8a7(a5)
+0B6B8  4A2D 08A7              tst.b   range_mode(a5)
 0B6BC  6706                   beq.b   L_0B6C4
-0B6BE  4EBA 00CC              jsr     sub_0B78C(pc)
+0B6BE  4EBA 00CC              jsr     piston_show_range(pc)
 0B6C2  600C                   bra.b   L_0B6D0
 0B6C4                         L_0B6C4:
 0B6C4  78FF                   moveq   #$ff,d4
-0B6C6  4EBA 000E              jsr     sub_0B6D6(pc)
+0B6C6  4EBA 000E              jsr     piston_apply(pc)
 0B6CA  7801                   moveq   #$1,d4
-0B6CC  4EBA 0008              jsr     sub_0B6D6(pc)
+0B6CC  4EBA 0008              jsr     piston_apply(pc)
 0B6D0                         L_0B6D0:
 0B6D0  4CDF 0018              movem.l (a7)+,d3-d4
 0B6D4  4E75                   rts     
-0B6D6                         sub_0B6D6:
+0B6D6                         piston_apply:
 0B6D6  4283                   clr.l   d3
 0B6D8                         L_0B6D8:
 0B6D8  1018                   move.b  (a0)+,d0
@@ -14146,8 +14154,8 @@
 0B6FC  B66D 0118              cmp.w   num_stops(a5),d3
 0B700  63D6                   bls.b   L_0B6D8
 0B702  4E75                   rts     
-0B704                         sub_0B704:
-0B704  302D 08AA              move.w  $8aa(a5),d0
+0B704                         piston_set_range:
+0B704  302D 08AA              move.w  comb_rowbytes(a5),d0
 0B708  286D 06EE              movea.l stop_state(a5),a4
 0B70C  528C                   addq.l  #$1,a4
 0B70E  7601                   moveq   #$1,d3
@@ -14175,8 +14183,8 @@
 0B73C  7E18                   moveq   #$18,d7
 0B73E  4E40                   trap    #$0                    ; sys $18 sys_beep
 0B740  4E75                   rts     
-0B742                         sub_0B742:
-0B742  302D 08AA              move.w  $8aa(a5),d0
+0B742                         piston_set:
+0B742  302D 08AA              move.w  comb_rowbytes(a5),d0
 0B746  2248                   movea.l a0,a1
 0B748  2448                   movea.l a0,a2
 0B74A  D4C0                   adda.w  d0,a2
@@ -14211,11 +14219,11 @@
 0B786  7E18                   moveq   #$18,d7
 0B788  4E40                   trap    #$0                    ; sys $18 sys_beep
 0B78A  4E75                   rts     
-0B78C                         sub_0B78C:
+0B78C                         piston_show_range:
 0B78C  4283                   clr.l   d3
 0B78E                         L_0B78E:
 0B78E  2C48                   movea.l a0,a6
-0B790  DCED 08AA              adda.w  $8aa(a5),a6
+0B790  DCED 08AA              adda.w  comb_rowbytes(a5),a6
 0B794  1018                   move.b  (a0)+,d0
 0B796  8016                   or.b    (a6),d0
 0B798                         L_0B798:
@@ -14347,7 +14355,7 @@
 0B8A8  48E7 1080              movem.l d3/a0,-(a7)
 0B8AC  3628 0012              move.w  $12(a0),d3
 0B8B0  6704                   beq.b   L_0B8B6
-0B8B2  4EBA F45E              jsr     sub_0AD12(pc)
+0B8B2  4EBA F45E              jsr     note_offset_hook(pc)
 0B8B6                         L_0B8B6:
 0B8B6  4CDF 0108              movem.l (a7)+,d3/a0
 0B8BA  4E75                   rts     
@@ -14371,12 +14379,12 @@
 0B8E2  2949 0022              move.l  a1,$22(a4)
 0B8E6  234C 0022              move.l  a4,$22(a1)
 0B8EA  2849                   movea.l a1,a4
-0B8EC  4EBA 0E28              jsr     tbl_0AF80_4(pc)
+0B8EC  4EBA 0E28              jsr     coupler_activate(pc)
 0B8F0  4E75                   rts     
 0B8F2                         L_0B8F2:
 0B8F2  2F0C                   move.l  a4,-(a7)
 0B8F4  286C 0022              movea.l $22(a4),a4
-0B8F8  4EBA 0E1C              jsr     tbl_0AF80_4(pc)
+0B8F8  4EBA 0E1C              jsr     coupler_activate(pc)
 0B8FC  4DD4                   lea.l   (a4),a6
 0B8FE  7E09                   moveq   #$9,d7
 0B900  4E40                   trap    #$0                    ; sys $09 sys_free
@@ -14386,7 +14394,7 @@
 0B906  4AE8 0014              tas.b   $14(a0)
 0B90A  6B10                   bmi.b   L_0B91C
 0B90C  48E7 0080              movem.l a0,-(a7)
-0B910  4EBA F400              jsr     sub_0AD12(pc)
+0B910  4EBA F400              jsr     note_offset_hook(pc)
 0B914  4CDF 0100              movem.l (a7)+,a0
 0B918  4268 0014              clr.w   $14(a0)
 0B91C                         L_0B91C:
@@ -14433,8 +14441,8 @@
 0BB8E  4DD4 4E43 4E92 4CDF 0009 4E75 2F08 2458  |.MCN.N.L..uN./X$|
 0BB9E  2258 3618 670A 2C58 4296 78FF 2049 4E92  |X".6.gX,.B.xI .N|
 0BBAE  205F 4DE8 FFF8 7E09 4E40 4E75            |_ .M...~@NuN|
-0BBBA                         sub_0BBBA:
-0BBBA  48E7 0018              movem.l a3-a4,-(a7)
+0BBBA                         chan_input_event:
+0BBBA  48E7 0018              movem.l a3-a4,-(a7)            ; channel d2 input value d3 on/off: keep a sorted list of active inputs; highest wins
 0BBBE  4A43                   tst.w   d3
 0BBC0  6740                   beq.b   L_0BC02
 0BBC2  2C6D 06E2              movea.l chan_list(a5),a6
@@ -14469,8 +14477,8 @@
 0BC02                         L_0BC02:
 0BC02  4CDF 1800              movem.l (a7)+,a3-a4
 0BC06  4E75                   rts     
-0BC08                         sub_0BC08:
-0BC08  48E7 FCF8              movem.l d0-d5/a0-a4,-(a7)
+0BC08                         channels_poll:
+0BC08  48E7 FCF8              movem.l d0-d5/a0-a4,-(a7)      ; every 100 ms: for each channel whose value changed: record, fire Cot outputs crossing the value, update graph
 0BC0C  206D 06E2              movea.l chan_list(a5),a0
 0BC10  2818                   move.l  (a0)+,d4
 0BC12  4282                   clr.l   d2
@@ -14531,9 +14539,9 @@
 0BC96  6614                   bne.b   L_0BCAC
 0BC98  362B 0006              move.w  $6(a3),d3
 0BC9C  7801                   moveq   #$1,d4
-0BC9E  4EBA F234              jsr     sub_0AED4(pc)
+0BC9E  4EBA F234              jsr     function_use(pc)
 0BCA2  78FF                   moveq   #$ff,d4
-0BCA4  4EBA F22E              jsr     sub_0AED4(pc)
+0BCA4  4EBA F22E              jsr     function_use(pc)
 0BCA8  2653                   movea.l (a3),a3
 0BCAA  60E6                   bra.b   L_0BC92
 0BCAC                         L_0BCAC:
@@ -14558,7 +14566,7 @@
 0BCCC  B46B 0004              cmp.w   $4(a3),d2
 0BCD0  650C                   bcs.b   L_0BCDE
 0BCD2  362B 0006              move.w  $6(a3),d3
-0BCD6  4EBA F1FC              jsr     sub_0AED4(pc)
+0BCD6  4EBA F1FC              jsr     function_use(pc)
 0BCDA  2653                   movea.l (a3),a3
 0BCDC  60EE                   bra.b   L_0BCCC
 0BCDE                         L_0BCDE:
@@ -14570,10 +14578,10 @@
 0BCE8  6716                   beq.b   L_0BD00
 0BCEA  342A 0004              move.w  $4(a2),d2
 0BCEE  7801                   moveq   #$1,d4
-0BCF0  4EBA FEC8              jsr     sub_0BBBA(pc)
+0BCF0  4EBA FEC8              jsr     chan_input_event(pc)
 0BCF4  C143                   exg.l   d0,d3
 0BCF6  78FF                   moveq   #$ff,d4
-0BCF8  4EBA FEC0              jsr     sub_0BBBA(pc)
+0BCF8  4EBA FEC0              jsr     chan_input_event(pc)
 0BCFC  C740                   exg.l   d3,d0
 0BCFE  60E4                   bra.b   sub_0BCE4
 0BD00                         L_0BD00:
@@ -14824,7 +14832,7 @@
 0BFCE  3418                   move.w  (a0)+,d2
 0BFD0  3618                   move.w  (a0)+,d3
 0BFD2  3818                   move.w  (a0)+,d4
-0BFD4  2A2D 06C2              move.l  $6c2(a5),d5
+0BFD4  2A2D 06C2              move.l  division_base(a5),d5
 0BFD8  11FC 0001 FE11         move.b  #$1,$fe11.w
 0BFDE  4EBA EB3C              jsr     key_event(pc)
 0BFE2  2B47 0C0C              move.l  d7,$c0c(a5)
@@ -14835,26 +14843,26 @@
 0BFEE  3618                   move.w  (a0)+,d3
 0BFF0  3418                   move.w  (a0)+,d2
 0BFF2  3818                   move.w  (a0)+,d4
-0BFF4  2A2D 06C2              move.l  $6c2(a5),d5
+0BFF4  2A2D 06C2              move.l  division_base(a5),d5
 0BFF8  11FC 0001 FE11         move.b  #$1,$fe11.w
-0BFFE  4EBA ED6C              jsr     tbl_0B628_1(pc)
+0BFFE  4EBA ED6C              jsr     stop_contact_change(pc)
 0C002  2B47 0C0C              move.l  d7,$c0c(a5)
 0C006  11FC 00C2 FE11         move.b  #$c2,$fe11.w
 0C00C  4E75                   rts     
 0C00E                         tbl_0BFBE_3:
 0C00E  3618                   move.w  (a0)+,d3
 0C010  3818                   move.w  (a0)+,d4
-0C012  2A2D 06C2              move.l  $6c2(a5),d5
+0C012  2A2D 06C2              move.l  division_base(a5),d5
 0C016  11FC 0001 FE11         move.b  #$1,$fe11.w
-0C01C  4EBA EEB6              jsr     sub_0AED4(pc)
+0C01C  4EBA EEB6              jsr     function_use(pc)
 0C020  2B47 0C0C              move.l  d7,$c0c(a5)
 0C024  11FC 00C2 FE11         move.b  #$c2,$fe11.w
 0C02A  4E75                   rts     
 0C02C                         tbl_0BFBE_4:
 0C02C  3618                   move.w  (a0)+,d3
 0C02E  3818                   move.w  (a0)+,d4
-0C030  2A2D 06C2              move.l  $6c2(a5),d5
-0C034  4EBA F654              jsr     sub_0B68A(pc)
+0C030  2A2D 06C2              move.l  division_base(a5),d5
+0C034  4EBA F654              jsr     piston_press(pc)
 0C038  4E75                   rts     
 0C03A                         tbl_0BFBE_6:
 0C03A  3E18                   move.w  (a0)+,d7
@@ -14864,7 +14872,7 @@
 0C044                         tbl_0BFBE_5:
 0C044  3B58 0C1E              move.w  (a0)+,$c1e(a5)
 0C048  3B58 0C20              move.w  (a0)+,$c20(a5)
-0C04C  2A2D 06C2              move.l  $6c2(a5),d5
+0C04C  2A2D 06C2              move.l  division_base(a5),d5
 0C050  2B6D 0656 0BF8         move.l  ticks(a5),$bf8(a5)
 0C056  3B7C 01F4 0C1C         move.w  #$1f4,$c1c(a5)
 0C05C                         L_0C05C:
@@ -14885,18 +14893,18 @@
 0C08C                         tbl_0BFBE_7:
 0C08C  3B58 0C1E              move.w  (a0)+,$c1e(a5)
 0C090  3B58 0C20              move.w  (a0)+,$c20(a5)
-0C094  2A2D 06C2              move.l  $6c2(a5),d5
+0C094  2A2D 06C2              move.l  division_base(a5),d5
 0C098  2B6D 0656 0BF8         move.l  ticks(a5),$bf8(a5)
 0C09E  3B7C 01F4 0C1C         move.w  #$1f4,$c1c(a5)
 0C0A4                         L_0C0A4:
 0C0A4  362D 0C1E              move.w  $c1e(a5),d3
 0C0A8  342D 0C20              move.w  $c20(a5),d2
 0C0AC  7801                   moveq   #$1,d4
-0C0AE  4EBA ECBC              jsr     tbl_0B628_1(pc)
+0C0AE  4EBA ECBC              jsr     stop_contact_change(pc)
 0C0B2  362D 0C1E              move.w  $c1e(a5),d3
 0C0B6  342D 0C20              move.w  $c20(a5),d2
 0C0BA  78FF                   moveq   #$ff,d4
-0C0BC  4EBA ECAE              jsr     tbl_0B628_1(pc)
+0C0BC  4EBA ECAE              jsr     stop_contact_change(pc)
 0C0C0  536D 0C1C              subq.w  #$1,$c1c(a5)
 0C0C4  66DE                   bne.b   L_0C0A4
 0C0C6  2E2D 0656              move.l  ticks(a5),d7
@@ -14972,8 +14980,8 @@
 0C1A8  7E0B                   moveq   #$b,d7
 0C1AA  4E40                   trap    #$0                    ; sys $0B sys_putinline
 0C1AC                         dc.b    '===  Setting up - please wait  ===',$00,$00
-0C1D0  4EBA D586              jsr     sub_09758(pc)
-0C1D4  4EBA D48E              jsr     sub_09664(pc)
+0C1D0  4EBA D586              jsr     relay_build_scan(pc)
+0C1D4  4EBA D48E              jsr     scan_setup_spf(pc)
 0C1D8  2A2D 0180              move.l  scan_count(a5),d5
 0C1DC  41FA 005E              lea.l   L_0C23C(pc),a0
 0C1E0  4EBA D4BC              jsr     sub_0969E(pc)
@@ -15178,7 +15186,7 @@
 0C3F0  5242                   addq.w  #$1,d2
 0C3F2  4EFA 0070              jmp     L_0C464(pc)
 0C3F6                         L_0C3F6:
-0C3F6  2C6D 0ABA              movea.l $aba(a5),a6
+0C3F6  2C6D 0ABA              movea.l midi_map(a5),a6
 0C3FA  3E00                   move.w  d0,d7
 0C3FC  EA4F                   lsr.w   #$5,d7
 0C3FE  0247 007C              andi.w  #$7c,d7
@@ -15197,7 +15205,7 @@
 0C41A  2F1B                   move.l  (a3)+,-(a7)
 0C41C  2C1B                   move.l  (a3)+,d6
 0C41E  9C8D                   sub.l   a5,d6
-0C420  BCBC 0000 A56E         cmp.l   #spec_0A56E,d6
+0C420  BCBC 0000 A56E         cmp.l   #debounce_hook,d6
 0C426  660A                   bne.b   L_0C432
 0C428  266B 000A              movea.l $a(a3),a3
 0C42C  588B                   addq.l  #$4,a3
@@ -15237,8 +15245,8 @@
 0C478  62F6                   bhi.b   L_0C470
 0C47A  221F                   move.l  (a7)+,d1
 0C47C  4EFA FEAE              jmp     L_0C32C(pc)
-0C480                         sub_0C480:
-0C480  3E3C 4514              move.w  #$4514,d7
+0C480                         scan_describe_key:
+0C480  3E3C 4514              move.w  #$4514,d7              ; editor "beep in": describe the input that just changed
 0C484  361B                   move.w  (a3)+,d3
 0C486  4EBA 008E              jsr     sub_0C516(pc)
 0C48A  7E0B                   moveq   #$b,d7
@@ -15250,12 +15258,12 @@
 0C49E  7E10                   moveq   #$10,d7
 0C4A0  4E40                   trap    #$0                    ; sys $10 sys_putnum
 0C4A2  4E75                   rts     
-0C4A4                         sub_0C4A4:
+0C4A4                         scan_describe_piston:
 0C4A4  3E3C 670C              move.w  #$670c,d7
 0C4A8  361B                   move.w  (a3)+,d3
 0C4AA  4EBA 006A              jsr     sub_0C516(pc)
 0C4AE  4E75                   rts     
-0C4B0                         sub_0C4B0:
+0C4B0                         scan_describe_switch:
 0C4B0  3E3C 1436              move.w  #$1436,d7
 0C4B4  361B                   move.w  (a3)+,d3
 0C4B6  4EBA 005E              jsr     sub_0C516(pc)
@@ -15267,17 +15275,17 @@
 0C4CE  7E10                   moveq   #$10,d7
 0C4D0  4E40                   trap    #$0                    ; sys $10 sys_putnum
 0C4D2  4E75                   rts     
-0C4D4                         sub_0C4D4:
+0C4D4                         scan_describe_stop:
 0C4D4  3E3C 79F0              move.w  #$79f0,d7
 0C4D8  361B                   move.w  (a3)+,d3
 0C4DA  4EBA 003A              jsr     sub_0C516(pc)
 0C4DE  4E75                   rts     
-0C4E0                         sub_0C4E0:
+0C4E0                         scan_describe_spf:
 0C4E0  3E3C 7946              move.w  #$7946,d7
 0C4E4  361B                   move.w  (a3)+,d3
 0C4E6  4EBA 002E              jsr     sub_0C516(pc)
 0C4EA  4E75                   rts     
-0C4EC                         sub_0C4EC:
+0C4EC                         scan_describe_ctl:
 0C4EC  3E3C 15EC              move.w  #$15ec,d7
 0C4F0  361B                   move.w  (a3)+,d3
 0C4F2  4EBA 0022              jsr     sub_0C516(pc)
@@ -15325,9 +15333,9 @@
 0C602  284E                   movea.l a6,a4
 0C604  2B4C 069A              move.l  a4,scan_buffer(a5)
 0C608                         L_0C608:
-0C608  4EBA D05A              jsr     sub_09664(pc)
+0C608  4EBA D05A              jsr     scan_setup_spf(pc)
 0C60C  70FF                   moveq   #$ff,d0
-0C60E  4EBA 00D6              jsr     sub_0C6E6(pc)
+0C60E  4EBA 00D6              jsr     scan_port(pc)
 0C612  336D 0690 0002         move.w  scan_control(a5),$2(a1)
 0C618                         L_0C618:
 0C618  3280                   move.w  d0,(a1)
@@ -15335,7 +15343,7 @@
 0C61C  421C                   clr.b   (a4)+
 0C61E  2E2D 0180              move.l  scan_count(a5),d7
 0C622  51CF FFFE              dbra    d7,$c622
-0C626  4A6D 06A8              tst.w   $6a8(a5)
+0C626  4A6D 06A8              tst.w   console_polarity(a5)
 0C62A  660A                   bne.b   L_0C636
 0C62C  4A51                   tst.w   (a1)
 0C62E  6B0E                   bmi.b   L_0C63E
@@ -15355,7 +15363,7 @@
 0C64E  426D 018E              clr.w   $18e(a5)
 0C652  206D 069A              movea.l scan_buffer(a5),a0
 0C656  70FF                   moveq   #$ff,d0
-0C658  4EBA 008C              jsr     sub_0C6E6(pc)
+0C658  4EBA 008C              jsr     scan_port(pc)
 0C65C  336D 0690 0002         move.w  scan_control(a5),$2(a1)
 0C662  7C02                   moveq   #$2,d6
 0C664  4A2D 0047              tst.b   ram_sized(a5)
@@ -15366,7 +15374,7 @@
 0C66E  5340                   subq.w  #$1,d0
 0C670  2E06                   move.l  d6,d7
 0C672  51CF FFFE              dbra    d7,$c672
-0C676  4A6D 06A8              tst.w   $6a8(a5)
+0C676  4A6D 06A8              tst.w   console_polarity(a5)
 0C67A  6618                   bne.b   L_0C694
 0C67C  4A18                   tst.b   (a0)+
 0C67E  670A                   beq.b   L_0C68A
@@ -15421,8 +15429,8 @@
 0C6E0  42AD 069A              clr.l   scan_buffer(a5)
 0C6E4                         L_0C6E4:
 0C6E4  4E73                   rte     
-0C6E6                         sub_0C6E6:
-0C6E6  227C FFFF FF80         movea.l #$ffffff80,a1
+0C6E6                         scan_port:
+0C6E6  227C FFFF FF80         movea.l #$ffffff80,a1          ; a1 = $FFFFFF80 (a dummy word when the console is on channel B and there is no scanner)
 0C6EC  4A2D 0046              tst.b   modem_console(a5)
 0C6F0  6704                   beq.b   L_0C6F6
 0C6F2  43FA 0004              lea.l   dat_0C6F8(pc),a1
@@ -15432,18 +15440,18 @@
 0C6F8                         dc.b    $00,$00,$00,$00
 0C6FC                         sub_0C6FC:
 0C6FC  48E7 1088              movem.l d3/a0/a4,-(a7)
-0C700  2C6D 06BA              movea.l $6ba(a5),a6
+0C700  2C6D 06BA              movea.l kbd_states(a5),a6
 0C704  3E1C                   move.w  (a4)+,d7
 0C706  E747                   asl.w   #$3,d7
 0C708  41F6 7004              lea.l   $4(a6,d7.w),a0
-0C70C  4EBA 00E2              jsr     sub_0C7F0(pc)
+0C70C  4EBA 00E2              jsr     hook_link(pc)
 0C710  4CDF 1108              movem.l (a7)+,d3/a0/a4
 0C714  4E75                   rts     
-0C716                         tbl_0AF80_4:
-0C716  48E7 FCF8              movem.l d0-d5/a0-a4,-(a7)
+0C716                         coupler_activate:
+0C716  48E7 FCF8              movem.l d0-d5/a0-a4,-(a7)      ; activate/release a coupler or rank-output block: link its hook into the source set, replay the notes already held
 0C71A  245C                   movea.l (a4)+,a2
 0C71C  204A                   movea.l a2,a0
-0C71E  4EBA 00D0              jsr     sub_0C7F0(pc)
+0C71E  4EBA 00D0              jsr     hook_link(pc)
 0C722  588A                   addq.l  #$4,a2
 0C724  301A                   move.w  (a2)+,d0
 0C726  676C                   beq.b   L_0C794
@@ -15534,12 +15542,12 @@
 0C7E0  268C                   move.l  a4,(a3)
 0C7E2  3942 0004              move.w  d2,$4(a4)
 0C7E6                         L_0C7E6:
-0C7E6  4EBA F3D2              jsr     sub_0BBBA(pc)
+0C7E6  4EBA F3D2              jsr     chan_input_event(pc)
 0C7EA  4CDF 1804              movem.l (a7)+,d2/a3-a4
 0C7EE                         L_0C7EE:
 0C7EE  4E75                   rts     
-0C7F0                         sub_0C7F0:
-0C7F0  4A04                   tst.b   d4
+0C7F0                         hook_link:
+0C7F0  4A04                   tst.b   d4                     ; add (d4 > 0) or remove node a4 from the hook list at a0
 0C7F2  6F04                   ble.b   L_0C7F8
 0C7F4  600E                   bra.b   L_0C804
 0C7F6                         L_0C7F6:
@@ -15573,7 +15581,7 @@
 0C828  39BC 00FF 7000         move.w  #$ff,(a4,d7.w)
 0C82E  3229 000A              move.w  $a(a1),d1
 0C832  3981 7002              move.w  d1,$2(a4,d7.w)
-0C836  4EBA ED14              jsr     L_0B54C(pc)
+0C836  4EBA ED14              jsr     output_chamber_direct(pc)
 0C83A  60E0                   bra.b   L_0C81C
 0C83C                         L_0C83C:
 0C83C  4EBA 0004              jsr     sub_0C842(pc)
@@ -16661,7 +16669,7 @@
 0D2CE                         L_0D2CE:
 0D2CE  137C 000C 0004         move.b  #$c,$4(a1)
 0D2D4  4EBA 047E              jsr     show_song_status(pc)
-0D2D8  266D 06BE              movea.l $6be(a5),a3
+0D2D8  266D 06BE              movea.l kbd_divisions(a5),a3
 0D2DC  201B                   move.l  (a3)+,d0
 0D2DE  2C00                   move.l  d0,d6
 0D2E0  5286                   addq.l  #$1,d6
@@ -16683,7 +16691,7 @@
 0D300  7E08                   moveq   #$8,d7
 0D302  4E40                   trap    #$0                    ; sys $08 sys_malloc
 0D304  234E 0040              move.l  a6,$40(a1)
-0D308  4EBA C700              jsr     sub_09A0A(pc)
+0D308  4EBA C700              jsr     build_divisions(pc)
 0D30C  234C 0030              move.l  a4,$30(a1)
 0D310  2C6D 06DA              movea.l stop_table(a5),a6
 0D314  2216                   move.l  (a6),d1
@@ -16696,7 +16704,7 @@
 0D322  50DE                   st.b    (a6)+
 0D324  5341                   subq.w  #$1,d1
 0D326  66FA                   bne.b   L_0D322
-0D328  2C6D 06FA              movea.l $6fa(a5),a6
+0D328  2C6D 06FA              movea.l lnk_tbl(a5),a6
 0D32C  2216                   move.l  (a6),d1
 0D32E  5281                   addq.l  #$1,d1
 0D330  2C01                   move.l  d1,d6
@@ -16707,7 +16715,7 @@
 0D33A  50DE                   st.b    (a6)+
 0D33C  5341                   subq.w  #$1,d1
 0D33E  66FA                   bne.b   L_0D33A
-0D340  2C6D 06F6              movea.l $6f6(a5),a6
+0D340  2C6D 06F6              movea.l fnc_tbl_base(a5),a6
 0D344  2016                   move.l  (a6),d0
 0D346  2C00                   move.l  d0,d6
 0D348  5286                   addq.l  #$1,d6
@@ -16719,9 +16727,9 @@
 0D356  7A30                   moveq   #$30,d5
 0D358  DA89                   add.l   a1,d5
 0D35A  9A8D                   sub.l   a5,d5
-0D35C  4EBA C9DC              jsr     sub_09D3A(pc)
+0D35C  4EBA C9DC              jsr     build_fn_blocks(pc)
 0D360  7801                   moveq   #$1,d4
-0D362  4EBA D8C4              jsr     sub_0AC28(pc)
+0D362  4EBA D8C4              jsr     replay_all_divisions(pc)
 0D366  47E9 0044              lea.l   $44(a1),a3
 0D36A  7E0C                   moveq   #$c,d7
 0D36C  4E41                   trap    #$1                    ; dsk $0C dsk_readhdr
@@ -16978,7 +16986,7 @@
 0D5C6  2C69 0030              movea.l $30(a1),a6
 0D5CA  2C76 1000              movea.l (a6,d1.w),a6
 0D5CE  2456                   movea.l (a6),a2
-0D5D0  4EBA D75A              jsr     sub_0AD2C(pc)
+0D5D0  4EBA D75A              jsr     note_set_change(pc)
 0D5D4                         L_0D5D4:
 0D5D4  4E75                   rts     
 0D5D6                         tbl_0D55E_3:
@@ -17138,7 +17146,7 @@
 0D73A  B47C 0010              cmp.w   #$10,d2
 0D73E  65F0                   bcs.b   L_0D730
 0D740  2869 0030              movea.l $30(a1),a4
-0D744  4EBA D4E2              jsr     sub_0AC28(pc)
+0D744  4EBA D4E2              jsr     replay_all_divisions(pc)
 0D748  08E9 0001 0004         bset.b  #$1,$4(a1)
 0D74E  4EBA 0004              jsr     show_song_status(pc)
 0D752  4E75                   rts     
@@ -17502,38 +17510,38 @@
 0DB26  2250                   movea.l (a0),a1
 0DB28  2F09                   move.l  a1,-(a7)
 0DB2A  7801                   moveq   #$1,d4
-0DB2C  4EBA D664              jsr     sub_0B192(pc)
+0DB2C  4EBA D664              jsr     unit_use(pc)
 0DB30  225F                   movea.l (a7)+,a1
 0DB32  78FF                   moveq   #$ff,d4
-0DB34  4EBA D65C              jsr     sub_0B192(pc)
+0DB34  4EBA D65C              jsr     unit_use(pc)
 0DB38  4E75                   rts     
 0DB3A                         sub_0DB3A:
 0DB3A  7C00                   moveq   #$0,d6
 0DB3C  7E06                   moveq   #$6,d7
 0DB3E  4E40                   trap    #$0                    ; sys $06 sys_getnum
 0DB40  3F01                   move.w  d1,-(a7)
-0DB42  2A2D 06C2              move.l  $6c2(a5),d5
+0DB42  2A2D 06C2              move.l  division_base(a5),d5
 0DB46  7801                   moveq   #$1,d4
 0DB48  4A57                   tst.w   (a7)
 0DB4A  6736                   beq.b   L_0DB82
 0DB4C  7637                   moveq   #$37,d3
-0DB4E  4EBA D21C              jsr     tbl_0B628_1(pc)
+0DB4E  4EBA D21C              jsr     stop_contact_change(pc)
 0DB52  0C57 0001              cmpi.w  #$1,(a7)
 0DB56  672A                   beq.b   L_0DB82
 0DB58  7638                   moveq   #$38,d3
-0DB5A  4EBA D210              jsr     tbl_0B628_1(pc)
+0DB5A  4EBA D210              jsr     stop_contact_change(pc)
 0DB5E  0C57 0002              cmpi.w  #$2,(a7)
 0DB62  671E                   beq.b   L_0DB82
 0DB64  7639                   moveq   #$39,d3
-0DB66  4EBA D204              jsr     tbl_0B628_1(pc)
+0DB66  4EBA D204              jsr     stop_contact_change(pc)
 0DB6A  0C57 0003              cmpi.w  #$3,(a7)
 0DB6E  6712                   beq.b   L_0DB82
 0DB70  763A                   moveq   #$3a,d3
-0DB72  4EBA D1F8              jsr     tbl_0B628_1(pc)
+0DB72  4EBA D1F8              jsr     stop_contact_change(pc)
 0DB76  0C57 0004              cmpi.w  #$4,(a7)
 0DB7A  6706                   beq.b   L_0DB82
 0DB7C  763B                   moveq   #$3b,d3
-0DB7E  4EBA D1EC              jsr     tbl_0B628_1(pc)
+0DB7E  4EBA D1EC              jsr     stop_contact_change(pc)
 0DB82                         L_0DB82:
 0DB82  7402                   moveq   #$2,d2
 0DB84  7631                   moveq   #$31,d3
@@ -17552,28 +17560,28 @@
 0DBA8  4A57                   tst.w   (a7)
 0DBAA  6736                   beq.b   L_0DBE2
 0DBAC  7637                   moveq   #$37,d3
-0DBAE  4EBA D1BC              jsr     tbl_0B628_1(pc)
+0DBAE  4EBA D1BC              jsr     stop_contact_change(pc)
 0DBB2  0C57 0001              cmpi.w  #$1,(a7)
 0DBB6  672A                   beq.b   L_0DBE2
 0DBB8  7638                   moveq   #$38,d3
-0DBBA  4EBA D1B0              jsr     tbl_0B628_1(pc)
+0DBBA  4EBA D1B0              jsr     stop_contact_change(pc)
 0DBBE  0C57 0002              cmpi.w  #$2,(a7)
 0DBC2  671E                   beq.b   L_0DBE2
 0DBC4  7639                   moveq   #$39,d3
-0DBC6  4EBA D1A4              jsr     tbl_0B628_1(pc)
+0DBC6  4EBA D1A4              jsr     stop_contact_change(pc)
 0DBCA  0C57 0003              cmpi.w  #$3,(a7)
 0DBCE  6712                   beq.b   L_0DBE2
 0DBD0  763A                   moveq   #$3a,d3
-0DBD2  4EBA D198              jsr     tbl_0B628_1(pc)
+0DBD2  4EBA D198              jsr     stop_contact_change(pc)
 0DBD6  0C57 0004              cmpi.w  #$4,(a7)
 0DBDA  6706                   beq.b   L_0DBE2
 0DBDC  763B                   moveq   #$3b,d3
-0DBDE  4EBA D18C              jsr     tbl_0B628_1(pc)
+0DBDE  4EBA D18C              jsr     stop_contact_change(pc)
 0DBE2                         L_0DBE2:
 0DBE2  4A5F                   tst.w   (a7)+
 0DBE4  4E75                   rts     
 0DBE6                         sub_0DBE6:
-0DBE6  2A2D 06C2              move.l  $6c2(a5),d5
+0DBE6  2A2D 06C2              move.l  division_base(a5),d5
 0DBEA  7C00                   moveq   #$0,d6
 0DBEC  7E06                   moveq   #$6,d7
 0DBEE  4E40                   trap    #$0                    ; sys $06 sys_getnum
@@ -17613,7 +17621,7 @@
 0DC52  266D 0E6C              movea.l $e6c(a5),a3
 0DC56  26ED 0E5C              move.l  $e5c(a5),(a3)+
 0DC5A  429B                   clr.l   (a3)+
-0DC5C  487A D0B4              pea.l   sub_0AD12(pc)
+0DC5C  487A D0B4              pea.l   note_offset_hook(pc)
 0DC60  26DF                   move.l  (a7)+,(a3)+
 0DC62  26ED 0E60              move.l  $e60(a5),(a3)+
 0DC66  425B                   clr.w   (a3)+
@@ -17622,7 +17630,7 @@
 0DC70  266D 0E70              movea.l $e70(a5),a3
 0DC74  26ED 0E60              move.l  $e60(a5),(a3)+
 0DC78  429B                   clr.l   (a3)+
-0DC7A  487A D096              pea.l   sub_0AD12(pc)
+0DC7A  487A D096              pea.l   note_offset_hook(pc)
 0DC7E  26DF                   move.l  (a7)+,(a3)+
 0DC80  26ED 0E64              move.l  $e64(a5),(a3)+
 0DC84  425B                   clr.w   (a3)+
@@ -17631,7 +17639,7 @@
 0DC8E  266D 0E74              movea.l $e74(a5),a3
 0DC92  26ED 0E64              move.l  $e64(a5),(a3)+
 0DC96  429B                   clr.l   (a3)+
-0DC98  487A D078              pea.l   sub_0AD12(pc)
+0DC98  487A D078              pea.l   note_offset_hook(pc)
 0DC9C  26DF                   move.l  (a7)+,(a3)+
 0DC9E  26ED 0E68              move.l  $e68(a5),(a3)+
 0DCA2  425B                   clr.w   (a3)+
@@ -17644,15 +17652,15 @@
 0DCB8  4A82                   tst.l   d2
 0DCBA  6720                   beq.b   L_0DCDC
 0DCBC  286D 0E6C              movea.l $e6c(a5),a4
-0DCC0  4EBA EA54              jsr     tbl_0AF80_4(pc)
+0DCC0  4EBA EA54              jsr     coupler_activate(pc)
 0DCC4  5382                   subq.l  #$1,d2
 0DCC6  6714                   beq.b   L_0DCDC
 0DCC8  286D 0E70              movea.l $e70(a5),a4
-0DCCC  4EBA EA48              jsr     tbl_0AF80_4(pc)
+0DCCC  4EBA EA48              jsr     coupler_activate(pc)
 0DCD0  5382                   subq.l  #$1,d2
 0DCD2  6708                   beq.b   L_0DCDC
 0DCD4  286D 0E74              movea.l $e74(a5),a4
-0DCD8  4EBA EA3C              jsr     tbl_0AF80_4(pc)
+0DCD8  4EBA EA3C              jsr     coupler_activate(pc)
 0DCDC                         L_0DCDC:
 0DCDC  7619                   moveq   #$19,d3
 0DCDE  7801                   moveq   #$1,d4
@@ -17664,12 +17672,12 @@
 0DCF2  7EFF                   moveq   #$ff,d7
 0DCF4  0F8E 0000              movep.w d7,$0(a6)
 0DCF8                         L_0DCF8:
-0DCF8  4EBA D032              jsr     sub_0AD2C(pc)
+0DCF8  4EBA D032              jsr     note_set_change(pc)
 0DCFC  4A38 0048              tst.b   $48.w
 0DD00  6710                   beq.b   L_0DD12
 0DD02  4DF8 FE1D              lea.l   $fe1d.w,a6
 0DD06  0F0E 0000              movep.w $0(a6),d7
-0DD0A  3B47 0194              move.w  d7,$194(a5)
+0DD0A  3B47 0194              move.w  d7,key_time_us(a5)
 0DD0E  46FC 2000              move.w  #$2000,sr
 0DD12                         L_0DD12:
 0DD12  4E75                   rts     
@@ -18893,7 +18901,7 @@
 0EA9A  4A12                   tst.b   (a2)
 0EA9C  675E                   beq.b   L_0EAFC
 0EA9E  487A FFF6              pea.l   sub_0EA96(pc)
-0EAA2  2A2D 06C2              move.l  $6c2(a5),d5
+0EAA2  2A2D 06C2              move.l  division_base(a5),d5
 0EAA6  7801                   moveq   #$1,d4
 0EAA8                         L_0EAA8:
 0EAA8  141A                   move.b  (a2)+,d2
@@ -18942,16 +18950,16 @@
 0EB1C  4E75                   rts     
 0EB1E                         L_0EB1E:
 0EB1E  4282                   clr.l   d2
-0EB20  4EBA C24A              jsr     tbl_0B628_1(pc)
+0EB20  4EBA C24A              jsr     stop_contact_change(pc)
 0EB24  4E75                   rts     
 0EB26                         L_0EB26:
-0EB26  4EBA C3AC              jsr     sub_0AED4(pc)
+0EB26  4EBA C3AC              jsr     function_use(pc)
 0EB2A  4E75                   rts     
 0EB2C                         L_0EB2C:
-0EB2C  4EBA C664              jsr     sub_0B192(pc)
+0EB2C  4EBA C664              jsr     unit_use(pc)
 0EB30  4E75                   rts     
 0EB32                         L_0EB32:
-0EB32  4EBA CB56              jsr     sub_0B68A(pc)
+0EB32  4EBA CB56              jsr     piston_press(pc)
 0EB36  4E75                   rts     
 0EB38  4EBA 0018 3F06 2E16 6706 2C47 5346 66F6  |.N...?...gG,FS.f|
 0EB48  508E 9C5F 4446 4287 4E75 4DED 0160 2C56  |.P_.FD.BuN.M`.V,|
