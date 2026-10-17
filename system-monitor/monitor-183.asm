@@ -803,7 +803,7 @@
 0189E  2B4E 09A8              move.l  a6,rx_hook_a(a5)
 018A2  4DFA 0BFA              lea.l   tx_console(pc),a6
 018A6  2B4E 09AC              move.l  a6,tx_hook_a(a5)
-018AA  4EBA 00DE              jsr     sub_0198A(pc)
+018AA  4EBA 00DE              jsr     channel_b_idle(pc)
 018AE  2E0D                   move.l  a5,d7
 018B0  6654                   bne.b   L_01906
 018B2  11FC 0040 FE29         move.b  #$40,$fe29.w
@@ -849,8 +849,8 @@
 0194C  11FC 00CC FE23         move.b  #$cc,$fe23.w
 01952                         L_01952:
 01952  4E75                   rts     
-01954                         sub_01954:
-01954  11FC 000A FE35         move.b  #$a,$fe35.w
+01954                         set_baud_b:
+01954  11FC 000A FE35         move.b  #$a,$fe35.w            ; reprogram channel B: CSRB = d1, reset rx/tx/errors, 8N1, enable
 0195A  11C1 FE33              move.b  d1,$fe33.w
 0195E  11FC 0020 FE35         move.b  #$20,$fe35.w
 01964  11FC 0030 FE35         move.b  #$30,$fe35.w
@@ -860,8 +860,8 @@
 0197C  11FC 0007 FE31         move.b  #$7,$fe31.w
 01982  11FC 0001 FE35         move.b  #$1,$fe35.w
 01988  4E75                   rts     
-0198A                         sub_0198A:
-0198A  46FC 2700              move.w  #$2700,sr
+0198A                         channel_b_idle:
+0198A  46FC 2700              move.w  #$2700,sr              ; disable channel B (unless it is the console), hooks -> rx_ignore
 0198E  4A2D 0046              tst.b   modem_console(a5)
 01992  6606                   bne.b   L_0199A
 01994  11FC 000A FE35         move.b  #$a,$fe35.w
@@ -877,15 +877,15 @@
 019B8                         rx_ignore:
 019B8  72FF                   moveq   #$ff,d1
 019BA  4E75                   rts     
-019BC                         sub_019BC:
-019BC  4EBA FFCC              jsr     sub_0198A(pc)
+019BC                         midi_channel_b:
+019BC  4EBA FFCC              jsr     channel_b_idle(pc)     ; MIDI on channel B: counter/timer CTUR 0 CTLR 8 (8 MHz IP2 / 16 / 16 = 31250), CSRB $DD
 019C0  46FC 2700              move.w  #$2700,sr
 019C4  2E0D                   move.l  a5,d7
 019C6  6612                   bne.b   L_019DA
 019C8  4238 FE2D              clr.b   $fe2d.w
 019CC  11FC 0008 FE2F         move.b  #$8,$fe2f.w
 019D2  123C 00DD              move.b  #$dd,d1
-019D6  4EBA FF7C              jsr     sub_01954(pc)
+019D6  4EBA FF7C              jsr     set_baud_b(pc)
 019DA                         L_019DA:
 019DA  2F0C                   move.l  a4,-(a7)
 019DC  7C08                   moveq   #$8,d6
@@ -914,8 +914,8 @@
 01A1E  4E40                   trap    #$0                    ; sys $09 sys_free
 01A20  46FC 2000              move.w  #$2000,sr
 01A24  4E75                   rts     
-01A26                         sub_01A26:
-01A26  4EBA FF62              jsr     sub_0198A(pc)
+01A26                         modem_channel_b:
+01A26  4EBA FF62              jsr     channel_b_idle(pc)     ; modem on channel B at the rate d0 (modem_baud_table), hooks -> rx_modem/tx_modem
 01A2A  2E0D                   move.l  a5,d7
 01A2C  6708                   beq.b   L_01A36
 01A2E  7E07                   moveq   #$7,d7
@@ -924,12 +924,12 @@
 01A34  6012                   bra.b   L_01A48
 01A36                         L_01A36:
 01A36  46FC 2700              move.w  #$2700,sr
-01A3A  4DFA 0106              lea.l   dat_01B42(pc),a6
+01A3A  4DFA 0106              lea.l   modem_baud_table(pc),a6
 01A3E                         L_01A3E:
 01A3E  321E                   move.w  (a6)+,d1
 01A40  B05E                   cmp.w   (a6)+,d0
 01A42  62FA                   bhi.b   L_01A3E
-01A44  4EBA FF0E              jsr     sub_01954(pc)
+01A44  4EBA FF0E              jsr     set_baud_b(pc)
 01A48                         L_01A48:
 01A48  4DFA 15EC              lea.l   rx_modem(pc),a6
 01A4C  2B4E 0A18              move.l  a6,rx_hook_b(a5)
@@ -1026,8 +1026,8 @@
 01B38  422D 09A2              clr.b   tx_busy_a(a5)
 01B3C  4CDF 5FFF              movem.l (a7)+,d0-d7/a0-a4/a6
 01B40  4E73                   rte     
-01B42                         dat_01B42:
-01B42  0044 012C 0066 04B0 0088 0960 00BB 2580  |D.,.f.....`....%|
+01B42                         modem_baud_table:
+01B42  0044 012C 0066 04B0 0088 0960 00BB 2580  |D.,.f.....`....%| ; {CSR.w, max baud.w}: $44 300, $66 1200, $88 2400, $BB 9600, $CC 38400
 01B52  00CC 9600                                |....|
 01B56                         term_select:
 01B56  2F0C                   move.l  a4,-(a7)               ; pick terminal escape-sequence table by terminal type
@@ -2300,7 +2300,7 @@
 02888  2B4E 0A2A              move.l  a6,$a2a(a5)
 0288C  426D 0A2E              clr.w   $a2e(a5)
 02890  426D 0A30              clr.w   $a30(a5)
-02894  4EBA F190              jsr     sub_01A26(pc)
+02894  4EBA F190              jsr     modem_channel_b(pc)
 02898  4285                   clr.l   d5
 0289A  426D 0A52              clr.w   $a52(a5)
 0289E  4DFA 0A2E              lea.l   dat_032CE(pc),a6
@@ -2410,10 +2410,10 @@
 029AE  4E40                   trap    #$0                    ; sys $01 sys_putc
 029B0  60A2                   bra.b   L_02954
 029B2                         L_029B2:
-029B2  4EBA EFD6              jsr     sub_0198A(pc)
-029B6  4A6D 0ABE              tst.w   $abe(a5)
+029B2  4EBA EFD6              jsr     channel_b_idle(pc)
+029B6  4A6D 0ABE              tst.w   midi_users(a5)
 029BA  6704                   beq.b   L_029C0
-029BC  4EBA EFFE              jsr     sub_019BC(pc)
+029BC  4EBA EFFE              jsr     midi_channel_b(pc)
 029C0                         L_029C0:
 029C0  2C6D 0A22              movea.l $a22(a5),a6
 029C4  7E09                   moveq   #$9,d7
@@ -9810,7 +9810,7 @@
 08922  2C6D 0226              movea.l tsk_sts(a5),a6
 08926  7E2B                   moveq   #$2b,d7
 08928  4E40                   trap    #$0                    ; sys $2B sys_wake
-0892A  4EBA 0636              jsr     sub_08F62(pc)
+0892A  4EBA 0636              jsr     midi_open(pc)
 0892E  422D 08AC              clr.b   $8ac(a5)
 08932  422D 0201              clr.b   output_dirty(a5)
 08936  4DFA 034D              lea.l   dat_08C85(pc),a6
@@ -9841,7 +9841,7 @@
 0898A  7E28                   moveq   #$28,d7
 0898C  4E40                   trap    #$0                    ; sys $28 sys_indicator
 0898E  4EBA 00E6              jsr     sub_08A76(pc)
-08992  4EBA 05DE              jsr     sub_08F72(pc)
+08992  4EBA 05DE              jsr     midi_close(pc)
 08996  4A2D 0201              tst.b   output_dirty(a5)
 0899A  6734                   beq.b   L_089D0
 0899C  2C3C 0000 083A         move.l  #$83a,d6
@@ -10162,7 +10162,7 @@
 08DC2  7E0B                   moveq   #$b,d7
 08DC4  4E40                   trap    #$0                    ; sys $0B sys_putinline
 08DC6                         dc.b    '----  MIDI Input Messgaes  ----',$00
-08DE6  4EBA 017A              jsr     sub_08F62(pc)
+08DE6  4EBA 017A              jsr     midi_open(pc)
 08DEA                         L_08DEA:
 08DEA  3C3C 0002              move.w  #$2,d6
 08DEE  7E02                   moveq   #$2,d7
@@ -10206,7 +10206,7 @@
 08E3E  66BE                   bne.b   L_08DFE
 08E40  60A8                   bra.b   L_08DEA
 08E42                         L_08E42:
-08E42  4EBA 012E              jsr     sub_08F72(pc)
+08E42  4EBA 012E              jsr     midi_close(pc)
 08E46  4DD4                   lea.l   (a4),a6
 08E48  7E22                   moveq   #$22,d7
 08E4A  4E40                   trap    #$0                    ; sys $22 sys_closewin
@@ -10275,7 +10275,7 @@
 08ED2  5242                   addq.w  #$1,d2
 08ED4  B47C 0010              cmp.w   #$10,d2
 08ED8  63DC                   bls.b   L_08EB6
-08EDA  4EBA 0086              jsr     sub_08F62(pc)
+08EDA  4EBA 0086              jsr     midi_open(pc)
 08EDE                         L_08EDE:
 08EDE  4A2D 01F5              tst.b   def_loaded(a5)
 08EE2  6606                   bne.b   L_08EEA
@@ -10323,7 +10323,7 @@
 08F44  7E37                   moveq   #$37,d7
 08F46  4E40                   trap    #$0                    ; sys $37 sys_getkey
 08F48  6A94                   bpl.b   L_08EDE
-08F4A  4EBA 0026              jsr     sub_08F72(pc)
+08F4A  4EBA 0026              jsr     midi_close(pc)
 08F4E  2C6D 0AB6              movea.l midi_counts(a5),a6
 08F52  42AD 0AB6              clr.l   midi_counts(a5)
 08F56  7E09                   moveq   #$9,d7
@@ -10332,19 +10332,19 @@
 08F5C  7E22                   moveq   #$22,d7
 08F5E  4E40                   trap    #$0                    ; sys $22 sys_closewin
 08F60  4E75                   rts     
-08F62                         sub_08F62:
-08F62  4A6D 0ABE              tst.w   $abe(a5)
+08F62                         midi_open:
+08F62  4A6D 0ABE              tst.w   midi_users(a5)         ; use count $ABE; first user switches channel B to MIDI
 08F66  6604                   bne.b   L_08F6C
-08F68  4EBA 8A52              jsr     sub_019BC(pc)
+08F68  4EBA 8A52              jsr     midi_channel_b(pc)
 08F6C                         L_08F6C:
-08F6C  526D 0ABE              addq.w  #$1,$abe(a5)
+08F6C  526D 0ABE              addq.w  #$1,midi_users(a5)
 08F70  4E75                   rts     
-08F72                         sub_08F72:
-08F72  4A6D 0ABE              tst.w   $abe(a5)
+08F72                         midi_close:
+08F72  4A6D 0ABE              tst.w   midi_users(a5)
 08F76  670A                   beq.b   L_08F82
-08F78  536D 0ABE              subq.w  #$1,$abe(a5)
+08F78  536D 0ABE              subq.w  #$1,midi_users(a5)
 08F7C  6E04                   bgt.b   L_08F82
-08F7E  4EBA 8A0A              jsr     sub_0198A(pc)
+08F7E  4EBA 8A0A              jsr     channel_b_idle(pc)
 08F82                         L_08F82:
 08F82  4E75                   rts     
 08F84                         sub_08F84:
@@ -15269,14 +15269,14 @@
 0C31E  4282                   clr.l   d2
 0C320  1A2D 01F5              move.b  def_loaded(a5),d5
 0C324  422D 01F5              clr.b   def_loaded(a5)
-0C328  4EBA CC38              jsr     sub_08F62(pc)
+0C328  4EBA CC38              jsr     midi_open(pc)
 0C32C                         L_0C32C:
 0C32C  7E29                   moveq   #$29,d7
 0C32E  4E40                   trap    #$0                    ; sys $29 sys_yield
 0C330  7E37                   moveq   #$37,d7
 0C332  4E40                   trap    #$0                    ; sys $37 sys_getkey
 0C334  6A14                   bpl.b   L_0C34A
-0C336  4EBA CC3A              jsr     sub_08F72(pc)
+0C336  4EBA CC3A              jsr     midi_close(pc)
 0C33A  1B45 01F5              move.b  d5,def_loaded(a5)
 0C33E  7E14                   moveq   #$14,d7
 0C340  4E40                   trap    #$0                    ; sys $14 sys_scanner_free
@@ -19142,11 +19142,11 @@
 0EB68  7E21                   moveq   #$21,d7
 0EB6A  4E40                   trap    #$0                    ; sys $21 sys_openwin
 0EB6C  2B4E 0C84              move.l  a6,$c84(a5)
-0EB70  2E3C 0000 8F62         move.l  #sub_08F62,d7
-0EB76  4EB5 7800              jsr     (a5,d7.l)              ; -> $08F62
+0EB70  2E3C 0000 8F62         move.l  #midi_open,d7
+0EB76  4EB5 7800              jsr     (a5,d7.l)              ; -> midi_open
 0EB7A  4EBA 0016              jsr     sub_0EB92(pc)
-0EB7E  2E3C 0000 8F72         move.l  #sub_08F72,d7
-0EB84  4EB5 7800              jsr     (a5,d7.l)              ; -> $08F72
+0EB7E  2E3C 0000 8F72         move.l  #midi_close,d7
+0EB84  4EB5 7800              jsr     (a5,d7.l)              ; -> midi_close
 0EB88  2C6D 0C84              movea.l $c84(a5),a6
 0EB8C  7E22                   moveq   #$22,d7
 0EB8E  4E40                   trap    #$0                    ; sys $22 sys_closewin

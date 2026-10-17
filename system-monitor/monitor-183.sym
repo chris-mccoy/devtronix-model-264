@@ -627,3 +627,13 @@ DDF4 addr_test          ; Tstadr: control $0300, data 255..0 for ever
 DE5C input_test         ; Tstinp: scan a board's 128 inputs (control $15FE), analog values with $35xx
 DFAA output_test        ; Tstotp: control $0F00, walk outputs 1..96 on/off
 E04E parse_board        ; two letters A-P -> board address bits
+
+# ------------------------------------------------------------- serial ports
+1954 set_baud_b        ; reprogram channel B: CSRB = d1, reset rx/tx/errors, 8N1, enable
+198A channel_b_idle    ; disable channel B (unless it is the console), hooks -> rx_ignore
+19BC midi_channel_b    ; MIDI on channel B: counter/timer CTUR 0 CTLR 8 (8 MHz IP2 / 16 / 16 = 31250), CSRB $DD
+1A26 modem_channel_b   ; modem on channel B at the rate d0 (modem_baud_table), hooks -> rx_modem/tx_modem
+1B42 modem_baud_table  ; {CSR.w, max baud.w}: $44 300, $66 1200, $88 2400, $BB 9600, $CC 38400
+8F62 midi_open         ; use count $ABE; first user switches channel B to MIDI
+8F72 midi_close
+=0ABE midi_users       ; use count of MIDI on channel B
