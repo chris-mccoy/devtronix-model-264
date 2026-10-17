@@ -169,8 +169,8 @@ Byte-swapped, the monitor begins `lea 0(pc),a5 ; bra.s` past the version strings
 
 ## Open questions / next steps
 
-3. Identify `$FFFFFE03` on the schematic (`$FFFFFE00` is the board's LED display).
-4. Disassemble the System Monitor 2.6 (183): it owns the filesystem, the relay I/O
-   scanning, MIDI, and the record/playback file format the music disks use.
-5. Catalogue the music disks (`58-note-*`, `jerrystour`, `mccoy*`, `stephen-ross-copy`,
-   `r-rhode-conc`, …) with `devdisk.py` once the directory structure is understood.
+1. Identify `$FFFFFE03` on the schematic (`$FFFFFE00` is the board's LED display).
+
+Everything else this list once held is done: the System Monitor is disassembled and
+documented in `../system-monitor/`, and every music disk is catalogued and rendered
+(`../renders/INDEX.md`, not in the public repository).
