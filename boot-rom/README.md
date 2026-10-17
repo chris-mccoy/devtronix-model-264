@@ -100,6 +100,16 @@ Register offsets are the standard 68681 map times 2 (odd bytes): MR at +0, SR/CS
 | `$FFE6` | R | Bit 1 = FDC INTRQ |
 | `$FFE7` | W | `$80` = FDC running, `$00` = FDC reset |
 
+**The sector buffer.** The controller never hands data to the CPU directly. READ SECTOR is
+issued and the code waits for the command to *complete* (INTRQ, then BUSY clear) before
+reading a byte, so the whole sector has already been clocked by DRQ into the 2 KB AM9128
+static RAM that sits beside the WD2791 on the board. The CPU then reads it back through the
+single port `$FFE4`, whose address counter advances on every access; writing `$FFE5` resets
+the counter. On a write the monitor fills the buffer through the same port first, sets
+`$FFE7` to `$84` (bit 2 = buffer-to-controller direction), and only then issues WRITE
+SECTOR. So the drive does DMA, but into its own buffer, which the 68000 sees as a one-byte
+window rather than as memory.
+
 ### Status display codes (`$FFFFFE00`)
 
 | Code | Meaning |
