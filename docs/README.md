@@ -22,11 +22,14 @@ as they exist in a local copy. Nothing under `disk-images/` is ever modified.
 
 ## The machine
 
-- **Computer** an Alpha Microsystems 68000 system of the AM-1000 class (Motorola 68000
-  at 8 MHz on those boards); the "Dimension-030" is InterLink Systems' 1991 68030
-  accelerator card for Alpha Micro machines, and the monitor's "Turbo Mode" enables its
-  instruction cache with `movec CACR`, exactly as Alpha Micro's own TURBO utility does.
-- **Memory** 512 KB RAM at `$000000`; 8 KB boot ROM at `$800000`.
+- **Computer** Devtronix's own board, "Organ Computer Control 264-1" (1984), built to
+  the design of the Alpha Microsystems AM-1000: MC68000P8 at 8 MHz, SCN68681 DUART,
+  6840 timer, WD2791 floppy controller, and the Alpha Micro byte-swapped bus. The
+  "Dimension-030" is InterLink Systems' 1991 68030 accelerator card for Alpha Micro
+  machines, and the monitor's "Turbo Mode" enables its instruction cache with
+  `movec CACR`, exactly as Alpha Micro's own TURBO utility does.
+- **Memory** 512 KB RAM at `$000000` (sixteen HM50256 DRAMs); 8 KB boot ROM at
+  `$800000` (two 2732A EPROMs, high and low byte).
 - **I/O** MC68681 DUART at `$FFFFFE21` (channel A = terminal, 9600 baud;
   channel B = modem, 1200 baud), MC6840 timer at `$FFFFFE11` (1 ms tick, tempo
   clock), WD179x floppy controller with glue at `$FFFFFFE0`, console scanner
@@ -38,6 +41,13 @@ as they exist in a local copy. Nothing under `disk-images/` is ever modified.
   tables (`Term n`): TeleVideo 950 family, [Wyse WY-50](https://terminals-wiki.org/wiki/index.php/Wyse_WY-50)
   (the default on 45 of the 48 monitor images), an ADM-3A-class minimum, and Devtronix's
   own PC terminal program. The boot ROM itself speaks TeleVideo (`ESC =`, `ESC Y`, `ESC T`).
+
+![Rear panel](../img/dev-back.jpg)
+
+*The rear of the Model 264: the TERMINAL port (DUART channel A), the port relabelled
+"MIDI AUXILIARY" by hand (channel B, the modem port the MIDI adapter plugs into), the
+slots for the console and output ribbon cables, the fan, mains fuse and switch, and a
+REMOTE RESET jack.*
 
 ### Byte order: read this before touching any dump
 

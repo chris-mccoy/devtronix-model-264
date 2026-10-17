@@ -72,6 +72,20 @@ and screen layouts, which the listing shows as data.
 | `$FFFFFFE0..E7` | WD179x floppy, exactly as the boot ROM uses it (`../boot-rom/README.md`) |
 | `movec CACR` | "Dimension-030 Turbo Mode": a 68030 accelerator; its driver is the last 340 bytes of the image |
 
+![CPU, DUART and timer on the 264-1 board](../img/dev-motherboard-cpu-duart.jpg)
+
+*The parts the monitor drives, on the "Organ Computer Control 264-1" board: MC68000P8
+with its 16 MHz oscillator (8 MHz bus clock), the Signetics SCN68681 DUART, the AMI
+S6840 programmable timer, AM9128 static RAM, DP8304 bus transceivers and 74LS373
+latches. The 3.6864 MHz crystal that clocks the DUART's baud-rate generator is just out
+of frame at the top right.*
+
+![The floppy controller](../img/dev-motherboad-fdc.jpg)
+
+*The "DISK CONTROL" corner: a Western Digital WD2791 floppy controller (the WD179x
+register map the boot ROM and monitor drive), with an AM9128 2 KB static RAM beside it,
+74LS273/74LS175 latches, and the two trimmers of the WD2791's data separator.*
+
 The tempo timer is programmed as `latch = 500000 / BPM`, which with the 800 kHz
 clock gives **96 pulses per beat**; at the default tempo of 120 that is 192
 pulses per second. All recorded timing is in these pulses.
@@ -451,11 +465,42 @@ for 1 s whenever a scan entry is created. A scan of one input costs
 eight comparisons of a DAC value against the input (`analog_sample`, `$B57E`,
 also `read_analog` for the tempo control), with interrupts off around each read.
 
+![Scanner ribbon connectors](../img/dev-ribbon-console-chamber.jpg)
+
+*Where the scanner leaves the board: the two 26-way headers marked "CONSOLE" (J6) and
+"CHAMBER – TONE GEN", fed by rows of DS75361 dual TTL-to-MOS drivers and 74LS374
+latches, which is the hardware behind the `$FF80`/`$FF82` ports.*
+
+![Input boards in the console](../img/dev-input-output-boards-console.jpg)
+
+*Input boards inside the console (labelled AA, AE, AF, AG, AH ...), each with its
+daisy-chained ribbon from the scanner and the key, stop and piston wiring on
+displacement connectors. These are the "A-series" boards of the definition's addresses.*
+
+![An output board](../img/dev-output-board.jpg)
+
+*One chamber output board ("'96 OUTPUT BOARD 264-3"): CD4051 address decoders at the
+left, ULN2981 driver arrays feeding the pipe magnets at the right, with "MAG PWR" and
+"GND" studs for the high-current supply. Each board is 128 outputs, `A1`..`P8`.*
+
+![The chamber output board wall](../img/dev-output-boards.jpg)
+
+*The chamber boards DD to DP on their wall, each a 128-output "D-series" address in the
+definition.*
+
 MIDI uses DUART channel B: received messages are queued by the interrupt
 handler as 4-byte records (`midi_rx_ring`) and turned into input events with
 the pseudo address `$6001 + channel×128 + note` (`midi_dispatch`, `$A8A8`),
 so a MIDI note is just another console input; outputs with an address ≥
 `$6001` are sent as note on/off on channel B (`output_midi`, `$B4C2`).
+
+![The MIDI adapter, component side](../img/dev-midi-front.jpg)
+![The MIDI adapter, solder side](../img/dev-midi-back.jpg)
+
+*The "Devtronix MIDI Adapter 264-4" (board PC121-3) that hangs on the rear "MIDI
+AUXILIARY" port: a Sharp PC900 opto-isolator on the IN side, an SN74LS04 driving the OUT
+side, and the two 5-pin DIN sockets. It turns DUART channel B's serial lines into a MIDI
+current loop.*
 
 ### The scan loop
 
@@ -469,6 +514,13 @@ a debounce time get a timer node in front of their hook. The SCN task then
 loops for ever: one pass over the table (`scan_pass`), every pending MIDI
 event, one analog input, yield. `scan_rate` counts passes per second and
 `worst_delay` the longest gap, both shown on the Run screen.
+
+![The Run screen](../img/dev-midi-research.jpg)
+
+*The Run screen on the Wyse, with "--- Scanner Initialized ---": disk MCCOY NC 1,
+file 05, scan rate 765 passes per second, worst delay 6 ms, free disk and RAM, tempo
+120 and meter 4/4, and the Run-mode command list below. On the right, the open 264 with
+the HxC floppy emulator; on the left, this project's disassembly on an iPad.*
 
 A **hook list** is the relay's universal mechanism: a chain of
 `{next.l, handler.l, args...}` nodes called by `call_hooks` (`$BF3E`) with

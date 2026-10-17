@@ -18,19 +18,26 @@ relay. Everything here was derived from the Bus Pirate ROM dump in
 
 Python dependencies are declared in `../pyproject.toml` and locked in `../uv.lock`; run scripts with `uv run` from anywhere in the project.
 
+![The boot PROMs on the CPU board](../img/dev-boot-rom.jpg)
+
+*The CPU board, "Organ Computer Control 264-1", Devtronix Organs 1984: the MC68000P8 at
+the left, the two 2732A EPROMs labelled "C04 HI BOOT PROM" and "C04 LO BOOT PROM" that
+this folder decodes, and the HM50256 DRAMs of the 512 KB main memory at the right.*
+
 ## Headline facts
 
-- **CPU:** Motorola 68000 family, on an Alpha Microsystems AM-1000-class board (see
-  `../docs/README.md`, References). Reset SSP `$0007F000`, reset PC `$00800008`.
+- **CPU:** MC68000P8 at 8 MHz on Devtronix's own board, "Organ Computer Control 264-1"
+  (1984), built to the Alpha Micro design (see `../docs/README.md`, References). Reset SSP
+  `$0007F000`, reset PC `$00800008`.
   The system monitor on disk mentions a "Dimension-030 Turbo Mode", so a 68030
   accelerator option existed.
 - **ROM** at `$800000`. The loader occupies `$800000-$8005EF`; the rest of the 2 KB
   dump is `$FF`.
-- **The ROM dump is probably incomplete.** The dumper (`devtronix.py`) only read
-  addresses `$000-$3FF` (1024 words = 2 KB), but it can drive 12 address bits, the
-  folder holds a 2732 (4K x 8) datasheet, and the loader copies **8000 bytes** of ROM
-  to RAM at start-up, which only makes sense for an 8 KB ROM pair. Re-dump
-  `$400-$FFF` to see whether anything follows the loader.
+- **The ROM dump covers 2 KB of an 8 KB pair.** The photo above settles it: the boot
+  PROMs are two 2732A EPROMs (4K x 8 each, high and low byte), 8 KB in all. The dumper
+  (`devtronix.py`) only read addresses `$000-$3FF` (1024 words = 2 KB), though it can
+  drive 12 address bits, and the loader copies **8000 bytes** of ROM to RAM at
+  start-up. Re-dump `$400-$FFF` to see whether anything follows the loader.
 - **The loader relocates itself** to RAM at `$07E000` and runs there (so it can patch
   a terminal escape-sequence template in place). Stack is just below it.
 
@@ -125,6 +132,12 @@ Register offsets are the standard 68681 map times 2 (odd bytes): MR at +0, SR/CS
    SOH, data, 8-bit sum; loader replies `G` (good) or `E` (resend). Then waits for ESC
    and jumps.
 
+![The loader's banner on the console terminal](../img/dev-terminal.jpg)
+
+*What the loader shows: the banner at row 2, "Loading system monitor" at row 7, and
+one dot per sector as the monitor's 73 sectors come off the floppy. The terminal is a
+Wyse; the open case below it shows the fan and the edge of the CPU board.*
+
 Terminal output uses TeleVideo/ADM-3A sequences (`ESC =` cursor address, `ESC Y`,
 `ESC T`, `ESC . 0`). Strings embed control bytes: `$81 row col`, `$82` CRLF, `$C1`
 clear to end of screen, `$C2` clear to end of line.
@@ -156,8 +169,8 @@ Byte-swapped, the monitor begins `lea 0(pc),a5 ; bra.s` past the version strings
 
 ## Open questions / next steps
 
-1. Re-dump ROM addresses `$400-$FFF` (change `range(0x0000,0x0400)` in `devtronix.py`).
-2. Confirm which EPROMs are fitted (the byte order is explained: it is the Alpha Micro design).
+1. Re-dump ROM addresses `$400-$FFF` (change `range(0x0000,0x0400)` in `devtronix.py`);
+   the EPROMs are 2732As, so there are 6 KB still unread.
 3. Identify `$FFFFFE03` on the schematic (`$FFFFFE00` is the board's LED display).
 4. Disassemble the System Monitor 2.6 (183): it owns the filesystem, the relay I/O
    scanning, MIDI, and the record/playback file format the music disks use.

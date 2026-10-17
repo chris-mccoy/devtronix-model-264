@@ -2,9 +2,9 @@
 
 Reverse engineering of the Devtronix Model 264, a Motorola 68000-based pipe-organ
 relay and combination action with a record/playback facility, from its boot ROM
-and its floppy disks. The 264 is built on an
+and its floppy disks. The 264's computer is Devtronix's own board, built to the design of the
 [Alpha Microsystems](https://en.wikipedia.org/wiki/Alpha_Microsystems) 68000
-system, which is why 16-bit words in its memory and on its disks are stored low
+systems, which is why 16-bit words in its memory and on its disks are stored low
 byte first: Alpha Micro wired its 68000 machines with the data-bus bytes swapped
 to stay compatible with the little-endian WD16 of its earlier AM-100 line (see Cameron
 Kaiser's [Alpha Micro AM-1000E and AM-1200 refurb](https://oldvcr.blogspot.com/2026/03/refurb-weekend-double-header-alpha.html) for a hands-on account of these machines). The aim was to recover the performances recorded on the
