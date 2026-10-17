@@ -22,7 +22,7 @@ as they exist in a local copy. Nothing under `disk-images/` is ever modified.
 
 ## The machine
 
-- **CPU** Motorola 68000; a "Dimension-030" 68030 accelerator option exists
+- **Computer** an Alpha Microsystems 68000 system (Motorola 68000); a "Dimension-030" 68030 accelerator option exists
   (the monitor enables its cache with `movec CACR`).
 - **Memory** 512 KB RAM at `$000000`; 8 KB boot ROM at `$800000`.
 - **I/O** MC68681 DUART at `$FFFFFE21` (channel A = terminal, 9600 baud;
@@ -40,9 +40,11 @@ Strings are stored in byte-address order but **16-bit words are stored low
 byte first**. Longs are two little-endian words, high word first. This is
 visible in both the ROM dump and the flux-level floppy images, and the
 firmware itself relies on it. Rules: swap the two bytes of every word before
-disassembling; read strings as-is; read 16-bit fields little-endian. The
-hardware mechanism (probably a byte-lane swap on byte-sized bus cycles) has not
-been confirmed on the board.
+disassembling; read strings as-is; read 16-bit fields little-endian. The reason
+is the computer itself: the 264 is built on an
+[Alpha Microsystems](https://en.wikipedia.org/wiki/Alpha_Microsystems) 68000
+system, and Alpha Micro wired the 68000's data bus byte-swapped so that data
+from its earlier little-endian WD16 machines (the AM-100 line) kept its layout.
 
 ## Boot ROM (Loader Revision C.04)
 
@@ -129,8 +131,7 @@ KryoFlux streams or HFE files into sector images.
 
 ## Open questions
 
-1. Confirm the byte-lane arrangement and the ROM size on the CPU board; re-dump
-   ROM addresses `$400`–`$FFF`.
+1. Confirm the ROM size on the CPU board and re-dump ROM addresses `$400`–`$FFF`.
 2. ~~Listen to the renders; confirm the 120 BPM tempo assumption.~~ Done: Chris has
    listened to them and they sound right, which confirms the 120 BPM clock.
 3. Decode `os-backup` and `startupa` from their HFEs.
