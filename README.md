@@ -6,7 +6,8 @@ and its floppy disks. The 264 is built on an
 [Alpha Microsystems](https://en.wikipedia.org/wiki/Alpha_Microsystems) 68000
 system, which is why 16-bit words in its memory and on its disks are stored low
 byte first: Alpha Micro wired its 68000 machines with the data-bus bytes swapped
-to stay compatible with the little-endian WD16 of its earlier AM-100 line. The aim was to recover the performances recorded on the
+to stay compatible with the little-endian WD16 of its earlier AM-100 line (see Cameron
+Kaiser's [Alpha Micro AM-1000E and AM-1200 refurb](https://oldvcr.blogspot.com/2026/03/refurb-weekend-double-header-alpha.html) for a hands-on account of these machines). The aim was to recover the performances recorded on the
 disks, and that has been done: every recording now renders to a standard MIDI file.
 
 ![Devtronix Front](img/dev.jpg)

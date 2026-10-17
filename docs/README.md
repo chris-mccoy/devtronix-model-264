@@ -22,15 +22,18 @@ as they exist in a local copy. Nothing under `disk-images/` is ever modified.
 
 ## The machine
 
-- **Computer** an Alpha Microsystems 68000 system (Motorola 68000); a "Dimension-030" 68030 accelerator option exists
-  (the monitor enables its cache with `movec CACR`).
+- **Computer** an Alpha Microsystems 68000 system of the AM-1000 class (Motorola 68000
+  at 8 MHz on those boards); the "Dimension-030" is InterLink Systems' 1991 68030
+  accelerator card for Alpha Micro machines, and the monitor's "Turbo Mode" enables its
+  instruction cache with `movec CACR`, exactly as Alpha Micro's own TURBO utility does.
 - **Memory** 512 KB RAM at `$000000`; 8 KB boot ROM at `$800000`.
 - **I/O** MC68681 DUART at `$FFFFFE21` (channel A = terminal, 9600 baud;
   channel B = modem, 1200 baud), MC6840 timer at `$FFFFFE11` (1 ms tick, tempo
   clock), WD179x floppy controller with glue at `$FFFFFFE0`, console scanner
-  (input boards, magnet output boards, swell-shoe A/D) at `$FFFFFF80`, and a
-  two-digit status display at `$FFFFFE00` that shows boot codes and then the
-  sector being read.
+  (input boards, magnet output boards, swell-shoe A/D) at `$FFFFFF80`, and the
+  Alpha Micro board's two-digit LED display at `$FFFFFE00`, on which the loader
+  shows its progress codes and then the sector being read (AMOS uses the same
+  display for its own codes, "b" for no boot device, "5b" while sensing baud).
 - **Terminal** a serial terminal on the DUART; the monitor has seven escape-sequence
   tables (`Term n`): TeleVideo 950 family, [Wyse WY-50](https://terminals-wiki.org/wiki/index.php/Wyse_WY-50)
   (the default on 45 of the 48 monitor images), an ADM-3A-class minimum, and Devtronix's
@@ -146,3 +149,23 @@ KryoFlux streams or HFE files into sector images.
    expression.
 5. The relay logic itself (`task_scn`, key and stop events) is traced but not
    annotated in depth.
+
+## References
+
+- Cameron Kaiser, "Refurb weekend double header: Alpha Micro AM-1000E and AM-1200",
+  Old Vintage Computing Research, 21 March 2026:
+  <https://oldvcr.blogspot.com/2026/03/refurb-weekend-double-header-alpha.html>. A hands-on account of the Alpha Micro 68000 machines the 264 is built
+  on. It independently confirms what the dumps showed: Alpha Micro's 68K systems
+  "effectively run little-endian" because the designers flipped the address lines so
+  16-bit values, opcodes included, kept the layout of the earlier WD-16 machines,
+  with longs stored as two little-endian halves, high half first ("middle endian",
+  the PDP-11 layout). It also describes the hardware we see from the code side: an
+  8 MHz 68000, SCN2681/MC68681 DUARTs, the AM-220 floppy board with a WD279x
+  controller, a two-digit LED status display on the board, ROMs that autosense the
+  terminal baud rate, InterLink's Dimension-030 68030 accelerator and its TURBO
+  utility that sets only the instruction-cache bits of CACR, and a world of modified
+  Wyse terminals (the AM-62 and AM-75) with TeleVideo 925 emulation on the side.
+  AMOS, Alpha Micro's own operating system, ran position-independent programs without
+  an MMU; Devtronix replaced AMOS with its own boot ROM and System Monitor but kept the
+  same conventions (A5-relative, position-independent code; Wyse and TeleVideo
+  terminal tables; status codes on the LED display).

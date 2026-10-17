@@ -20,7 +20,8 @@ Python dependencies are declared in `../pyproject.toml` and locked in `../uv.loc
 
 ## Headline facts
 
-- **CPU:** Motorola 68000 family. Reset SSP `$0007F000`, reset PC `$00800008`.
+- **CPU:** Motorola 68000 family, on an Alpha Microsystems AM-1000-class board (see
+  `../docs/README.md`, References). Reset SSP `$0007F000`, reset PC `$00800008`.
   The system monitor on disk mentions a "Dimension-030 Turbo Mode", so a 68030
   accelerator option existed.
 - **ROM** at `$800000`. The loader occupies `$800000-$8005EF`; the rest of the 2 KB
@@ -52,8 +53,9 @@ Practical rule:
 - **To read strings or byte tables:** use the image as-is.
 - **To read a 16-bit field** (sector numbers, addresses): little-endian.
 
-How the hardware achieves this is not yet known; the leading guess is that the CPU
-board swaps data-bus byte lanes on byte-sized cycles. Worth confirming from the board.
+This is how Alpha Micro built all its 68000 machines: the address lines are flipped so
+that 16-bit values keep the layout of the company's earlier WD-16 systems (see
+`../docs/README.md`, References).
 
 ## Memory map (as used by the loader)
 
@@ -67,7 +69,7 @@ board swaps data-bus byte lanes on byte-sized cycles. Worth confirming from the 
 | `$07E000` | Relocated loader; stack grows down from here |
 | `$07F000` | Reset-time SSP |
 | `$800000` | Boot ROM (this loader) |
-| `$FFFFFE00` | Write: two-digit status display (see codes below). Probably the console's "File #" seven-segment display |
+| `$FFFFFE00` | Write: the Alpha Micro board's two-digit LED display (see codes below); AMOS shows its own boot codes on it. Not the console's "File #" display |
 | `$FFFFFE03` | Read once at reset, value discarded. Unknown |
 | `$FFFFFE21-$FFFFFE3F` | MC68681 DUART, registers on odd bytes. Channel A = terminal, channel B = modem |
 | `$FFFFFFE0-$FFFFFFE7` | Floppy subsystem (WD179x-compatible controller plus glue), see below |
@@ -155,8 +157,8 @@ Byte-swapped, the monitor begins `lea 0(pc),a5 ; bra.s` past the version strings
 ## Open questions / next steps
 
 1. Re-dump ROM addresses `$400-$FFF` (change `range(0x0000,0x0400)` in `devtronix.py`).
-2. Confirm on the board how the byte-lane swap is done, and which EPROMs are fitted.
-3. Identify `$FFFFFE00` (status display) and `$FFFFFE03` on the schematic.
+2. Confirm which EPROMs are fitted (the byte order is explained: it is the Alpha Micro design).
+3. Identify `$FFFFFE03` on the schematic (`$FFFFFE00` is the board's LED display).
 4. Disassemble the System Monitor 2.6 (183): it owns the filesystem, the relay I/O
    scanning, MIDI, and the record/playback file format the music disks use.
 5. Catalogue the music disks (`58-note-*`, `jerrystour`, `mccoy*`, `stephen-ross-copy`,
