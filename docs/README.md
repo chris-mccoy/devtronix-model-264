@@ -5,7 +5,7 @@ record/playback facility, built around a Motorola 68000. This project reverse
 engineers it from a 2011 Bus Pirate dump of its boot ROM and 2020 flux-level
 dumps of its floppies, so that the performances recorded on those floppies can
 be recovered. This file is the index and the one-page summary; the detailed
-write-ups are linked from each section. Work done 16 October 2026.
+write-ups are linked from each section.
 
 | Folder | Contents |
 |---|---|
