@@ -31,8 +31,10 @@ as they exist in a local copy. Nothing under `disk-images/` is ever modified.
   (input boards, magnet output boards, swell-shoe A/D) at `$FFFFFF80`, and a
   two-digit status display at `$FFFFFE00` that shows boot codes and then the
   sector being read.
-- **Terminal** TeleVideo/ADM-3A escape sequences (`ESC =` cursor address,
-  `ESC Y`, `ESC T`).
+- **Terminal** a serial terminal on the DUART; the monitor has seven escape-sequence
+  tables (`Term n`): TeleVideo 950 family, [Wyse WY-50](https://terminals-wiki.org/wiki/index.php/Wyse_WY-50)
+  (the default on 45 of the 48 monitor images), an ADM-3A-class minimum, and Devtronix's
+  own PC terminal program. The boot ROM itself speaks TeleVideo (`ESC =`, `ESC Y`, `ESC T`).
 
 ### Byte order: read this before touching any dump
 

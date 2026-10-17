@@ -76,6 +76,44 @@ The tempo timer is programmed as `latch = 500000 / BPM`, which with the 800 kHz
 clock gives **96 pulses per beat**; at the default tempo of 120 that is 192
 pulses per second. All recorded timing is in these pulses.
 
+## Terminals
+
+The console is a serial terminal on DUART channel A (9600 baud by default). The
+monitor draws its windows with seven terminal-specific sequences, chosen by the
+`Term n` command through `term_select` (`$1B56`) from `term_tables` (`$1B8A`):
+seven tables of seven pointers, copied to `$9D4(a5)`. The slots are: clear
+screen, cursor-address lead-in (followed by row+32, column+32), line-graphics
+on, line-graphics off, the box-drawing glyph string (blank, then ┌ ┐ └ ┘ ├ ┤ ┬
+┴ ┼ ─ │ in that order), cursor on, cursor off.
+
+| `Term` | Terminal | Clear | Cursor | Graphics on / off | Box glyphs | Cursor on / off |
+|---|---|---|---|---|---|---|
+| 0 | TeleVideo 950 family (also 925/Wyse in TVI mode) | `ESC = ␠ ␠ ESC Y` | `ESC =` | `ESC $` / `ESC %` | `fgehmlnoikj` | `ESC . 3` / `ESC . 0` |
+| 1 | Wyse 50 family, alternate graphics switch | `ESC ; ESC \` 3` | `ESC =` | `ESC H ~` / `ESC H }` | `2315490=8:6` | `ESC \` 1` / `ESC \` 0` |
+| 2 | TeleVideo, cursor never hidden | as 0 | `ESC =` | as 0 | as 0 | `ESC . 3` / `ESC . 1` |
+| 3 | TeleVideo without line graphics | as 0 | `ESC =` | none | `+++++++++-\|` | `ESC . 3` / `ESC . 0` |
+| 4 | Minimal: cursor addressing and clear only (ADM-3A class) | as 0 | `ESC =` | none | `+++++++++-\|` | none |
+| 5 | Devtronix PC terminal program (IBM PC, code page 437) | `FS` ($1C) | `GS` ($1D) | none | `┌┐└┘├┤┬┴┼─│` | `US` ($1F) / `RS` ($1E) |
+| 6 | **[Wyse WY-50](https://terminals-wiki.org/wiki/index.php/Wyse_WY-50)** | `ESC ; ESC \` 3` | `ESC =` | `ESC H ^B` / `ESC H ^C` | `2315490=8:6` | `ESC \` 1` / `ESC \` 0` |
+
+Type 6 is the WY-50 as its manual describes it: `ESC ;` clears, `ESC \` n`
+sets the cursor style, `ESC H ^B`/`ESC H ^C` enter and leave line-drawing mode,
+and the digits and punctuation `2 3 1 5 4 9 0 = 8 : 6` are its box characters.
+Type 1 is the same terminal with `ESC H ~` and `ESC H }` for the graphics
+switch; which Wyse model or firmware wanted that is not known. Type 5 is
+selected automatically, whatever `Term` says, when the boot ROM found the
+console on channel B (the modem port, `console_b` = `$FF`): a PC running
+Devtronix's own terminal program, which also handles the `Topc`/`Frompc`
+transfers. `Term` does no range check; `Term 7` happens to land on the type-0
+table.
+
+The current type is a word at **offset 6 of the monitor image** (`$1038`).
+`System [n]` saves the running monitor to disk with type *n* baked in, so each
+disk's monitor records the terminal its owner used. Over the 48 monitor images
+in the collection: 45 default to **6, the Wyse WY-50**; Jerry's disc (monitor
+2.5) and the New Console disc default to 0, TeleVideo; the Stephen Ross copy
+says 7, which behaves as TeleVideo.
+
 ## The file system
 
 Everything below was read out of the FIL task (`task_fil`, `$3EEA`) and

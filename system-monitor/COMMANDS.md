@@ -53,7 +53,7 @@ Differences in version 189 are at the end.
 | `Screen` | `$62B6` | Redraw the screen; shows "System version 2.6 (183) released on 05/11/93" |
 | `Ver` | `$5F0A` | Prints the version and date line |
 | `Beep` | `$60EE` | Toggle the terminal bell: "Terminal Beep Turned On/Off" |
-| `Term [n]` | `$6276` | Without a number prints "Current terminal type is n"; with one selects the terminal escape-sequence table (`term_select`, tables at `$1B8A`; the default is TeleVideo/ADM-3A style) |
+| `Term [n]` | `$6276` | Without a number prints "Current terminal type is n"; with one selects the terminal escape-sequence table (`term_select`, tables at `$1B8A`): 0 TeleVideo 950, 1 Wyse 50 (alternate graphics), 2 TeleVideo cursor always on, 3 TeleVideo no graphics, 4 minimal ADM-3A class, 5 Devtronix PC terminal program, 6 Wyse WY-50. Most disks' monitors default to 6; see README.md "Terminals" |
 | `Tbeep` | `$A4FE` | Test the bell: "So, like, BEEP!" after a timer callback |
 | `X n` | `$60C2` | Test command: waits `n` ticks, opens a window, waits for a key |
 | `Time n` | `$A538` | Timer-wheel test: schedules a callback `n` ticks ahead |
