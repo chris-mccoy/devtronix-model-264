@@ -170,7 +170,7 @@ T1 1B dsk_printslot     ; print slot letter+number
 =0000 drv030           ; -> Dimension-030 driver entry (0 unless relocated)
 =0044 console_b        ; $FF = console on DUART channel B (compared with loader's $44)
 =0046 modem_console    ; loader: $FF if the terminal answered on channel B
-=0047 ram_sized        ; set while probing RAM size
+=0047 cpu_is_030       ; set by the start-up `movec cacr` probe: nonzero on the Dimension-030 (cache on, RAM probed above $80000; scanner settle loops +4)
 =0100 heap_list        ; heap free-list head
 =0104 heap_free        ; -> first free block
 =0108 heap_start       ; start of heap (image end $132DC)
@@ -329,7 +329,7 @@ T1 1B dsk_printslot     ; print slot letter+number
 1044 date_str
 104E init_ram          ; set heap bounds, probe RAM size (bus error vector $10), detect 030
 104E ;; Start-up: heap bounds, vectors $40 (a5), $80 trap0, $84 trap1, $8C trap3, RAM sizing
-10E8 vec_buserr        ; bus error during RAM probe: end of memory found
+10E8 vec_illegal       ; illegal-instruction vector during start-up: `movec` faulted, so a plain 68000: clear cpu_is_030, skip the RAM probe
 1100 init_tasks        ; heap init, console init, then jump to task_init
 1168 task_opr          ; OPR task: operator console (banner, D1/C1 autoload, command loop)
 1168 ;; OPR task body: console set-up, status windows, autoload D1 and C1, main mode loop

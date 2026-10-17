@@ -143,6 +143,33 @@ track, `sector_size = $200`), single-sided disks and three drives, but every
 image in the collection is the 1024-byte double-sided format. Byte order: 16-bit
 fields are stored low byte first, strings in byte order.
 
+### Timing and CPU speed
+
+Everything musical is timed by hardware, not by the CPU: the MC6840 gives the
+1 ms system tick (T1), the tempo pulses (T2, 96 per beat from an 800 kHz clock)
+and the key-timing one-shot (T3); the DUART makes its own baud rates; the floppy
+data path is handshaked by the sector buffer. A faster processor therefore does
+not change the tempo, the recorded timing, the debounce times (timer wheel) or
+the magnet pulse length (timer wheel). What *is* CPU-speed dependent are the
+short busy-wait loops, 25 in the monitor and 5 in the loader: eight-iteration
+settles between WD2791 register writes, the controller reset pulses, the
+scanner's per-input settle loops (`scan_timing`), the analog read's 24- and
+3-loop waits, a few start-up delays, and in the loader the terminal probe window
+(300 000 iterations per baud rate, a few seconds at 8 MHz) and two 500 000-loop
+pauses.
+
+The monitor knows when it is running on the Dimension-030 and adjusts: at
+start-up it executes `movec #9,cacr` with the illegal-instruction vector pointed
+at `vec_illegal` (`$10E8`). On a plain 68000 the instruction faults, the handler
+clears `cpu_is_030` and skips the RAM probe; on the 68030 it enables the
+instruction cache, the flag stays set, memory above `$80000` is probed in 4 KB
+steps (the card carries its own RAM), and from then on the scanner adds four
+settle loops per input (`scan_setup_spf`, `sys_scanner_setup`). The floppy
+settles are not adjusted, but at eight iterations they only shrink from about
+20 µs to a few, still within what the WD2791 needs. So the accelerator does not
+break tempo; the only visible timing change is the loader's shorter window for
+answering the BEL probe with ESC.
+
 ### Serial ports and the MIDI baud rate
 
 The serial work lives in a handful of small routines near the DUART interrupt

@@ -160,6 +160,20 @@ virtual port lets a soft synth on the same machine be the organ. MAME's
 gets this for free once channel B of its `mc68681` is wired to a `midiin`/`midiout`
 device pair.
 
+### 4c. CPU speed
+
+The firmware's timing comes from the 6840, the DUART and the floppy handshake,
+so an emulator does not have to model instruction timing to get the tempo right.
+The CPU speed only shows in busy-wait loops: the loader's terminal probe waits
+300 000 iterations per baud rate for an ESC, so a very fast emulated CPU makes
+that window short (slow the core or answer ESC promptly); the monitor's 8-loop
+settles around floppy register writes and the scanner settle loops need no
+emulated delay at all, since an emulated WD2791 and scanner are always ready.
+The monitor's `movec #9,cacr` at start-up must either work (an emulated 68030)
+or raise the illegal-instruction exception (vector 4), as a real 68000 does;
+either is fine, but it must not be silently ignored. See the monitor README,
+"Timing and CPU speed".
+
 ## 5. What the terminal must understand
 
 The loader prints TeleVideo sequences (`ESC =` row col, `ESC Y`, `ESC T`, `ESC . 0`).

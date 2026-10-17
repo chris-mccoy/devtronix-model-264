@@ -92,12 +92,12 @@
 010A0  4238 0048              clr.b   $48.w
 010A4  2E0D                   move.l  a5,d7
 010A6  6646                   bne.b   L_010EE
-010A8  4DFA 003E              lea.l   vec_buserr(pc),a6
+010A8  4DFA 003E              lea.l   vec_illegal(pc),a6
 010AC  21CE 0010              move.l  a6,$10.w
 010B0  1E38 FE06              move.b  $fe06.w,d7
 010B4  7E09                   moveq   #$9,d7
 010B6  4E7B 7002              movec   d7,cacr
-010BA  50ED 0047              st.b    ram_sized(a5)
+010BA  50ED 0047              st.b    cpu_is_030(a5)
 010BE  50ED 0202              st.b    autoload(a5)
 010C2  2C7C 0008 0000         movea.l #$80000,a6
 010C8  203C 5A5A 5A5A         move.l  #$5a5a5a5a,d0
@@ -112,9 +112,9 @@
 010E0  518E                   subq.l  #$8,a6
 010E2  2B4E 010C              move.l  a6,heap_end(a5)
 010E6  6006                   bra.b   L_010EE
-010E8                         vec_buserr:
-010E8  5C8F                   addq.l  #$6,a7                 ; bus error during RAM probe: end of memory found
-010EA  422D 0047              clr.b   ram_sized(a5)
+010E8                         vec_illegal:
+010E8  5C8F                   addq.l  #$6,a7                 ; illegal-instruction vector during start-up: `movec` faulted, so a plain 68000: clear cpu_is_030, skip the RAM probe
+010EA  422D 0047              clr.b   cpu_is_030(a5)
 010EE                         L_010EE:
 010EE  286D 0108              movea.l heap_start(a5),a4
 010F2  266D 010C              movea.l heap_end(a5),a3
@@ -7004,7 +7004,7 @@
 061A4                         dc.b    'Function Timer Turned On',$00,$00
 061BE  4E75                   rts     
 061C0                         sub_061C0:
-061C0  4A2D 0047              tst.b   ram_sized(a5)
+061C0  4A2D 0047              tst.b   cpu_is_030(a5)
 061C4  662E                   bne.b   L_061F4
 061C6  7C0D                   moveq   #$d,d6
 061C8  7E35                   moveq   #$35,d7
@@ -10757,7 +10757,7 @@
 09688  3B46 0690              move.w  d6,scan_control(a5)
 0968C  548E                   addq.l  #$2,a6
 0968E  3E1E                   move.w  (a6)+,d7
-09690  4A2D 0047              tst.b   ram_sized(a5)
+09690  4A2D 0047              tst.b   cpu_is_030(a5)
 09694  6702                   beq.b   L_09698
 09696  5847                   addq.w  #$4,d7
 09698                         L_09698:
@@ -15533,7 +15533,7 @@
 0C658  4EBA 008C              jsr     scan_port(pc)
 0C65C  336D 0690 0002         move.w  scan_control(a5),$2(a1)
 0C662  7C02                   moveq   #$2,d6
-0C664  4A2D 0047              tst.b   ram_sized(a5)
+0C664  4A2D 0047              tst.b   cpu_is_030(a5)
 0C668  6702                   beq.b   L_0C66C
 0C66A  5846                   addq.w  #$4,d6
 0C66C                         L_0C66C:
