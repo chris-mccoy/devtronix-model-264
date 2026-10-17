@@ -69,7 +69,7 @@ and screen layouts, which the listing shows as data.
 | `$FFFFFE21..3F` | MC68681 DUART, A = terminal, B = modem/debug, interrupt vector `$3C` |
 | `$FFFFFF80 / 82` | Console scanner data and control words: input boards, output (magnet) boards, and a successive-approximation A/D for the analog inputs (swell shoes) |
 | `$FFFFFF84 / 86` | Scanner strobes, cleared every tick |
-| `$FFFFFFE0..E7` | WD179x floppy, exactly as the boot ROM uses it (`../boot-rom/README.md`) |
+| `$FFFFFFE0..E7` | WD2791 floppy controller with its 2 KB SRAM sector buffer, driven exactly as the boot ROM drives it (see "The floppy driver" below and `../boot-rom/README.md`) |
 | `movec CACR` | "Dimension-030 Turbo Mode": a 68030 accelerator; its driver is the last 340 bytes of the image |
 
 ![CPU, DUART and timer on the 264-1 board](../img/dev-motherboard-cpu-duart.jpg)
@@ -142,6 +142,25 @@ track/2, side = track&1. The monitor also supports 512-byte sectors (9 per
 track, `sector_size = $200`), single-sided disks and three drives, but every
 image in the collection is the 1024-byte double-sided format. Byte order: 16-bit
 fields are stored low byte first, strings in byte order.
+
+### The floppy driver
+
+`sector_io` (`$49B4`) seeks and reads or writes one sector with up to 8 retries;
+`fdc_transfer` (`$4A24`) is the part that talks to the hardware, and it uses the
+controller's **SRAM sector buffer** the same way the boot ROM does. The WD2791
+never passes data to the CPU byte by byte: on a read the driver issues READ
+SECTOR, waits for the command to complete (`fdc_command`, `$4AFA`: INTRQ on
+`$FFE6` bit 1, then BUSY clear, 750 ms timeout, yielding to other tasks while
+it waits), and only then reads the 1024 (or 512) bytes out of the port `$FFE4`
+in a tight loop; the hardware has already clocked the sector from the
+controller into the 2 KB AM9128 on every DRQ, and each read of the port
+advances the buffer's address counter. On a write it clears the counter
+(`$FFE5`), copies the sector *into* `$FFE4`, sets `$FFE7` to `$84` (bit 2 =
+buffer-to-controller), and then issues WRITE SECTOR, which drains the buffer;
+formatting uses `$8C`. The CPU never sees the buffer as memory, only as this
+one-byte window. Errors (RNF, CRC, lost data: status bits 2–4) reset the
+controller, RESTORE to track 0, wait 50 ms and retry; a write-protected disk is
+noticed from status bit 6 after the seek and shown on the console indicator.
 
 ### Boot block (logical sector 0)
 
