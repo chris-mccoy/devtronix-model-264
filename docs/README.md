@@ -42,6 +42,11 @@ as they exist in a local copy. Nothing under `disk-images/` is ever modified.
   Alpha Micro board's two-digit LED display at `$FFFFFE00`, on which the loader
   shows its progress codes and then the sector being read (AMOS uses the same
   display for its own codes, "b" for no boot device, "5b" while sensing baud).
+- **MIDI** on DUART channel B at 31250 baud, clocked from the chip's timer on the
+  8 MHz CPU clock. MIDI notes are ordinary I/O addresses whose board letter is `M`
+  (`MA-E5` = channel 1, note 36), used on rank outputs throughout the collection: the
+  58-note player drives a MIDI instrument, the McCoy organ is entirely MIDI divisions,
+  and the tour-disc definitions carry a 16-channel orchestra.
 - **Terminal** a serial terminal on the DUART; the monitor has seven escape-sequence
   tables (`Term n`): TeleVideo 950 family, [Wyse WY-50](https://terminals-wiki.org/wiki/index.php/Wyse_WY-50)
   (the default on 45 of the 48 monitor images), an ADM-3A-class minimum, and Devtronix's
