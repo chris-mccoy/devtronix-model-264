@@ -107,6 +107,59 @@ RxRDY and TxRDY of both channels (IMR `$33`) on vector `$3C`; the handler reads
 SRA/SRB and calls the installed hooks. OPCR is written once (`$0A`); the output
 port is otherwise unused and the input port serves only as the timer clock.
 
+### 4b. MIDI: connecting the host's MIDI ports to channel B
+
+The 264's MIDI port is DUART channel B behind the "Devtronix MIDI Adapter"
+(opto-isolated DIN in and out on the rear "MIDI AUXILIARY" connector). In an
+emulator the adapter is a cable: whatever the host operating system offers as MIDI
+ports (CoreMIDI, ALSA, WinMM, or a virtual port) is plugged straight into the
+emulated DUART's channel B. That is enough for the System Monitor to see the host's
+MIDI exactly as it saw the adapter.
+
+**When to connect.** The monitor tells you: it switches channel B to MIDI by
+writing CSR `$DD` (the counter/timer clock) with the timer preloaded to 8
+(`midi_channel_b`, `$19BC`), and back to one of the baud-rate codes for modem use.
+An emulated 68681 can treat "CSRB = `$DD`" as the signal to route channel B to the
+host MIDI ports and any other CSRB value as the signal to route it to the modem or
+debug console. Nothing else about the DUART changes; both directions are plain
+8-bit bytes at 31250 baud.
+
+**Input (host → monitor).** Deliver each MIDI byte into channel B's receiver
+and raise its RxRDY interrupt (ISR bit 0 of SRB, IMR `$33`, vector `$3C`). The
+monitor's handler (`rx_midi` via `rx_hook_b`) classifies status bytes, keeps the
+running status, assembles complete messages into 4-byte records in a 1 KB ring
+(`midi_rx_ring`), and the SCN task turns them into events: note on/off become
+inputs at addresses `MA-A1`..`MP-P8` (channel, note), program changes become
+momentary inputs in the `N` range, and everything else is counted. The ring is
+large and the handler is short, so delivering a burst of bytes back to back is
+safe, but a faithful emulator paces them at the real 320 µs per byte, which is
+also what keeps the monitor's receive-FIFO handling honest (the 68681 holds three
+bytes).
+
+**Output (monitor → host).** Whenever the monitor sets TxRDY interrupts on
+channel B (`sys_txenable_b`), take each byte it writes to THRB and send it to the
+host MIDI out port; after each byte, raise TxRDY again so the next one comes
+(`tx_midi`, draining `midi_tx_ring`). The bytes are complete MIDI messages:
+note on/off for rank pipes and units with MIDI addresses (`output_midi`,
+velocity from the per-channel value, function type 21), program changes and
+controllers from function types 19–22, and in the editor a test note when the
+marker is on a MIDI address.
+
+**What you then get.** With the host's ports connected, the monitor's `MI`
+command shows the incoming bytes and `MM` the message map; a definition whose
+ranks are MIDI, such as the McCoy organ's (entirely MIDI divisions on channels
+1–4) or the New Console and tour definitions (a 16-channel orchestra), makes
+`Play` of a recorded track come out of the host's synthesizer through the
+original relay logic, couplers, pizzicato and all; a MIDI keyboard on the host
+plays any keys or stops that carry MIDI addresses; and `Record` stores unmapped
+incoming MIDI in the track as `$F7` events, as it did on the real machine.
+
+Libraries: RtMidi or PortMidi give one API over CoreMIDI, ALSA and WinMM; a
+virtual port lets a soft synth on the same machine be the organ. MAME's
+`-midiin` / `-midiout` options do the same through PortMidi, so a MAME driver
+gets this for free once channel B of its `mc68681` is wired to a `midiin`/`midiout`
+device pair.
+
 ## 5. What the terminal must understand
 
 The loader prints TeleVideo sequences (`ESC =` row col, `ESC Y`, `ESC T`, `ESC . 0`).
@@ -131,8 +184,9 @@ terminal emulation.
    enters Run mode and the scan-rate figure appears. Nothing happens on the console
    without a scanner model, which is expected.
 4. **Scanner model and MIDI.** Working: `Play` of a track drives the output log; a
-   virtual keyboard presses keys and the relay fires pipes; MIDI in through channel B
-   reaches `midi_dispatch`.
+   virtual keyboard presses keys and the relay fires pipes; the host's MIDI ports are
+   on channel B (section 4b), so `MI` shows a MIDI keyboard's bytes and `Play` with
+   the McCoy definition sounds on the host's synthesizer.
 5. **Extras.** Modem mode against a YMODEM peer; the PC link; the Dimension-030
    `movec` as a no-op so `Turbo` prints its message.
 
