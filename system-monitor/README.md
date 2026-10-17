@@ -57,6 +57,11 @@ and screen layouts, which the listing shows as data.
   block receives the error code and the trap returns with Z set on success.
 - **`trap #3`** schedules a callback on a 1 ms timing wheel (used for magnet
   pulse lengths, the metronome and the player).
+- **`trap #2` is unused.** Neither monitor nor the boot ROM contains the
+  instruction, and its vector (`$88`) is never installed; the monitor sets only
+  `$80` (trap #0), `$84` (trap #1), `$8C` (trap #3), `$10` (illegal instruction,
+  for the 68030 probe), `$3C` (DUART) and `$78` (timer). A `trap #2` would jump
+  through the zero the loader left at `$88` and fault.
 - **Modes** (`cmd_table` at `$38B8`: 88 entries of `{mode.w, allowed.w, name[8],
   handler.l, param.w}`): Idle/Menu, Edit (definition editor), Run (organ
   running: Record, Play, Tempo, Meter, Finish, Kill, ...), RunEdit.
