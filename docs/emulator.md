@@ -89,7 +89,11 @@ protocol, for a fuller model (see `../system-monitor/README.md`, "The relay"):
   down; ignoring writes is fine.
 
 Addresses follow the definition's encoding (`board1<<11 | board2<<7 | pin<<3 |
-digit`, 1-based); MIDI pseudo addresses `$6001+` never reach the scanner.
+digit`, 1-based). Values from `$6001` up are MIDI notes (board letter `M`, second
+letter = channel, pin and digit = note) and from `$6801` MIDI program changes
+(board letter `N`); the monitor routes those to the DUART's channel B instead of the
+scanner, so an emulator's scanner never sees them. See the monitor README, "MIDI
+pseudo addresses".
 
 ### 4a. The DUART in detail
 

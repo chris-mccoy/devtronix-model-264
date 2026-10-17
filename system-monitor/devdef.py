@@ -240,11 +240,14 @@ def io_address(v):
     """Console I/O address word as the monitor prints it (sys_putaddr, $5DB6)."""
     if v == 0:
         return "-----"
-    if v >= 0x6001:                        # MIDI note output (editor, $F79A)
-        return f"MIDI ch{((v >> 7) & 15) + 1} note {(v & 0x7F) - 1}"
     d = (v - 1) & 0xFFFF
-    return (chr(65 + (d >> 11 & 15)) + chr(65 + (d >> 7 & 15)) + ("~" if d & 0x8000 else "-")
-            + chr(65 + (d >> 3 & 15)) + chr(49 + (d & 7)))
+    letters = (chr(65 + (d >> 11 & 15)) + chr(65 + (d >> 7 & 15)) + ("~" if d & 0x8000 else "-")
+               + chr(65 + (d >> 3 & 15)) + chr(49 + (d & 7)))
+    if 0x6001 <= v <= 0x6800:              # MIDI note: board letter M, channel, note (README "MIDI pseudo addresses")
+        return f"{letters} (MIDI ch{((v - 1) >> 7 & 15) + 1} note {(v - 1) & 0x7F})"
+    if 0x6801 <= v <= 0x7000:              # MIDI program change as an input: board letter N
+        return f"{letters} (MIDI ch{((v - 1) >> 7 & 15) + 1} program {(v - 1) & 0x7F})"
+    return letters
 
 # ----------------------------------------------------------------------------- parsing
 class Item:

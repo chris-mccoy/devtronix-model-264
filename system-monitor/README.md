@@ -392,9 +392,41 @@ if that pipe has an address. A keyboard's compass is simply the keys that have
 addresses: all five organs have manuals at 25–85 and pedals at 25–56.
 
 **Console I/O addresses** (`sys_putaddr`, `$5DB6`): 0 = none (`-----`),
-otherwise *v−1* = `board1<<11 | board2<<7 | pin<<3 | digit` printed as
-`AA-A1`..`PP-P8`. Values ≥ `$6001` are MIDI outputs: channel = bits 7–10,
-note = low 7 bits − 1 (`$6025` = channel 1 note 36).
+otherwise *v−1* = `board1<<11 | board2<<7 | pin<<3 | digit`, printed as
+`AA-A1`..`PP-P8` (a `~` instead of the `-` when bit 15 is set, an inverted-polarity
+input). The same 16-bit field is used for every input and output in the
+definition, and the editor accepts it in that letter form.
+
+**MIDI pseudo addresses.** Values from `$6001` up are MIDI, and they are simply
+the part of the address space whose first board letter is `M` or above:
+*v−1* = `$6000 | channel<<7 | note`, so a MIDI note is "board M, second letter =
+channel (A = 1 .. P = 16), pin letter = note>>3, digit = note&7 + 1", and the
+monitor prints it exactly like a board pin:
+
+| MIDI | Value | Printed |
+|---|---|---|
+| channel 1 note 36 (8' C) | `$6025` | `MA-E5` |
+| channel 5 note 90 | `$625B` | `ME-L3` |
+| channel 16 note 127 | `$6800` | `MP-P8` |
+| program change 40 on channel 1 | `$6829` | `NA-F1` |
+
+Board letters `M` to `P` are therefore not available for real boards on the 264.
+A MIDI address
+on a **key** or **stop contact** means the input is played by that MIDI note:
+`scan_add_input` (`$9916`) puts it in `midi_map[channel][note]` instead of the
+scan table, and `midi_dispatch` (`$A8A8`) fires its hooks when the note arrives on
+channel B (note on = +1, note off or velocity 0 = −1). A MIDI address on a **rank
+pipe** or **unit** output sends note on/off instead of driving a board
+(`output_midi`, `$B4C2`; velocity from `midi_velocity`, the per-channel value set
+by function type 21). Program changes arrive as momentary inputs in the `$6801`
+range (board letter `N`: *v−1* = `$6800 | channel<<7 | program`), so a stop or
+piston can be given a program-change address and be "pressed" from a sequencer;
+the other message classes (aftertouch, controllers, pitch bend, system) are
+counted for the `MM` display and otherwise ignored. Jerry's definition uses this
+for the "Echo Ventil" unit (`ME-L3`), and the 58-note player definitions give
+their one keyboard MIDI addresses so a roll reader can play it. In the editor,
+putting the marker on a MIDI output address sends that note (`$F79A`) the way it
+energises a magnet for a board address.
 
 **Names.** Only some stops carry a name; the editor's "computer generated" stop
 names come from the link and function named like the stop (Jerry's definition
