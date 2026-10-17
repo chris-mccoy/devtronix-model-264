@@ -422,11 +422,29 @@ by function type 21). Program changes arrive as momentary inputs in the `$6801`
 range (board letter `N`: *v−1* = `$6800 | channel<<7 | program`), so a stop or
 piston can be given a program-change address and be "pressed" from a sequencer;
 the other message classes (aftertouch, controllers, pitch bend, system) are
-counted for the `MM` display and otherwise ignored. Jerry's definition uses this
-for the "Echo Ventil" unit (`ME-L3`), and the 58-note player definitions give
-their one keyboard MIDI addresses so a roll reader can play it. In the editor,
-putting the marker on a MIDI output address sends that note (`$F79A`) the way it
-energises a magnet for a board address.
+counted for the `MM` display and otherwise ignored. Bit 15 of an address is the
+inverted-polarity flag (printed `~`), masked off before the MIDI test, so
+`CE~L3` is a chamber output, not a MIDI note.
+
+The collection uses MIDI addresses a great deal, almost always on **rank
+outputs**, and always with pipe 25 (8' C) as MIDI note 36, which is where this
+project's note numbering came from:
+
+- Every "58 Note Player" definition has ranks `Midi 8'` and `Midi 16"` whose
+  pipes are notes on channels 1 and 2: the roll player drove a MIDI instrument.
+- The McCoy definitions have no pipe ranks at all; `PEDAL DIVISION`, `GREAT
+  DIVISION` and so on are MIDI channels 1–4, so that organ was a MIDI instrument
+  played through the 264's relay.
+- The New Console and 1995 tour definitions add an orchestra: `Midi 1 - Str.
+  Bass`, `Midi 3 - Harp`, `Midi 4 - Tympani`, `Midi 14 - Pizz. Strings`, a
+  97-note `Bosendorfer` piano on channel 1, a `Chamber Piano` on channel 9, up to
+  channel 16.
+- MIDI *inputs* are rare: the McCoy "AHLBORN" definition gives two keys of its
+  Great a MIDI address, and the `main` disk's D20/D30 switch one stop from MIDI
+  note 32 on channel 4.
+
+In the editor, putting the marker on a MIDI output address sends that note
+(`$F79A`) the way it energises a magnet for a board address.
 
 **Names.** Only some stops carry a name; the editor's "computer generated" stop
 names come from the link and function named like the stop (Jerry's definition

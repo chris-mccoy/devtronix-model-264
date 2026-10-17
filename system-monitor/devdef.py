@@ -243,10 +243,11 @@ def io_address(v):
     d = (v - 1) & 0xFFFF
     letters = (chr(65 + (d >> 11 & 15)) + chr(65 + (d >> 7 & 15)) + ("~" if d & 0x8000 else "-")
                + chr(65 + (d >> 3 & 15)) + chr(49 + (d & 7)))
-    if 0x6001 <= v <= 0x6800:              # MIDI note: board letter M, channel, note (README "MIDI pseudo addresses")
-        return f"{letters} (MIDI ch{((v - 1) >> 7 & 15) + 1} note {(v - 1) & 0x7F})"
-    if 0x6801 <= v <= 0x7000:              # MIDI program change as an input: board letter N
-        return f"{letters} (MIDI ch{((v - 1) >> 7 & 15) + 1} program {(v - 1) & 0x7F})"
+    m = v & 0x7FFF                         # the relay masks bit 15 (polarity) before the MIDI test ($B45A)
+    if 0x6001 <= m <= 0x6800:              # MIDI note: board letter M, channel, note (README "MIDI pseudo addresses")
+        return f"{letters} (MIDI ch{((m - 1) >> 7 & 15) + 1} note {(m - 1) & 0x7F})"
+    if 0x6801 <= m <= 0x7000:              # MIDI program change as an input: board letter N
+        return f"{letters} (MIDI ch{((m - 1) >> 7 & 15) + 1} program {(m - 1) & 0x7F})"
     return letters
 
 # ----------------------------------------------------------------------------- parsing
