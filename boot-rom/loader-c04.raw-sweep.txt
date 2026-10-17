@@ -1,0 +1,420 @@
+800000  0007f000               ori.b   #$0, d7
+800004  008000081e38           ori.l   #$81e38, d0
+80000A  fe03                   dc.w    $fe03
+80000C  11fc0000fe00           move.b  #$0, $fe00.w
+800012  227c0007e000           movea.l #$7e000, a1
+800018  2449                   movea.l a1, a2
+80001A  2c49                   movea.l a1, a6
+80001C  3e3c0200               move.w  #$200, d7
+800020  421e                   clr.b   (a6)+
+800022  5347                   subq.w  #$1, d7
+800024  66fa                   bne.b   $800020
+800026  47fa0010               lea.l   $800038(pc), a3
+80002A  323c07d0               move.w  #$7d0, d1
+80002E  24db                   move.l  (a3)+, (a2)+
+800030  5341                   subq.w  #$1, d1
+800032  66fa                   bne.b   $80002e
+800034  2e49                   movea.l a1, a7
+800036  4ed1                   jmp     (a1)
+800038  4eba02ac               jsr     $8002e6(pc)
+80003C  283c000066bb           move.l  #$66bb, d4
+800042  11fc00a1fe00           move.b  #$a1, $fe00.w
+800048  287cfffffe21           movea.l #$fffffe21, a4
+80004E  183c00bb               move.b  #$bb, d4
+800052  4eba03ba               jsr     $80040e(pc)
+800056  6760                   beq.b   $8000b8
+800058  08c40010               bset.b  #$10, d4
+80005C  e05c                   ror.w   #$8, d4
+80005E  287cfffffe31           movea.l #$fffffe31, a4
+800064  11fc00b1fe00           move.b  #$b1, $fe00.w
+80006A  183c00bb               move.b  #$bb, d4
+80006E  4eba039e               jsr     $80040e(pc)
+800072  6744                   beq.b   $8000b8
+800074  11fc00b2fe00           move.b  #$b2, $fe00.w
+80007A  183c0088               move.b  #$88, d4
+80007E  4eba038e               jsr     $80040e(pc)
+800082  6734                   beq.b   $8000b8
+800084  11fc00b3fe00           move.b  #$b3, $fe00.w
+80008A  183c0066               move.b  #$66, d4
+80008E  4eba037e               jsr     $80040e(pc)
+800092  6724                   beq.b   $8000b8
+800094  11fc00c1fe00           move.b  #$c1, $fe00.w
+80009A  287cfffffe21           movea.l #$fffffe21, a4
+8000A0  283c000066bb           move.l  #$66bb, d4
+8000A6  45fa0456               lea.l   $8004fe(pc), a2
+8000AA  4eba02ba               jsr     $800366(pc)
+8000AE  45fa048c               lea.l   $80053c(pc), a2
+8000B2  4eba02b2               jsr     $800366(pc)
+8000B6  602e                   bra.b   $8000e6
+8000B8  7207                   moveq   #$7, d1
+8000BA  4eba02b8               jsr     $800374(pc)
+8000BE  45fa043e               lea.l   $8004fe(pc), a2
+8000C2  4eba02a2               jsr     $800366(pc)
+8000C6  45fa0490               lea.l   $800558(pc), a2
+8000CA  4eba029a               jsr     $800366(pc)
+8000CE  4eba02b2               jsr     $800382(pc)
+8000D2  b23c000d               cmp.b   #$d, d1
+8000D6  670e                   beq.b   $8000e6
+8000D8  b23c0024               cmp.b   #$24, d1
+8000DC  67000186               beq.w   $800264
+8000E0  4eba0292               jsr     $800374(pc)
+8000E4  60e8                   bra.b   $8000ce
+8000E6  7207                   moveq   #$7, d1
+8000E8  4eba028a               jsr     $800374(pc)
+8000EC  247c00040000           movea.l #$40000, a2
+8000F2  4282                   clr.l   d2
+8000F4  4285                   clr.l   d5
+8000F6  4eba00a4               jsr     $80019c(pc)
+8000FA  0c2a00f20001           cmpi.b  #$f2, $1(a2)
+800100  6620                   bne.b   $800122
+800102  08120000               btst.b  #$0, (a2)
+800106  56c5                   sne.b   d5
+800108  4eba0036               jsr     $800140(pc)
+80010C  6720                   beq.b   $80012e
+80010E  45fa04ae               lea.l   $8005be(pc), a2
+800112  4eba0252               jsr     $800366(pc)
+800116  2e3c0007a120           move.l  #$7a120, d7
+80011C  5387                   subq.l  #$1, d7
+80011E  66fc                   bne.b   $80011c
+800120  6096                   bra.b   $8000b8
+800122  7401                   moveq   #$1, d2
+800124  95ca                   suba.l  a2, a2
+800126  204a                   movea.l a2, a0
+800128  43fa0072               lea.l   $80019c(pc), a1
+80012C  4e91                   jsr     (a1)
+80012E  08040010               btst.b  #$10, d4
+800132  6706                   beq.b   $80013a
+800134  50f80046               st.b    $46.w
+800138  e05c                   ror.w   #$8, d4
+80013A  31c40044               move.w  d4, $44.w
+80013E  4ed0                   jmp     (a0)
+800140  342a0036               move.w  $36(a2), d2
+800144  6730                   beq.b   $800176
+800146  302a0038               move.w  $38(a2), d0
+80014A  e240                   asr.w   #$1, d0
+80014C  4eba004e               jsr     $80019c(pc)
+800150  264a                   movea.l a2, a3
+800152  4283                   clr.l   d3
+800154  2443                   movea.l d3, a2
+800156  425a                   clr.w   (a2)+
+800158  5340                   subq.w  #$1, d0
+80015A  66fa                   bne.b   $800156
+80015C  204a                   movea.l a2, a0
+80015E  4eba001e               jsr     $80017e(pc)
+800162  6b0c                   bmi.b   $800170
+800164  4eba0036               jsr     $80019c(pc)
+800168  d4fc0400               adda.w  #$400, a2
+80016C  5243                   addq.w  #$1, d3
+80016E  60ee                   bra.b   $80015e
+800170  4238ffe6               clr.b   $ffe6.w
+800174  4e75                   rts     
+800176  4238ffe6               clr.b   $ffe6.w
+80017A  7eff                   moveq   #$ff, d7
+80017C  4e75                   rts     
+80017E  4deb0040               lea.l   $40(a3), a6
+800182  3403                   move.w  d3, d2
+800184  4a5e                   tst.w   (a6)+
+800186  6710                   beq.b   $800198
+800188  3e1e                   move.w  (a6)+, d7
+80018A  9447                   sub.w   d7, d2
+80018C  6af6                   bpl.b   $800184
+80018E  d447                   add.w   d7, d2
+800190  598e                   subq.l  #$4, a6
+800192  d456                   add.w   (a6), d2
+800194  4287                   clr.l   d7
+800196  4e75                   rts     
+800198  7eff                   moveq   #$ff, d7
+80019A  4e75                   rts     
+80019C  48e74040               movem.l d1/a1, -(a7)
+8001A0  123c002e               move.b  #$2e, d1
+8001A4  4eba01ce               jsr     $800374(pc)
+8001A8  11fc0080ffe7           move.b  #$80, $ffe7.w
+8001AE  3c3c00a1               move.w  #$a1, d6
+8001B2  2202                   move.l  d2, d1
+8001B4  11c1fe00               move.b  d1, $fe00.w
+8001B8  82fc0005               divu.w  #$5, d1
+8001BC  4a05                   tst.b   d5
+8001BE  6708                   beq.b   $8001c8
+8001C0  e241                   asr.w   #$1, d1
+8001C2  6404                   bcc.b   $8001c8
+8001C4  00460010               ori.w   #$10, d6
+8001C8  11c6ffe6               move.b  d6, $ffe6.w
+8001CC  4a38ffe0               tst.b   $ffe0.w
+8001D0  6bfa                   bmi.b   $8001cc
+8001D2  11c1ffe3               move.b  d1, $ffe3.w
+8001D6  7e08                   moveq   #$8, d7
+8001D8  5387                   subq.l  #$1, d7
+8001DA  66fc                   bne.b   $8001d8
+8001DC  4841                   swap    d1
+8001DE  5241                   addq.w  #$1, d1
+8001E0  11c1ffe2               move.b  d1, $ffe2.w
+8001E4  7e08                   moveq   #$8, d7
+8001E6  5387                   subq.l  #$1, d7
+8001E8  66fc                   bne.b   $8001e6
+8001EA  7e18                   moveq   #$18, d7
+8001EC  4eba0048               jsr     $800236(pc)
+8001F0  4238ffe5               clr.b   $ffe5.w
+8001F4  11fc0080ffe7           move.b  #$80, $ffe7.w
+8001FA  1e3c0084               move.b  #$84, d7
+8001FE  4eba0036               jsr     $800236(pc)
+800202  4238ffe5               clr.b   $ffe5.w
+800206  43f8ffe4               lea.l   $ffe4.w, a1
+80020A  3e3c0400               move.w  #$400, d7
+80020E  2c4a                   movea.l a2, a6
+800210  1cd1                   move.b  (a1), (a6)+
+800212  5347                   subq.w  #$1, d7
+800214  66fa                   bne.b   $800210
+800216  1e38ffe0               move.b  $ffe0.w, d7
+80021A  0207001c               andi.b  #$1c, d7
+80021E  6710                   beq.b   $800230
+800220  11fc00eefe00           move.b  #$ee, $fe00.w
+800226  4eba0024               jsr     $80024c(pc)
+80022A  7245                   moveq   #$45, d1
+80022C  4efaff76               jmp     $8001a4(pc)
+800230  4cdf0202               movem.l (a7)+, d1/a1
+800234  4e75                   rts     
+800236  11c7ffe0               move.b  d7, $ffe0.w
+80023A  08380001ffe6           btst.b  #$1, $ffe6.w
+800240  67f8                   beq.b   $80023a
+800242  08380000ffe0           btst.b  #$0, $ffe0.w
+800248  66f8                   bne.b   $800242
+80024A  4e75                   rts     
+80024C  4238ffe7               clr.b   $ffe7.w
+800250  7e40                   moveq   #$40, d7
+800252  5387                   subq.l  #$1, d7
+800254  66fc                   bne.b   $800252
+800256  11fc0080ffe7           move.b  #$80, $ffe7.w
+80025C  7e08                   moveq   #$8, d7
+80025E  4ebaffd6               jsr     $800236(pc)
+800262  4e75                   rts     
+800264  7224                   moveq   #$24, d1
+800266  4eba010c               jsr     $800374(pc)
+80026A  247c00000000           movea.l #$0, a2
+800270  7404                   moveq   #$4, d2
+800272  4eba0034               jsr     $8002a8(pc)
+800276  2012                   move.l  (a2), d0
+800278  243c00000400           move.l  #$400, d2
+80027E  4eba0028               jsr     $8002a8(pc)
+800282  d5c2                   adda.l  d2, a2
+800284  b5c0                   cmpa.l  d0, a2
+800286  63f6                   bls.b   $80027e
+800288  2e3c0007a120           move.l  #$7a120, d7
+80028E  5387                   subq.l  #$1, d7
+800290  66fc                   bne.b   $80028e
+800292  45fa0309               lea.l   $80059d(pc), a2
+800296  4eba00ce               jsr     $800366(pc)
+80029A  4eba00e6               jsr     $800382(pc)
+80029E  b23c001b               cmp.b   #$1b, d1
+8002A2  66f6                   bne.b   $80029a
+8002A4  4efafe88               jmp     $80012e(pc)
+8002A8  48e75440               movem.l d1/d3/d5/a1, -(a7)
+8002AC  4eba00d4               jsr     $800382(pc)
+8002B0  b23c0001               cmp.b   #$1, d1
+8002B4  66f6                   bne.b   $8002ac
+8002B6  224a                   movea.l a2, a1
+8002B8  3602                   move.w  d2, d3
+8002BA  4285                   clr.l   d5
+8002BC  4eba00c4               jsr     $800382(pc)
+8002C0  12c1                   move.b  d1, (a1)+
+8002C2  da01                   add.b   d1, d5
+8002C4  5343                   subq.w  #$1, d3
+8002C6  66f4                   bne.b   $8002bc
+8002C8  4eba00b8               jsr     $800382(pc)
+8002CC  b205                   cmp.b   d5, d1
+8002CE  670a                   beq.b   $8002da
+8002D0  7245                   moveq   #$45, d1
+8002D2  4eba00a0               jsr     $800374(pc)
+8002D6  4efaffd4               jmp     $8002ac(pc)
+8002DA  7247                   moveq   #$47, d1
+8002DC  4eba0096               jsr     $800374(pc)
+8002E0  4cdf022a               movem.l (a7)+, d1/d3/d5/a1
+8002E4  4e75                   rts     
+8002E6  11fc0080fe29           move.b  #$80, $fe29.w
+8002EC  11fc00bbfe23           move.b  #$bb, $fe23.w
+8002F2  11fc0066fe33           move.b  #$66, $fe33.w
+8002F8  11fc0020fe25           move.b  #$20, $fe25.w
+8002FE  11fc0030fe25           move.b  #$30, $fe25.w
+800304  11fc0040fe25           move.b  #$40, $fe25.w
+80030A  11fc0020fe35           move.b  #$20, $fe35.w
+800310  11fc0030fe35           move.b  #$30, $fe35.w
+800316  11fc0040fe35           move.b  #$40, $fe35.w
+80031C  11fc0010fe25           move.b  #$10, $fe25.w
+800322  11fc0013fe21           move.b  #$13, $fe21.w
+800328  11fc0007fe21           move.b  #$7, $fe21.w
+80032E  11fc000afe25           move.b  #$a, $fe25.w
+800334  11fc0010fe35           move.b  #$10, $fe35.w
+80033A  11fc0013fe31           move.b  #$13, $fe31.w
+800340  11fc0007fe31           move.b  #$7, $fe31.w
+800346  11fc000afe35           move.b  #$a, $fe35.w
+80034C  11fc0004fe25           move.b  #$4, $fe25.w
+800352  11fc0004fe35           move.b  #$4, $fe35.w
+800358  11fc0001fe25           move.b  #$1, $fe25.w
+80035E  11fc0001fe35           move.b  #$1, $fe35.w
+800364  4e75                   rts     
+800366  4281                   clr.l   d1
+800368  121a                   move.b  (a2)+, d1
+80036A  6706                   beq.b   $800372
+80036C  4eba0022               jsr     $800390(pc)
+800370  60f4                   bra.b   $800366
+800372  4e75                   rts     
+800374  19410006               move.b  d1, $6(a4)
+800378  082c00020002           btst.b  #$2, $2(a4)
+80037E  67f8                   beq.b   $800378
+800380  4e75                   rts     
+800382  082c00000002           btst.b  #$0, $2(a4)
+800388  67f8                   beq.b   $800382
+80038A  122c0006               move.b  $6(a4), d1
+80038E  4e75                   rts     
+800390  4a01                   tst.b   d1
+800392  6ae0                   bpl.b   $800374
+800394  48e71010               movem.l d3/a3, -(a7)
+800398  0241007f               andi.w  #$7f, d1
+80039C  08810006               bclr.b  #$6, d1
+8003A0  6702                   beq.b   $8003a4
+8003A2  5a41                   addq.w  #$5, d1
+8003A4  3e01                   move.w  d1, d7
+8003A6  e347                   asl.w   #$1, d7
+8003A8  3e3b7018               move.w  $8003c2(pc, d7.w), d7
+8003AC  4ebb7014               jsr     $8003c2(pc, d7.w)
+8003B0  5303                   subq.b  #$1, d3
+8003B2  6b08                   bmi.b   $8003bc
+8003B4  121b                   move.b  (a3)+, d1
+8003B6  4ebaffbc               jsr     $800374(pc)
+8003BA  60f4                   bra.b   $8003b0
+8003BC  4cdf0808               movem.l (a7)+, d3/a3
+8003C0  4e75                   rts     
+8003C2  00100026               ori.b   #$26, (a0)
+8003C6  0042fc3e               ori.w   #$fc3e, d2
+8003CA  fc3e                   dc.w    $fc3e
+8003CC  fc3e                   dc.w    $fc3e
+8003CE  0012001c               ori.b   #$1c, (a2)
+8003D2  4e75                   rts     
+8003D4  47fa0006               lea.l   $8003dc(pc), a3
+8003D8  7602                   moveq   #$2, d3
+8003DA  4e75                   rts     
+8003DC  591b                   subq.b  #$4, (a3)+
+8003DE  47fa0006               lea.l   $8003e6(pc), a3
+8003E2  7602                   moveq   #$2, d3
+8003E4  4e75                   rts     
+8003E6  541b                   addq.b  #$2, (a3)+
+8003E8  1e1a                   move.b  (a2)+, d7
+8003EA  e14f                   lsl.w   #$8, d7
+8003EC  1e1a                   move.b  (a2)+, d7
+8003EE  47fa0010               lea.l   $800400(pc), a3
+8003F2  06472020               addi.w  #$2020, d7
+8003F6  e05f                   ror.w   #$8, d7
+8003F8  37470002               move.w  d7, $2(a3)
+8003FC  7604                   moveq   #$4, d3
+8003FE  4e75                   rts     
+800400  3d1b                   move.w  (a3)+, -(a6)
+800402  000047fa               ori.b   #$fa, d0
+800406  00067602               ori.b   #$2, d6
+80040A  4e75                   rts     
+80040C  0a0d                   dc.w    $0a0d
+80040E  19440002               move.b  d4, $2(a4)
+800412  7207                   moveq   #$7, d1
+800414  4ebaff5e               jsr     $800374(pc)
+800418  203c000493e0           move.l  #$493e0, d0
+80041E  082c00000002           btst.b  #$0, $2(a4)
+800424  6606                   bne.b   $80042c
+800426  5380                   subq.l  #$1, d0
+800428  6af4                   bpl.b   $80041e
+80042A  4e75                   rts     
+80042C  0c2c001b0006           cmpi.b  #$1b, $6(a4)
+800432  66e4                   bne.b   $800418
+800434  4e75                   rts     
+800436  48e7d840               movem.l d0-d1/d3-d4/a1, -(a7)
+80043A  2006                   move.l  d6, d0
+80043C  43fa0064               lea.l   $8004a2(pc), a1
+800440  0800000e               btst.b  #$e, d0
+800444  6704                   beq.b   $80044a
+800446  43fa0086               lea.l   $8004ce(pc), a1
+80044A  2819                   move.l  (a1)+, d4
+80044C  2601                   move.l  d1, d3
+80044E  4281                   clr.l   d1
+800450  b691                   cmp.l   (a1), d3
+800452  6506                   bcs.b   $80045a
+800454  5281                   addq.l  #$1, d1
+800456  9691                   sub.l   (a1), d3
+800458  60f6                   bra.b   $800450
+80045A  4a81                   tst.l   d1
+80045C  6616                   bne.b   $800474
+80045E  b8bc00000001           cmp.l   #$1, d4
+800464  670e                   beq.b   $800474
+800466  4a00                   tst.b   d0
+800468  672c                   beq.b   $800496
+80046A  08000008               btst.b  #$8, d0
+80046E  6704                   beq.b   $800474
+800470  7220                   moveq   #$20, d1
+800472  6010                   bra.b   $800484
+800474  068100000030           addi.l  #$30, d1
+80047A  0240feff               andi.w  #$feff, d0
+80047E  4a00                   tst.b   d0
+800480  6602                   bne.b   $800484
+800482  8084                   or.l    d4, d0
+800484  b004                   cmp.b   d4, d0
+800486  650e                   bcs.b   $800496
+800488  08000009               btst.b  #$9, d0
+80048C  6706                   beq.b   $800494
+80048E  4ebafee4               jsr     $800374(pc)
+800492  6002                   bra.b   $800496
+800494  14c1                   move.b  d1, (a2)+
+800496  5889                   addq.l  #$4, a1
+800498  5384                   subq.l  #$1, d4
+80049A  66b2                   bne.b   $80044e
+80049C  4cdf021b               movem.l (a7)+, d0-d1/d3-d4/a1
+8004A0  4e75                   rts     
+8004A2  00 00 00 0a 3b 9a ca 00 05 f5 e1 00 00 98 96 80  |....;...........|
+8004B2  00 0f 42 40 00 01 86 a0 00 00 27 10 00 00 03 e8  |..B@......'.....|
+8004C2  00 00 00 64 00 00 00 0a 00 00 00 01 00 00 00 0b  |...d............|
+8004D2  40 00 00 00 08 00 00 00 01 00 00 00 00 20 00 00  |@............ ..|
+8004E2  00 04 00 00 00 00 80 00 00 00 10 00 00 00 02 00  |................|
+8004F2  00 00 00 40 00 00 00 08 00 00 00 01 2e 1b        |...@..........|
+800500  81 30 00 00 81 c1 0e 02 65 44 74 76 6f 72 69 6e  |.0......eDtvorin|
+800510  20 78 72 4f 61 67 20 6e 6f 43 74 6e 6f 72 20 6c  | xrOag noCtnor l|
+800520  79 53 74 73 6d 65 4c 20 61 6f 65 64 20 72 65 52  |yStsmeL aoed reR|
+800530  69 76 69 73 6e 6f 43 20 30 2e 00 34 07 81 4c 1a  |ivisnoC 0..4..L.|
+800540  61 6f 69 64 67 6e 73 20 73 79 65 74 20 6d 6f 6d  |aoidgns syet mom|
+800550  69 6e 6f 74 82 72 00 82 07 81 48 18 74 69 72 20  |inot.r....H.tir |
+800560  74 65 72 75 20 6e 6f 74 62 20 6f 6f 20 74 72 66  |teru notb oo trf|
+800570  6d 6f 64 20 73 69 3a 6b 08 81 48 16 74 69 24 20  |mod si:k..H.ti$ |
+800580  74 20 20 6f 6f 64 6e 77 6f 6c 64 61 61 20 72 63  |t  oodnwoldaa rc|
+800590  73 6f 20 73 6f 6d 65 64 3a 6d 82 82 82 00 45 82  |so somed:m....E.|
+8005A0  74 6e 72 65 45 20 43 53 74 20 20 6f 74 73 72 61  |tnreE CSt  otsra|
+8005B0  20 74 78 65 63 65 74 75 6f 69 3a 6e 00 20 0f 81  | txecetuoi:n. ..|
+8005C0  3f 0e 6f 4e 73 20 73 79 65 74 20 6d 6f 6d 69 6e  |?.oNs syet momin|
+8005D0  6f 74 20 72 6e 6f 74 20 69 68 20 73 69 64 6b 73  |ot rnot ih sidks|
+8005E0  00 00 00 00 00 00 00 02 00 41 18 d7 00 00 00 00  |.........A......|
+8005F0  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800600  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800610  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800620  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800630  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800640  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800650  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800660  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800670  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800680  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800690  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+8006A0  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+8006B0  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+8006C0  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+8006D0  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+8006E0  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+8006F0  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800700  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800710  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800720  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800730  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800740  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800750  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800760  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800770  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800780  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+800790  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+8007A0  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+8007B0  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+8007C0  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+8007D0  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+8007E0  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
+8007F0  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff  |................|
