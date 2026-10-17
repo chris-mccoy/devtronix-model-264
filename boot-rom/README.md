@@ -9,7 +9,8 @@ relay. Everything here was derived from the Bus Pirate ROM dump in
 
 | File | What it is |
 |---|---|
-| `loader-c04.bin` | 2048-byte big-endian 68000 image, ready for any 68k disassembler |
+| `../devtronix-hardware/devtronix-rom/devtronix.rom.merged` | **The ROM as it is**: each word address as the LO chip's byte then the HI chip's byte, which is the byte-address order the CPU reads bytes in (strings readable, instruction words byte-swapped). Load this into an emulator |
+| `loader-c04.bin` | The same with the two bytes of every word swapped, so instruction words read naturally: a convenience for 68000 disassemblers, not a physical layout |
 | `loader-c04.asm` | Fully annotated disassembly (read this) |
 | `loader-c04.raw-sweep.txt` | Mechanical capstone sweep, kept as the reference the annotation was built from |
 | `mkrom.py` | Rebuilds `loader-c04.bin` from `devtronix.rom.merged` (byte swap) |
