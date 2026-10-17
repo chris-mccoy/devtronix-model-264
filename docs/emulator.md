@@ -15,7 +15,7 @@ framework fits.
 | RAM, 512 KB | `$000000`–`$07FFFF` | Sized at start-up by the monitor; vectors at `$0`, monitor loads at `$1032`, loader relocates to `$7E000`, reset SSP `$7F000` | boot ROM "Memory map" |
 | Boot ROM, 8 KB | `$800000`–`$801FFF` | Two 2732A EPROMs; `loader-c04.bin` is the first 2 KB, the rest is `$FF` | boot ROM README |
 | **Byte order** | all memory | 16-bit words are stored low byte first; bytes are in address order; see section 2 | boot ROM "Byte order" |
-| MC68681 DUART | `$FFFFFE21`–`$FFFFFE3F`, odd bytes | Channel A = terminal (9600 8N1), channel B = modem / MIDI (1200, or MIDI rate); interrupt autovector `$3C` | boot ROM "DUART"; monitor "Hardware the monitor touches" |
+| MC68681 DUART, 3.6864 MHz crystal, IP2 = 8 MHz CPU clock | `$FFFFFE21`–`$FFFFFE3F`, odd bytes | Channel A = terminal 9600 (CSR `$BB`) or PC link 38400 (`$CC`); channel B = modem 300–38400 or MIDI at 31250 via the counter/timer (ACR `$40`, CTUR:CTLR = 8, CSR `$DD`); interrupt vector `$3C`, IMR `$33` | monitor "Serial ports and the MIDI baud rate" |
 | MC6840 PTM | `$FFFFFE11`–`$FFFFFE1F`, odd bytes, 800 kHz clock | T1 = 1 ms system tick, level-6 interrupt (vector `$78`); T2 = tempo pulse (latch = 500000 / BPM, 96 per beat); T3 = one-shot used with `movep` to time key events | monitor "Hardware the monitor touches", "Timer" |
 | WD2791 floppy controller | `$FFFFFFE0`–`$FFFFFFE3` | Command/status at `$E0`, sector at `$E2`, data (seek target) at `$E3`; commands `$08` restore, `$18` seek, `$84` read sector, `$A4` write sector, format | boot ROM "Floppy"; monitor "The floppy driver" |
 | Floppy sector buffer | `$FFFFFFE4` (port), `$FFFFFFE5` (counter reset), `$FFFFFFE6` (drive/side latch, INTRQ in bit 1), `$FFFFFFE7` (`$80` run, `$84` write direction, `$8C` format, `$00` reset) | 2 KB SRAM between controller and CPU; the CPU streams a sector through the port, see section 3 | boot ROM "The sector buffer" |
@@ -91,6 +91,18 @@ protocol, for a fuller model (see `../system-monitor/README.md`, "The relay"):
 Addresses follow the definition's encoding (`board1<<11 | board2<<7 | pin<<3 |
 digit`, 1-based); MIDI pseudo addresses `$6001+` never reach the scanner.
 
+### 4a. The DUART in detail
+
+An emulated 68681 needs the baud-rate generator (set 1, since ACR bit 7 is 0 in the
+monitor; the boot ROM uses set 2, where the codes `$BB`, `$66` and `$88` give the
+same rates) and the **counter/timer in timer mode**: the monitor clocks it from
+IP2, which the board ties to the 8 MHz CPU clock, with a preload of 8, and selects
+it with CSR `$DD` to get 31250 baud for MIDI. An emulator can simply treat CSR
+`$DD` on channel B as "MIDI rate" and route the bytes to a MIDI port. Interrupts:
+RxRDY and TxRDY of both channels (IMR `$33`) on vector `$3C`; the handler reads
+SRA/SRB and calls the installed hooks. OPCR is written once (`$0A`); the output
+port is otherwise unused and the input port serves only as the timer clock.
+
 ## 5. What the terminal must understand
 
 The loader prints TeleVideo sequences (`ESC =` row col, `ESC Y`, `ESC T`, `ESC . 0`).
@@ -138,6 +150,4 @@ component behaviour, then port it into a MAME driver reusing MAME's chip models.
 ## 8. Still unknown
 
 - `$FFFFFE03` and `$FFFFFE06`, read once at start-up and discarded.
-- The exact 68681 wiring of channel B when used for MIDI (baud rate programming for
-  31250 is done by the monitor's `Conset`, not yet traced in detail).
 - The Dimension-030's bus interface, irrelevant unless its driver is emulated.

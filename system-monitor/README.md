@@ -66,7 +66,7 @@ and screen layouts, which the listing shows as data.
 | Address | Device |
 |---|---|
 | `$FFFFFE11..1F` (odd bytes) | MC6840 programmable timer, 800 kHz clock. T1 = 1 ms tick (level-6 interrupt, vector `$78`), T2 = tempo pulse, T3 = one-shot pulse timer |
-| `$FFFFFE21..3F` | MC68681 DUART, A = terminal, B = modem/debug, interrupt vector `$3C` |
+| `$FFFFFE21..3F` | MC68681 DUART, A = terminal (or PC link), B = modem, MIDI or debug console, interrupt vector `$3C`; see "Serial ports and the MIDI baud rate" |
 | `$FFFFFF80 / 82` | Console scanner data and control words: input boards, output (magnet) boards, and a successive-approximation A/D for the analog inputs (swell shoes) |
 | `$FFFFFF84 / 86` | Scanner strobes, cleared every tick |
 | `$FFFFFFE0..E7` | WD2791 floppy controller with its 2 KB SRAM sector buffer, driven exactly as the boot ROM drives it (see "The floppy driver" below and `../boot-rom/README.md`) |
@@ -142,6 +142,32 @@ track/2, side = track&1. The monitor also supports 512-byte sectors (9 per
 track, `sector_size = $200`), single-sided disks and three drives, but every
 image in the collection is the 1024-byte double-sided format. Byte order: 16-bit
 fields are stored low byte first, strings in byte order.
+
+### Serial ports and the MIDI baud rate
+
+`init_serial` (`$189A`) programs the DUART once: ACR `$40` (baud-rate set 1,
+counter/timer in **timer mode clocked from the IP2 pin**), both channels 8N1,
+interrupt vector `$3C`, IMR `$33` (RxRDY and TxRDY of both channels), OPCR `$0A`.
+The uses of the two channels are then just a CSR value and a pair of
+receive/transmit hooks (`rx_hook_a/b`, `tx_hook_a/b`):
+
+| Use | Channel | CSR | Rate | Set by |
+|---|---|---|---|---|
+| Console terminal | A (or B when the loader found it there) | `$BB` | 9600 | `init_console_baud`, `$193A`, from the loader's `$44`/`$46` |
+| PC link (`Topc`, `Frompc`, `Pcdisk`) | A, when the console is on B | `$CC` | 38400 | `init_console_baud` |
+| Modem | B | `$44` `$66` `$88` `$BB` `$CC` | 300, 1200, 2400, 9600, 38400 (`Modem [baud]`, `modem_baud_table` at `$1B42`) | `modem_channel_b`, `$1A26` |
+| **MIDI** | B | `$DD` = counter/timer output for both Rx and Tx | **31250** | `midi_channel_b`, `$19BC` |
+
+The MIDI rate is the interesting one, because 31250 baud is not in the 68681's
+table. `midi_channel_b` loads the counter/timer with `CTUR = 0, CTLR = 8` and
+selects it as the clock. In timer mode the 68681 divides its clock by 2 × N and
+the result is used as a 16× baud clock, so with the 8 MHz CPU clock on IP2:
+8 000 000 / (2 × 8) / 16 = **31250**, exactly. The channel is switched to MIDI by
+`midi_open` (`$8F62`, use-counted in `midi_users`) when something needs MIDI, and
+back when `midi_close` brings the count to zero; leaving modem mode re-enables
+it if the count is nonzero. When the loader found the console on channel B
+(`modem_console`), MIDI and the modem are unavailable and channel A runs the PC
+link at 38400.
 
 ### The floppy driver
 
