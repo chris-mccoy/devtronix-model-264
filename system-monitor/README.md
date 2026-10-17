@@ -539,8 +539,7 @@ event, one analog input, yield. `scan_rate` counts passes per second and
 
 *The Run screen on the Wyse, with "--- Scanner Initialized ---": disk MCCOY NC 1,
 file 05, scan rate 765 passes per second, worst delay 6 ms, free disk and RAM, tempo
-120 and meter 4/4, and the Run-mode command list below. On the right, the open 264 with
-the HxC floppy emulator; on the left, this project's disassembly on an iPad.*
+120 and meter 4/4, and the Run-mode command list below.*
 
 A **hook list** is the relay's universal mechanism: a chain of
 `{next.l, handler.l, args...}` nodes called by `call_hooks` (`$BF3E`) with
