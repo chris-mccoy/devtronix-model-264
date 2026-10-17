@@ -585,8 +585,8 @@ shows:
    combination (`C`) file format is now decoded (section above).
    `dev2midi.py --ranks` does not
    model traps/units, tremulants, expression or pizzicato/reiterate timing.
-2. Confirm the tempo assumption on a real recording (a known tune at 192
-   pulses/s); the `Tempo` command could have been changed before recording.
+2. ~~Confirm the tempo assumption on a real recording.~~ Done: the renders have
+   been listened to and sound right at 120 BPM (192 pulses/s).
 3. The scanner side (`task_scn`, `key_event`, `stop_event` and the output
    tables at `$C5B4`) is traced but not annotated in depth; it is where the
    relay logic lives.

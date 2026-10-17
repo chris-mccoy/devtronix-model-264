@@ -108,8 +108,8 @@ KryoFlux streams or HFE files into sector images.
   tour disc holds twelve named tunes (Danny Boy, Joy To The World, Stars And
   Stripes Forever, ...); the eighteen "58 Note Player" disks hold unnamed
   recordings for a one-keyboard roll player. "Danny Boy" and "Joy To The
-  World" were checked note by note and are right; nothing has been listened to
-  yet.
+  World" were checked note by note, and the renders have been listened to and
+  sound right, which also confirms the 120 BPM tempo assumption.
 - **94 definition entries, 50 distinct by content**, about eight real organs:
   Jerry's "OLD ORGAN DEFINITION" (11 keyboards, 710 stops, 60 ranks), the
   1995 tour disc (467 stops, 109 ranks), New Console 12-08-93 / 2-13-95 (417
@@ -131,7 +131,8 @@ KryoFlux streams or HFE files into sector images.
 
 1. Confirm the byte-lane arrangement and the ROM size on the CPU board; re-dump
    ROM addresses `$400`–`$FFF`.
-2. Listen to the renders; confirm the 120 BPM tempo assumption.
+2. ~~Listen to the renders; confirm the 120 BPM tempo assumption.~~ Done: Chris has
+   listened to them and they sound right, which confirms the 120 BPM clock.
 3. Decode `os-backup` and `startupa` from their HFEs.
 4. Still unknown in the definition: a few `Stp` body fields, the `Piz`/`Rit`
    timing tables. `dev2midi.py --ranks` does not model traps, tremulants or
