@@ -12,11 +12,13 @@ write-ups are linked from each section. Work done 16 October 2026.
 | [`../boot-rom/`](../boot-rom/README.md) | Boot ROM ("Loader Revision C.04"): annotated disassembly, memory and I/O maps, disk reader |
 | [`../system-monitor/`](../system-monitor/README.md) | The operating software (System Monitor 2.6): disassembly, file system, file formats, all tools |
 | [`../system-monitor/COMMANDS.md`](../system-monitor/COMMANDS.md) | Every command the monitor's terminal accepts |
-| [`../renders/INDEX.md`](../renders/INDEX.md) | Catalogue of every recording, rendered to MIDI |
-| [`../decoded-images/`](../decoded-images/README.md) | Sector images decoded from the flux dumps, plus every HFE image |
+| `../renders/INDEX.md` | Catalogue of every recording, rendered to MIDI (not in the public repository) |
+| `../decoded-images/` | Sector images decoded from the flux dumps, plus every HFE image (not in the public repository) |
 
 Python tools run with `../.venv/bin/python` (capstone and pypdf are installed there).
-Nothing under `disk-images/` or `devtronix-hardware/` is ever modified.
+The disk images (`disk-images/`), decoded images and renders are kept out of the
+public repository until the recordings can be published; the write-ups refer to them
+as they exist in a local copy. Nothing under `disk-images/` is ever modified.
 
 ## The machine
 
