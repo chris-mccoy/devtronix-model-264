@@ -145,29 +145,37 @@ fields are stored low byte first, strings in byte order.
 
 ### Serial ports and the MIDI baud rate
 
-`init_serial` (`$189A`) programs the DUART once: ACR `$40` (baud-rate set 1,
-counter/timer in **timer mode clocked from the IP2 pin**), both channels 8N1,
-interrupt vector `$3C`, IMR `$33` (RxRDY and TxRDY of both channels), OPCR `$0A`.
-The uses of the two channels are then just a CSR value and a pair of
-receive/transmit hooks (`rx_hook_a/b`, `tx_hook_a/b`):
+The serial work lives in a handful of small routines near the DUART interrupt
+handler (`init_serial`, `$189A`; `set_baud_b`, `$1954`; `midi_channel_b`,
+`$19BC`; `modem_channel_b`, `$1A26`), and the MIDI rate comes out of the chip's
+timer rather than its baud-rate table.
 
-| Use | Channel | CSR | Rate | Set by |
-|---|---|---|---|---|
-| Console terminal | A (or B when the loader found it there) | `$BB` | 9600 | `init_console_baud`, `$193A`, from the loader's `$44`/`$46` |
-| PC link (`Topc`, `Frompc`, `Pcdisk`) | A, when the console is on B | `$CC` | 38400 | `init_console_baud` |
-| Modem | B | `$44` `$66` `$88` `$BB` `$CC` | 300, 1200, 2400, 9600, 38400 (`Modem [baud]`, `modem_baud_table` at `$1B42`) | `modem_channel_b`, `$1A26` |
-| **MIDI** | B | `$DD` = counter/timer output for both Rx and Tx | **31250** | `midi_channel_b`, `$19BC` |
+**How 31250 baud is made.** The 68681's built-in rate table has no MIDI rate,
+so the monitor uses the chip's counter/timer. At start-up, `init_serial` sets
+ACR to `$40`, which selects baud-rate set 1 and puts the counter/timer into
+timer mode clocked from the IP2 input pin. When MIDI is needed,
+`midi_channel_b` loads the timer with a preload of 8 (CTUR 0, CTLR 8) and sets
+channel B's clock-select register to `$DD`, meaning "timer output for both
+receive and transmit". In timer mode the chip divides its clock by twice the
+preload and uses the result as a 16× baud clock. The board ties IP2 to the
+8 MHz CPU clock, so 8 000 000 ÷ 16 ÷ 16 = 31250, exactly.
 
-The MIDI rate is the interesting one, because 31250 baud is not in the 68681's
-table. `midi_channel_b` loads the counter/timer with `CTUR = 0, CTLR = 8` and
-selects it as the clock. In timer mode the 68681 divides its clock by 2 × N and
-the result is used as a 16× baud clock, so with the 8 MHz CPU clock on IP2:
-8 000 000 / (2 × 8) / 16 = **31250**, exactly. The channel is switched to MIDI by
-`midi_open` (`$8F62`, use-counted in `midi_users`) when something needs MIDI, and
-back when `midi_close` brings the count to zero; leaving modem mode re-enables
-it if the count is nonzero. When the loader found the console on channel B
-(`modem_console`), MIDI and the modem are unavailable and channel A runs the PC
-link at 38400.
+**The rest of the port usage**
+
+| Use | Channel | CSR | Rate |
+|---|---|---|---|
+| Console terminal | A, or B if the loader found it there | `$BB` | 9600 |
+| PC link (`Topc`, `Frompc`, `Pcdisk`), when the console is on B | A | `$CC` | 38400 |
+| Modem (`Modem [baud]`) | B | `$44` `$66` `$88` `$BB` `$CC`, from `modem_baud_table` at `$1B42` | 300, 1200, 2400, 9600, 38400 |
+| MIDI | B | `$DD` | 31250 |
+
+Both channels run 8N1; the interrupt vector is `$3C` and IMR `$33` enables RxRDY
+and TxRDY of both channels, with the handler calling the installed
+`rx_hook_a/b` and `tx_hook_a/b`. MIDI is switched on by `midi_open` (`$8F62`),
+which keeps a use count in `midi_users`, and off again when the count drops to
+zero; leaving modem mode restores MIDI if the count is nonzero. If the console
+itself is on channel B (the loader's `modem_console` flag), neither MIDI nor the
+modem is available and channel A becomes the 38400-baud PC link.
 
 ### The floppy driver
 
