@@ -14,6 +14,7 @@ write-ups are linked from each section.
 | [`../system-monitor/COMMANDS.md`](../system-monitor/COMMANDS.md) | Every command the monitor's terminal accepts |
 | `../renders/INDEX.md` | Catalogue of every recording, rendered to MIDI (not in the public repository) |
 | `../decoded-images/` | Sector images decoded from the flux dumps, plus every HFE image (not in the public repository) |
+| [`emulator.md`](emulator.md) | What an emulator of the 264 needs: every device's expected behaviour, the byte-order rule, stages, and which framework |
 
 Python tools run with `uv run script.py ...` (dependencies are in `../pyproject.toml`, locked in `../uv.lock`; `uv sync` creates the environment).
 The disk images (`disk-images/`), decoded images and renders are kept out of the
