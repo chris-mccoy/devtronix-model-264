@@ -105,6 +105,10 @@ KryoFlux streams or HFE files into sector images.
 
 ## The collection
 
+- The floppies were dumped in 2020 with a KryoFlux board and its DTC program, which
+  saves the raw flux of every track (the archival copy) and also decodes it into a
+  sector image. `fluxdecode.py` re-decodes the flux independently and agrees with DTC
+  on every good sector.
 - 56 image sets, 54 of them Devtronix system disks (many are duplicate dumps of
   the same floppy). Two are MS-DOS disks, not Devtronix.
 - **844 track files**, all rendered: 1664 MIDI files in `renders/`, 41 tracks

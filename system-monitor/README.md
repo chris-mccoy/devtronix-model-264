@@ -493,13 +493,35 @@ uv run fluxdecode.py ../disk-images/58-note-07 out/58-note-07 \
         --ref ../disk-images/58-note-07/58-note-07_s0.raw ../disk-images/58-note-07/58-note-07_s1.raw
 ```
 
-Most folders under `../disk-images/` are **KryoFlux stream dumps**: one
-`<prefix>NN.S.raw` per cylinder NN and side S (`name=KryoFlux DiskSystem,
-version=2.20s`, sample clock 24.027 MHz, about five revolutions per file,
-cylinders 0-80 or 0-83). DTC, the KryoFlux software, also wrote its own sector
-image beside the streams, named `<name>_s0.raw`/`-s0.raw`; `render_all.py`
-only looks for `*_s0` and `*_s0.img`, which is why 24 folders were catalogued
-as "without a sector image". `autoboot/AUTOBOOT.HFE` is an HxC v0 image (80
+### How the floppies were dumped, and what the files are
+
+The 2020 dumps were made with a **KryoFlux**, a USB floppy-controller board
+that does not decode the disk at all: it samples the raw magnetic flux
+transitions coming off the drive head. Its command-line program is **DTC**, the
+KryoFlux "DiskTool Console". Run on a disk, DTC produced two things in each
+folder under `../disk-images/`:
+
+1. **Stream files**, one per cylinder and side, `<prefix>NN.S.raw` (`name=KryoFlux
+   DiskSystem, version=2.20s`, sample clock 24.027 MHz, about five revolutions
+   per file, cylinders 0-80 or 0-83 because DTC reads past the 80 the format
+   uses). These are the archival copies: everything that was on the disk,
+   including bad sectors and unformatted areas, with no interpretation applied.
+2. **A sector image** decoded by DTC itself from those streams, given the format
+   (MFM, 1024-byte sectors, 5 per track): `<name>_s0.raw` / `<name>-s0.raw` per
+   side. This is DTC's interpretation of the flux, and it is what the earlier
+   sessions used as the disk image wherever the folder had one.
+
+A third kind of file, the HxC `.hfe` images in `../devtronix-hardware/
+devtronix-floppy/`, was made from the same streams for the Gotek/HxC floppy
+emulator that now replaces the drive in the organ; `.hfe` holds the MFM bit
+stream of each track, between flux and sectors in level of interpretation.
+
+`fluxdecode.py` is an independent, second decoder of the stream files, written
+so that DTC's result could be checked rather than trusted, and so that the
+folders DTC did not turn into a sector image (`render_all.py` only looks for
+`*_s0` and `*_s0.img`, which is why 24 folders were catalogued as "without a
+sector image") could be. Wherever "DTC's image" or "the reference" appears
+below, it means the sector image DTC wrote beside the streams. `autoboot/AUTOBOOT.HFE` is an HxC v0 image (80
 tracks, 2 sides, MFM bitstream at 250 kbit/s). `meta/` holds the HxC profile
 used for the dumps.
 
