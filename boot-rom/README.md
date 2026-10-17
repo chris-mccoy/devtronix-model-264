@@ -9,11 +9,11 @@ relay. Everything here was derived from the Bus Pirate ROM dump in
 
 | File | What it is |
 |---|---|
-| `../devtronix-hardware/devtronix-rom/devtronix.rom.merged` | **The ROM as it is**: each word address as the LO chip's byte then the HI chip's byte, which is the byte-address order the CPU reads bytes in (strings readable, instruction words byte-swapped). Load this into an emulator |
+| `loader-c04.raw` | **The ROM as it is** (the 2011 dump, `devtronix.rom.merged`, renamed to match `monitor-183.raw`): each word address as the LO chip's byte then the HI chip's byte, which is the byte-address order the CPU reads bytes in (strings readable, instruction words byte-swapped). Load this into an emulator |
 | `loader-c04.bin` | The same with the two bytes of every word swapped, so instruction words read naturally: a convenience for 68000 disassemblers, not a physical layout |
 | `loader-c04.asm` | Fully annotated disassembly (read this) |
 | `loader-c04.raw-sweep.txt` | Mechanical capstone sweep, kept as the reference the annotation was built from |
-| `mkrom.py` | Rebuilds `loader-c04.bin` from `devtronix.rom.merged` (byte swap) |
+| `mkrom.py` | Rebuilds `loader-c04.bin` from `loader-c04.raw` (byte swap) |
 | `disasm.py` | Linear-sweep 68000 disassembler (capstone) with data-range support |
 | `devdisk.py` | Reads a floppy image the way the ROM does; parses boot block, file header, extents |
 
@@ -45,7 +45,7 @@ this folder decodes, and the HM50256 DRAMs of the 512 KB main memory at the righ
 ## Byte order — read this before touching any dump
 
 On this machine **strings are in byte-address order but 16-bit words are stored
-low byte first**. Concretely, in `devtronix.rom.merged` and in every floppy image:
+low byte first**. Concretely, in `loader-c04.raw` and in every floppy image:
 
 - `Devtronix Organ Control System Loader` reads straight through.
 - 68000 opcodes appear byte-swapped: `RTS` is `75 4E`, `JSR d16(PC)` is `BA 4E`.
@@ -57,7 +57,7 @@ positioning routine does a `ror.w #8` before storing a (row,col) word into a byt
 template, which is only correct if a word's low byte lands at the lower address.
 
 Practical rule:
-- **To disassemble:** swap the two bytes of every word (`mkrom.py` does this for the ROM).
+- **To disassemble:** swap the two bytes of every word (`mkrom.py` turns `loader-c04.raw` into `loader-c04.bin`).
 - **To read strings or byte tables:** use the image as-is.
 - **To read a 16-bit field** (sector numbers, addresses): little-endian.
 
