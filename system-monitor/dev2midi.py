@@ -23,11 +23,11 @@ Two renderings:
 The pulse clock is 96 per beat, which is used directly as the MIDI division;
 the tempo is not stored in a track (default 120 BPM, see README.md).
 """
-import argparse, os, struct, sys
+import argparse, heapq, re, os, struct, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from devfs import Disk, iter_events  # noqa: E402
-from devdef import Definition, midi_note, note_name, NOTES  # noqa: E402
+from devdef import Definition, midi_note, note_name, NOTES, io_address  # noqa: E402
 
 PPQ = 96
 GM_CHURCH_ORGAN = 19
@@ -118,20 +118,106 @@ class NoteSink:
 
 # ----------------------------------------------------------------------------- organ model
 class Organ:
-    """Enough of the relay logic to turn keys and stops into sounding pipes."""
+    """Enough of the relay logic to turn keys, stops and channel values into
+    sounding pipes, struck traps, running tremulants and shade positions."""
+    CHAMBERS = ("main", "solo", "echo", "great", "swell", "choir", "accomp", "pedal",
+                "orchestral", "percussion", "brass", "foundation", "ethereal")
+
     def __init__(self, d):
         self.d = d
         self.stops_on = set()
         self.keys = {}                      # keyboard -> set of key numbers
+        self.chan = {}                      # channel -> value 0..255
         self.links = d.lists.get("Lnk", [])
         self.fncs = {f.number: f for f in d.lists.get("Fnc", [])}
+        self.units = {u.number: u for u in d.lists.get("Unt", [])}
+        self.cots = [(c.w(0), c.w(2), c.w(4)) for c in d.lists.get("Cot", []) if c.w(0) and c.w(2)]
         self.active = set()                 # function numbers of true links
         self.by_stop = {}
         for l in self.links:
             for s in d.link_stops(l):
                 self.by_stop.setdefault(s, []).append(l)
         self.rank_pipes = {r.number: set(d.rank_notes(r)) for r in d.lists.get("Rnk", [])}
+        self.piz = {p.number: p.words(0, 122) for p in d.lists.get("Piz", [])}
+        self.rit = {r.number: r.words(0, 122) for r in d.lists.get("Rit", [])}
+        self._chambers()
 
+    # -- chambers, tremulants, shades (by name; board letters fill the gaps)
+    @staticmethod
+    def tokens(name):
+        return [t for t in re.split(r"[^a-z0-9]+", name.lower()) if t]
+
+    def chamber_of(self, name):
+        for t in self.tokens(name):
+            if t in self.CHAMBERS:
+                return t
+        return None
+
+    def _chambers(self):
+        d = self.d
+        self.rank_chamber = {}
+        letter_votes = {}
+        for r in d.lists.get("Rnk", []):
+            ch = self.chamber_of(r.name)
+            letters = {io_address(r.w(2 * n))[0] for n in range(1, 122) if r.w(2 * n) and r.w(2 * n) < 0x6001}
+            if ch:
+                self.rank_chamber[r.number] = ch
+                for L in letters:
+                    letter_votes.setdefault(L, {}).setdefault(ch, 0)
+                    letter_votes[L][ch] += 1
+            else:
+                self.rank_chamber[r.number] = letters
+        for n, v in list(self.rank_chamber.items()):
+            if isinstance(v, set):
+                best = {}
+                for L in v:
+                    for ch, c in letter_votes.get(L, {}).items():
+                        best[ch] = best.get(ch, 0) + c
+                self.rank_chamber[n] = max(best, key=best.get) if best else None
+        rank_tokens = {r.number: set(self.tokens(r.name)) for r in d.lists.get("Rnk", [])}
+        skip = set(self.CHAMBERS) | {"trem", "tremolo", "tremulant", "tremulants", "shade", "shades", "shutter", "shutters"}
+        # tremulants: unit -> set of ranks
+        self.trem_ranks, specific_claimed = {}, {}
+        trems = [u for u in self.units.values() if re.search(r"trem", u.name, re.I)]
+        for u in trems:
+            ch = self.chamber_of(u.name)
+            spec = {t for t in self.tokens(u.name) if t not in skip and not t.isdigit()}
+            ranks = set()
+            for n, toks in rank_tokens.items():
+                if ch and self.rank_chamber.get(n) not in (ch, None):
+                    continue
+                if spec and (toks & spec):
+                    ranks.add(n)
+            if ranks:
+                self.trem_ranks[u.number] = ranks
+                specific_claimed.setdefault(ch, set()).update(ranks)
+        for u in trems:
+            if u.number in self.trem_ranks:
+                continue
+            ch = self.chamber_of(u.name)
+            self.trem_ranks[u.number] = {n for n in rank_tokens
+                                         if (ch is None or self.rank_chamber.get(n) == ch)
+                                         and n not in specific_claimed.get(ch, set())}
+        # shades: chamber -> list of unit numbers
+        self.shade_units = {}
+        for u in self.units.values():
+            toks = self.tokens(u.name)
+            if any(t in ("shade", "shades", "shutter", "shutters", "upper", "lower", "side") for t in toks):
+                ch = self.chamber_of(u.name)
+                if ch:
+                    self.shade_units.setdefault(ch, []).append(u.number)
+        # traps: unit -> GM percussion note
+        self.perc_note = {}
+        for u in self.units.values():
+            if u.type == 0:
+                continue
+            name = u.name.lower()
+            for key, note in PERCUSSION:
+                if key in name:
+                    self.perc_note[u.number] = note
+                    break
+
+    # -- links / functions
     def eval_link(self, lnk):
         stack = []
         for i in range(15):
@@ -155,15 +241,25 @@ class Organ:
                 stack.append(v in self.stops_on)
         return bool(stack and stack[-1])
 
+    def _recompute(self):
+        self.active = set()
+        for l in self.links:
+            if self.eval_link(l):
+                self.active.update(self.d.link_functions(l))
+        for c, f, v in self.cots:             # channel outputs: active while the channel is at or above the value
+            if self.chan.get(c, 0) >= v:
+                self.active.add(f)
+
     def set_stop(self, n, on):
         if on:
             self.stops_on.add(n)
         else:
             self.stops_on.discard(n)
-        self.active = set()
-        for l in self.links:
-            if self.eval_link(l):
-                self.active.update(self.d.link_functions(l))
+        self._recompute()
+
+    def set_channel(self, c, v):
+        self.chan[c] = v
+        self._recompute()
 
     def set_key(self, kbd, key, on):
         s = self.keys.setdefault(kbd, set())
@@ -173,29 +269,31 @@ class Organ:
             s.discard(key)
 
     def rank_functions(self):
-        """Active functions that sound a rank, following modifiers and multipliers."""
+        """Active functions that sound a rank, as (function, modifier) where the
+        modifier is the pizzicato/reiterate function that reached it, if any."""
         out, seen = [], set()
-        todo = list(self.active)
+        todo = [(n, None) for n in self.active]
         while todo:
-            n = todo.pop()
-            if n in seen:
+            n, mod = todo.pop()
+            if (n, mod and mod.number) in seen:
                 continue
-            seen.add(n)
+            seen.add((n, mod and mod.number))
             f = self.fncs.get(n)
             if f is None:
                 continue
             t = f.type
             if t == 3:
-                out.append(f)
+                out.append((f, mod))
             elif t in (13, 14):                      # pizzicato / reiterate modifier
-                todo.append(f.w(2))
+                todo.append((f.w(2), f))
             elif t == 12:                            # function multiplier
-                todo.extend(v for v in f.words(2, 8) if v)
+                todo.extend((v, mod) for v in f.words(2, 8) if v)
         return out
 
     def division_keys(self, kbd, depth=0):
         """Keys sounding on a division: its own keys unless unison off, plus
-        keys coupled in from other keyboards by active divisional couplers."""
+        keys coupled in from other keyboards by active divisional couplers
+        (melody and bass couplers pass only their highest or lowest key)."""
         keys = set()
         unison_off = any(self.fncs[n].type == 6 and self.fncs[n].w(2) == kbd
                          for n in self.active if n in self.fncs)
@@ -213,6 +311,11 @@ class Organ:
                 src_keys = self.division_keys(src, depth + 1)
             else:
                 src_keys = self.keys.get(src, set())
+            special = f.w(14)
+            if src_keys and special in (1, 2):      # melody coupler: highest key only
+                src_keys = {max(src_keys)}
+            elif src_keys and special in (3, 4):    # bass coupler: lowest key only
+                src_keys = {min(src_keys)}
             for k in src_keys:
                 n2 = k + off
                 if lo <= n2 <= hi:
@@ -220,10 +323,11 @@ class Organ:
         return keys
 
     def sounding(self):
-        """Set of (rank, note) currently sounding."""
-        out = set()
+        """{(rank, note): mode} currently sounding; mode is None, ("piz", ms) or
+        ("rit", cycle_ms, duty_tenths, offsets)."""
+        out = {}
         cache = {}
-        for f in self.rank_functions():
+        for f, mod in self.rank_functions():
             kbd, rank, off = f.w(2), f.w(4), f.s(6)
             lo, hi = f.w(8) or 1, f.w(10) or NOTES
             if kbd not in cache:
@@ -231,9 +335,63 @@ class Organ:
             pipes = self.rank_pipes.get(rank, set())
             for k in cache[kbd]:
                 n = k + off
-                if lo <= n <= hi and n in pipes:
-                    out.add((rank, n))
+                if not (lo <= n <= hi and n in pipes):
+                    continue
+                mode = None
+                if mod is not None and mod.type == 13:
+                    ms = self.piz.get(mod.w(4), [0] * 122)[k] if 0 <= k < 122 else 0
+                    mode = ("piz", ms) if ms else None
+                elif mod is not None and mod.type == 14:
+                    w = self.rit.get(mod.w(4), [0] * 122)[k] if 0 <= k < 122 else 0
+                    if w:
+                        offsets = []
+                        for i in range(4):
+                            v = mod.s(6 + 2 * i)
+                            if i and v == 0:
+                                break
+                            offsets.append(v)
+                        mode = ("rit", w & 0xFF, (w >> 8) or 5, offsets or [0])
+                key = (rank, n)
+                if key not in out or out[key] is not None and mode is None:
+                    out[key] = mode
         return out
+
+    def units_on(self):
+        """Units switched on by active functions: type 5 (direct) and type 4
+        (trap: on while any key sounds on its division)."""
+        on, cache = set(), {}
+        for n in self.active:
+            f = self.fncs.get(n)
+            if f is None:
+                continue
+            if f.type == 5 and f.w(2):
+                on.add(f.w(2))
+            elif f.type == 4 and f.w(4):
+                kbd = f.w(2)
+                if kbd not in cache:
+                    cache[kbd] = self.division_keys(kbd)
+                if cache[kbd]:
+                    on.add(f.w(4))
+        return on
+
+    def trems_on(self, units):
+        ranks = set()
+        for u in units:
+            ranks |= self.trem_ranks.get(u, set())
+        return ranks
+
+    def shade_levels(self, units):
+        """chamber -> fraction of its shade units that are open."""
+        return {ch: sum(1 for u in us if u in units) / len(us) for ch, us in self.shade_units.items() if us}
+
+# GM percussion notes for trap names (first match wins)
+PERCUSSION = [("bass drum", 36), ("kettle", 47), ("tympani", 47), ("timpani", 47), ("snare", 38),
+              ("bongo", 60), ("tom", 45), ("crash", 49), ("cymbalstern", 59), ("tap cym", 51),
+              ("brush cym", 51), ("ride", 51), ("cymbal", 51), ("cymba", 51), ("tambourine", 54),
+              ("castanet", 75), ("chinese block", 76), ("wood block", 76), ("block", 77),
+              ("sand", 69), ("triangle", 81), ("cowbell", 56), ("maracas", 70), ("sleigh", 54),
+              ("gong", 52), ("whistle", 72), ("bell", 53), ("drum", 38)]
+GM_PERC_CHANNEL = 9
 
 # ----------------------------------------------------------------------------- rendering
 def stop_label(d, n):
@@ -258,12 +416,18 @@ def render(data, d, tempo, velocity, ranks, verbose=False):
     sink = NoteSink(velocity)
     tracks = [meta]
     kbd_tracks, rank_tracks = {}, {}
+    perc_track = [None]
     organ = Organ(d) if ranks else None
-    sounding = set()
+    sounding = {}                   # (rank, note) -> mode
+    units_now = set()
     last_t = 0
     keyboards = {k.number: k for k in d.lists.get("Kbd", [])}
     chan_names = {c.number: c.name for c in d.lists.get("Chn", [])}
-    stats = {"keys": 0, "stops": 0, "notes": 0, "unknown_kbd": set()}
+    stats = {"keys": 0, "stops": 0, "notes": 0, "hits": 0, "unknown_kbd": set()}
+    ticks_per_ms = tempo * PPQ / 60000.0
+
+    def ms_ticks(ms):
+        return max(1, int(round(ms * ticks_per_ms)))
 
     def kbd_track(n):
         if n not in kbd_tracks:
@@ -273,6 +437,8 @@ def render(data, d, tempo, velocity, ranks, verbose=False):
             tr.add(0, [0xC0 | chan, GM_CHURCH_ORGAN])
             kbd_tracks[n] = (tr, chan); tracks.append(tr)
         return kbd_tracks[n]
+
+    cc_state = {}
 
     def rank_track(n):
         if n not in rank_tracks:
@@ -284,21 +450,141 @@ def render(data, d, tempo, velocity, ranks, verbose=False):
             rank_tracks[n] = (tr, chan); tracks.append(tr)
         return rank_tracks[n]
 
+    def cc(rank, t, ctl, val):
+        tr, chan = rank_track(rank)
+        if cc_state.get((chan, ctl)) == val:
+            return
+        cc_state[(chan, ctl)] = val
+        tr.add(t, [0xB0 | chan, ctl, val])
+
+    def percussion():
+        if perc_track[0] is None:
+            perc_track[0] = Track("Traps (GM percussion)"); tracks.append(perc_track[0])
+        return perc_track[0]
+
+    def hit(t, note):
+        tr = percussion()
+        tr.add(t, [0x90 | GM_PERC_CHANNEL, note, velocity])
+        tr.add(t + ms_ticks(40), [0x80 | GM_PERC_CHANNEL, note, 0])
+        stats["hits"] += 1
+
+    # -- timers: (time, seq, callback) processed in order before each event
+    timers, seq = [], [0]
+
+    def after(t, callback):
+        seq[0] += 1
+        heapq.heappush(timers, (t, seq[0], callback))
+
+    def run_timers(upto):
+        while timers and timers[0][0] <= upto:
+            t, _, cb = heapq.heappop(timers)
+            cb(t)
+
+    spent = set()          # piz notes already released by their timer
+    rit_state = {}         # (rank, note) -> dict(idx, on, pitch, alive)
+    unit_reit = {}         # unit -> alive flag for reiterating traps
+
+    def note_on(key, t):
+        rank, n = key
+        tr, chan = rank_track(rank)
+        sink.on(tr, t, chan, midi_note(n)); stats["notes"] += 1
+
+    def note_off(key, t, pitch=None):
+        rank, n = key
+        tr, chan = rank_track(rank)
+        sink.off(tr, t, chan, midi_note(pitch if pitch is not None else n))
+
+    def start(key, mode, t):
+        if mode is None:
+            note_on(key, t)
+        elif mode[0] == "piz":
+            note_on(key, t)
+            def release(t2, key=key):
+                if sounding.get(key, 0) is not None and key in sounding and key not in spent:
+                    spent.add(key); note_off(key, t2)
+            after(t + ms_ticks(mode[1]), release)
+        else:
+            _, cycle, duty, offsets = mode
+            on_ms = max(1, cycle * duty // 10); off_ms = max(1, cycle - on_ms)
+            st = {"idx": 0, "on": True, "pitch": key[1] + offsets[0], "alive": True}
+            rit_state[key] = st
+            rank = key[0]
+            tr, chan = rank_track(rank)
+            sink.on(tr, t, chan, midi_note(st["pitch"])); stats["notes"] += 1
+            def toggle(t2, key=key, st=st):
+                if not st["alive"]:
+                    return
+                tr, chan = rank_track(key[0])
+                if st["on"]:
+                    sink.off(tr, t2, chan, midi_note(st["pitch"])); st["on"] = False
+                    after(t2 + ms_ticks(off_ms), toggle)
+                else:
+                    st["idx"] = (st["idx"] + 1) % len(offsets)
+                    st["pitch"] = key[1] + offsets[st["idx"]]
+                    sink.on(tr, t2, chan, midi_note(st["pitch"])); st["on"] = True
+                    after(t2 + ms_ticks(on_ms), toggle)
+            after(t + ms_ticks(on_ms), toggle)
+
+    def stop(key, mode, t):
+        if mode is not None and mode[0] == "rit":
+            st = rit_state.pop(key, None)
+            if st:
+                st["alive"] = False
+                if st["on"]:
+                    note_off(key, t, st["pitch"])
+            return
+        if key in spent:
+            spent.discard(key); return
+        note_off(key, t)
+
+    def update_units(t):
+        nonlocal units_now
+        now = organ.units_on()
+        for u in sorted(now - units_now):
+            note = organ.perc_note.get(u)
+            unit = organ.units.get(u)
+            if note:
+                hit(t, note)
+                if unit is not None and unit.type == 3 and unit.w(6):       # reiterating trap
+                    cycle = unit.w(6)
+                    flag = {"alive": True}; unit_reit[u] = flag
+                    def again(t2, u=u, note=note, cycle=cycle, flag=flag):
+                        if flag["alive"] and u in units_now:
+                            hit(t2, note); after(t2 + ms_ticks(cycle), again)
+                    after(t + ms_ticks(cycle), again)
+        for u in units_now - now:
+            f = unit_reit.pop(u, None)
+            if f:
+                f["alive"] = False
+        if now != units_now:
+            units_now = now
+            trem = organ.trems_on(now)
+            for rank in rank_tracks:
+                cc(rank, t, 1, 80 if rank in trem else 0)
+            for ch, level in organ.shade_levels(now).items():
+                for rank, rch in organ.rank_chamber.items():
+                    if rch == ch and rank in rank_tracks:
+                        cc(rank, t, 11, 24 + int(round(103 * level)))
+
     def update_sounding(t):
         nonlocal sounding
+        run_timers(t)
         now = organ.sounding()
-        for rank, n in sorted(sounding - now):
-            tr, chan = rank_track(rank)
-            sink.off(tr, t, chan, midi_note(n))
-        for rank, n in sorted(now - sounding):
-            tr, chan = rank_track(rank)
-            sink.on(tr, t, chan, midi_note(n)); stats["notes"] += 1
+        for key in sorted(k for k in sounding if k not in now):
+            stop(key, sounding[key], t)
+        for key in sorted(k for k in now if k not in sounding):
+            start(key, now[key], t)
+        for key in sorted(k for k in now if k in sounding and now[k] != sounding[k]):
+            stop(key, sounding[key], t); start(key, now[key], t)
         sounding = now
+        update_units(t)
 
     pending = False
     for off, t, kind, info in iter_events(data):
-        if ranks and pending and t != last_t:
-            update_sounding(last_t); pending = False
+        if ranks:
+            run_timers(t)
+            if pending and t != last_t:
+                update_sounding(last_t); pending = False
         last_t = t
         if kind == "key":
             kbd, key, on = info
@@ -325,16 +611,26 @@ def render(data, d, tempo, velocity, ranks, verbose=False):
             if ranks:
                 for s in stops_on:
                     organ.set_stop(s, True)
+                for i, v in enumerate(values or []):
+                    organ.set_channel(i + 1, v)
                 pending = True
         elif kind == "channel":
             c, v = info
             meta.text(t, f"Chn {c} {chan_names.get(c, '')} = {v}".replace("  ", " "))
+            if ranks:
+                organ.set_channel(c, v); pending = True
         elif kind == "midi":
             meta.text(t, "midi " + info.hex(" "))
         elif kind == "end":
             break
-    if ranks and pending:
-        update_sounding(last_t)
+    if ranks:
+        if pending:
+            update_sounding(last_t)
+        run_timers(last_t)
+        for key in list(sounding):
+            stop(key, sounding[key], last_t)
+        for f in unit_reit.values():
+            f["alive"] = False
     sink.all_off(last_t)                      # a track cut short
     # a rank that only ever doubled another rank on the same channel has no notes
     tracks = [tr for i, tr in enumerate(tracks)

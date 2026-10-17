@@ -25,9 +25,13 @@ as they exist in a local copy. Nothing under `disk-images/` is ever modified.
 - **Computer** Devtronix's own board, "Organ Computer Control 264-1" (1984), built to
   the design of the Alpha Microsystems AM-1000: MC68000P8 at 8 MHz, SCN68681 DUART,
   6840 timer, WD2791 floppy controller, and the Alpha Micro byte-swapped bus. The
-  "Dimension-030" is InterLink Systems' 1991 68030 accelerator card for Alpha Micro
+  "Dimension-030" is InterLink Systems' 1991 68030 accelerator for Alpha Micro
   machines, and the monitor's "Turbo Mode" enables its instruction cache with
-  `movec CACR`, exactly as Alpha Micro's own TURBO utility does.
+  `movec CACR`, exactly as Alpha Micro's own TURBO utility does. Chris recalls the
+  Dimension-030 as possibly an ISA card for IBM PC compatibles, which is not certain
+  either way; what the code shows is that the monitor executes `movec` on its own
+  CPU, so whatever the card's form, in the 264 it replaced or carried the processor
+  that runs the monitor.
 - **Memory** 512 KB RAM at `$000000` (sixteen HM50256 DRAMs); 8 KB boot ROM at
   `$800000` (two 2732A EPROMs, high and low byte).
 - **I/O** MC68681 DUART at `$FFFFFE21` (channel A = terminal, 9600 baud;
@@ -68,9 +72,9 @@ each port and baud rate and waiting for ESC, then offers "Hit return to boot
 from disk" / "Hit $ to download across modem". Boot reads logical sector 0,
 checks the `$F2` signature, finds the system-monitor file through a header
 sector and an extent list, zeroes RAM below the load address, loads the file
-and jumps to it. The modem path receives checksummed 1 KB blocks. The 2011 dump
-covers only the first 2 KB of what is probably an 8 KB ROM pair; the loader
-fits in it, but the rest of the ROM is unread.
+and jumps to it. The modem path receives checksummed 1 KB blocks. The ROM is an
+8 KB pair of 2732As; the loader occupies the first 1.5 KB and everything after it
+has been confirmed to be `$FF`.
 
 ## System Monitor 2.6 (183), dated 05/11/93
 
@@ -114,7 +118,10 @@ KryoFlux streams or HFE files into sector images.
   ON bitmap over the stops; their union is the piston's range. Decoded from the
   Set/Range/piston code. `devcomb.py` decodes one.
 - `dev2midi.py` renders a track with its definition to a standard MIDI file,
-  one channel per keyboard, or through stops and ranks with `--ranks`.
+  one channel per keyboard, or through stops and ranks with `--ranks`, which
+  also plays the traps as General MIDI percussion, drives tremulants as
+  modulation, follows the swell shades as expression, and applies the
+  pizzicato and reiterate timing tables.
 
 ## The collection
 
@@ -122,8 +129,12 @@ KryoFlux streams or HFE files into sector images.
   saves the raw flux of every track (the archival copy) and also decodes it into a
   sector image. `fluxdecode.py` re-decodes the flux independently and agrees with DTC
   on every good sector.
-- 56 image sets, 54 of them Devtronix system disks (many are duplicate dumps of
-  the same floppy). Two are MS-DOS disks, not Devtronix.
+- 58 image sets, 56 of them Devtronix system disks (many are duplicate dumps of
+  the same floppy). Two are MS-DOS disks, not Devtronix. The two disks that existed
+  only as HFE images are now decoded too: `os-backup` is "CMM 2" (both monitor
+  versions and the same two definitions as `cmm-backup`) and `startupa` is
+  "Startup A" (monitor 180 and one small four-keyboard definition); neither holds
+  a recording.
 - **844 track files**, all rendered: 1664 MIDI files in `renders/`, 41 tracks
   flagged for decode problems, 12 directory entries that are corrupt. Jerry's
   tour disc holds twelve named tunes (Danny Boy, Joy To The World, Stars And
@@ -139,10 +150,9 @@ KryoFlux streams or HFE files into sector images.
   player and MIDI-control definitions.
 - **28 combination files** on the real-organ disks, none on the player disks.
   Several were saved under an older definition than the disk's `D1`.
-- All 42 HFE images are gathered in `decoded-images/`. Two disks, `os-backup`
-  and `startupa`, exist only as HFE and have not been decoded. Four HFEs have
-  84 tracks because KryoFlux reads past cylinder 79; the format uses 80 and
-  the extra tracks hold nothing.
+- All 42 HFE images are gathered in `decoded-images/`. Four HFEs have 84 tracks
+  because KryoFlux reads past cylinder 79; the format uses 80 and the extra
+  tracks hold nothing.
 - The side files (`*_s0`, `*_s1`) are per-side images, cylinder by cylinder;
   the `.img` files are side 0 then side 1. A standard track-interleaved image
   for an emulator needs the two sides interleaved in 5120-byte chunks, with the
@@ -150,15 +160,17 @@ KryoFlux streams or HFE files into sector images.
 
 ## Open questions
 
-1. Confirm the ROM size on the CPU board and re-dump ROM addresses `$400`–`$FFF`.
-2. ~~Listen to the renders; confirm the 120 BPM tempo assumption.~~ Done: Chris has
-   listened to them and they sound right, which confirms the 120 BPM clock.
-3. Decode `os-backup` and `startupa` from their HFEs.
-4. Still unknown in the definition: a few `Stp` body fields, the `Piz`/`Rit`
-   timing tables. `dev2midi.py --ranks` does not model traps, tremulants or
-   expression.
-5. The relay logic itself (`task_scn`, key and stop events) is traced but not
-   annotated in depth.
+Everything listed here earlier has been settled: the ROM is 8 KB with `$FF`
+beyond the loader, the renders have been listened to at 120 BPM, the two
+HFE-only disks are decoded, the definition's timing tables and spare fields are
+explained, the relay is annotated, and the renderer models traps, tremulants,
+expression and the pizzicato/reiterate timing. What remains is judgement rather
+than decoding:
+
+1. The MIDI rendering of tremulants (modulation), shades (expression) and traps
+   (General MIDI percussion by name) is an approximation of what the organ does;
+   a proper rendering would need samples of the actual ranks.
+2. The Dimension-030's physical form (see "The machine").
 
 ## References
 

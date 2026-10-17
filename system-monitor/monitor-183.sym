@@ -598,3 +598,32 @@ C6E6 scan_port          ; a1 = $FFFFFF80 (a dummy word when the console is on ch
 C716 coupler_activate   ; activate/release a coupler or rank-output block: link its hook into the source set, replay the notes already held
 C7F0 hook_link          ; add (d4 > 0) or remove node a4 from the hook list at a0
 A7FA ;; SCN task: console scanner.  See README.md "The relay".
+
+# ------------------------------------------------------------- relay: special couplers, holds, units, modifiers, tests
+B7D6 melody_hook        ; coupler special 1: only the highest held source key sounds on the target; falls back on release
+B7EE melody_hold_hook   ; coupler special 2: melody without fall-back (note stays until released or a higher key is pressed)
+B814 bass_hook          ; coupler special 3: only the lowest held key, falling back upward
+B830 bass_hold_hook     ; coupler special 4: bass without fall-back
+B85A held_highest       ; highest note with a nonzero count in the source set -> d1
+B872 held_lowest        ; lowest note with a nonzero count in the source set -> d1
+B88C tracked_release    ; release the coupler's current note (+$12 of its args) through note_offset_hook
+B89C tracked_press      ; press the coupler's current note
+B906 single_hook        ; coupler special 5/6: note_offset_hook with a re-entrancy guard (tas)
+~ACC6
+ACC6 hold_hook          ; sustain (bit 1) / legato (bit 4) hook on key-on: set the bit on the key; legato also releases keys only it was holding
+B1D8 unit_oneshot       ; unit type 2: on, then off after the maximum time (timer), at least the minimum time; optionally on key-up
+B26E unit_reiterate     ; unit type 3: on for cycle*duty/10 ms, off for the rest, while in use (rit_unit_tick at $B2C4)
+B2C4 rit_unit_tick
+B32A unit_weighted      ; unit type 4: channel value as 8 weighted outputs
+B354 unit_midi_note     ; unit type 5: MIDI note on/off, channel B
+~BA4A
+BA4A rit_hook           ; reiterate modifier hook: play the note and schedule rit_tick per the Rit table (cycle ms low byte, duty high byte)
+BACA rit_tick           ; timer: toggle the note, step the pitch-offset list, reschedule; 0-3 ms random jitter if Rit word 0 is set
+~BB38
+BB38 piz_hook           ; pizzicato modifier hook: play the note and schedule piz_release after the Piz table's ms for the key
+BB9A piz_release        ; timer: release the pizzicato note early
+AFC6 modifier_activate  ; fn_activate types 13/14: swap the modified function's hook handler for piz_hook/rit_hook and re-activate it
+DDF4 addr_test          ; Tstadr: control $0300, data 255..0 for ever
+DE5C input_test         ; Tstinp: scan a board's 128 inputs (control $15FE), analog values with $35xx
+DFAA output_test        ; Tstotp: control $0F00, walk outputs 1..96 on/off
+E04E parse_board        ; two letters A-P -> board address bits

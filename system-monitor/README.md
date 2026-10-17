@@ -304,7 +304,7 @@ order of `dat_05ABE`: Kbd Rnk Unt Stp Lnk Fnc Pst Chn Cin Cot Piz Rit Spf Ctl In
 | `Ctl` control button | `$15EC` | 14 | 6 | +0 type (keypad digit, record/play start, ...), +2 input address, +4 debounce |
 | `Ind` indicator | `$3A74` | 12 | 4 | +0 type (disk busy, record active, ...), +2 output address |
 | `Pst` piston | `$670C` | 12 | 4 | +0 input address, +2 debounce |
-| `Piz` / `Rit` | `$6582` / `$71FC` | 252 | 244 | pizzicato / reiterate timing tables (not decoded further) |
+| `Piz` / `Rit` | `$6582` / `$71FC` | 252 | 244 | timing tables, one word per note: `Piz` word *n* = how long note *n* sounds, in ms (Jerry's: 50 ms, 30 ms in the treble, 80 ms for the pedal); `Rit` word 0 = "random timing" flag (`$FF`), word *n* = reiterate cycle for note *n*: low byte = cycle time in ms, high byte = duty in tenths (Jerry's glockenspiel `$0550` = 80 ms cycle, on for 40 ms). See "The relay", modifiers |
 | `Chn` channel | `$140E` | 12 | 4 | +0 type (1 expression, 2 crescendo, 3 tempo control), +2 record flag |
 | `Cin` channel input | `$1436` | 18 | 10 | +0 contact address, +2 channel, +4 value 0–255, +6 debounce, +8 sensitivity |
 | `Cot` channel output | `$152C` | 14 | 6 | +0 channel, +2 function, +4 value at which it fires |
@@ -329,6 +329,13 @@ unused item. The relay builds a function block per function at start-up
 (`sub_09D3A`, jump table `$9D98`), and at run time a stop change re-evaluates
 the links that mention the stop and activates or releases their functions
 (`spec_0ADFE` → `sub_0AE86` → `sub_0AED4`, with a use count per function).
+
+**Spare fields.** `Stp` body words +2 and +4, `Rnk` word 0 and `Kbd` word 122 are
+not among the editor's fields and are never read by the relay or the file code:
+`Rnk` and `Kbd` bodies are simply 122/123-word arrays indexed by note number
+(note 0 does not exist), and the two `Stp` words are left over from an earlier
+record layout (versions before `$1A15` carried 8 obsolete bytes at the head of
+every body). Nothing in them matters for playback.
 
 **Notes.** Keys and pipes share one absolute 121-note scale: note 1 is the C of
 the 32' octave (MIDI 12), **note 25 is 8' C, the bottom key of a 61-note manual
@@ -361,7 +368,20 @@ uv run dev2midi.py SIDE0 SIDE1 -t T8 -d D1 --ranks -o danny-boy-ranks.mid   # th
 ```
 
 `dev2midi.py` writes a format-1 file with 96 ticks per beat (one tick per
-pulse) at 120 BPM unless `--tempo` says otherwise. Track 0 carries the tempo
+pulse) at 120 BPM unless `--tempo` says otherwise. In `--ranks` mode it also
+models what the relay does beyond pipes: **traps** (units with drum-like names,
+struck when a type-4 trap function sees a key on its division or a type-5
+function switches the unit on; reiterating units repeat at their cycle time) go
+to a "Traps" track on General MIDI channel 10; **tremulants** (units named
+"...Trem...", matched to the ranks of their chamber and to ranks named in the
+tremulant's name) become modulation (CC1) on the affected rank tracks;
+**expression** follows the chamber's shade units (named "...Shade n" or
+"...upper/lower/side n", whether switched by stops as on Jerry's organ or by
+channel-value outputs as on the PCC) as CC11, with the chamber of each rank
+taken from its name or its output boards; **melody and bass couplers** pass
+only the highest or lowest key; **pizzicato** notes are released after the
+table's time, and **reiterating** notes retrigger at their cycle and duty,
+stepping through the function's pitch offsets. Track 0 carries the tempo
 and a marker for every stop change (and the initial sync block) plus text
 events for the swell-shoe channel values. In the default mode each keyboard
 gets a track and a channel (Church Organ) and every key plays at its own pitch,
@@ -588,6 +608,86 @@ the evaluator (`link_direct_stops`).
 Pistons are handled by `piston_press` (`$B68A`) as described under
 "Combination files"; every stop it changes goes through `stop_event` like a
 hand-drawn one.
+
+### Couplers with a mind of their own
+
+A divisional coupler's "special function" field (`Fnc` type 1, +14) picks the
+hook handler the coupler hangs on its source note set (`fn_block_by_type`,
+`$9FA8`):
+
+| Value | Handler | Behaviour |
+|---|---|---|
+| 0 | `note_offset_hook` | plain coupler: every note, offset, within limits |
+| 1 | `melody_hook` (`$B7D6`) | **melody coupler**: only the highest held key sounds on the target; when it is released the next highest takes over |
+| 2 | `melody_hold_hook` (`$B7EE`) | melody coupler that does not fall back: the sounding note stays until it is released itself or a higher key is pressed |
+| 3 | `bass_hook` (`$B814`) | **bass coupler**: the lowest held key only, falling back upward |
+| 4 | `bass_hold_hook` (`$B830`) | bass coupler without fall-back |
+| 5, 6 | `single_hook` (`$B906`) | plain coupler with a re-entrancy guard |
+
+Each keeps its current note in the coupler block (`+$1E`); `held_highest` /
+`held_lowest` (`$B85A`/`$B872`) scan the source set's note counts.
+
+**Sustain, legato and sostenuto** (function types 7, 8, 18) are not hooks on a
+note set but bits in the keyboard's key-state bytes (`kbd_states`): sustain
+owns bit 1, sostenuto bit 2, legato bit 4. Activating the function
+(`coupler_keys`, `$AC7E`) sets its bit on every key held at that moment, so
+those keys keep sounding after release until the function goes off, which
+clears the bits and releases whatever only they were holding. While sustain or
+legato is on, every new key also gets the bit (`hold_hook`, `$ACC6`); legato
+additionally releases every key that only the legato bit was holding, so the
+division plays one note at a time. Sostenuto captures only the keys down when
+it was switched on.
+
+### Units: traps, tremulants, shades
+
+A unit is one or more console or chamber outputs with a behaviour
+(`unit_type_table`, `$B1C8`, driven by `unit_use` on 0↔1 of a use count):
+
+| Type | Body | Behaviour |
+|---|---|---|
+| 1 | +2 location, +4 address | plain output: on while in use (tremulants, shade stages, lights, most trap actions) |
+| 2 | +6 minimum on time, +8 maximum on time, +10 trigger on key-up | one-shot: the output goes on and a timer turns it off after the maximum time; it stays on at least the minimum time; optionally fires on release instead |
+| 3 | +4 and +10 two outputs, +6 cycle time ms, +8 duty 1–9 | reiterating: on for cycle × duty / 10 ms, off for the rest, repeated while in use (snare rolls); with a second address the two alternate |
+| 4 | +4 .. +18 eight weighted outputs | a channel value as an 8-bit binary pattern on eight outputs (motorised shades) |
+| 5 | +2 MIDI channel, +4 note, +6 velocity | MIDI note on/off on DUART channel B |
+
+A **trap** function (type 4: division + unit) hooks `unit_use` on the division's
+note set, so the trap fires when the first key goes down and releases with the
+last; a type-5 function switches a unit directly from a stop. Jerry's organ
+drives everything, drums included, as type-1 outputs; the PCC definition has
+one one-shot (the sand block, 150 ms) and one reiterator ("Tap ROLL", 80 ms
+cycle, 60 % duty).
+
+### Pizzicato and reiterate modifiers
+
+Function types 13 and 14 modify another function (+2) using a `Piz` or `Rit`
+table (+4). Activating the modifier (`fn_activate` types 13/14, `$AFC6`) swaps
+the modified function's hook handler for `piz_hook` (`$BB38`) or `rit_hook`
+(`$BA4A`) and re-activates it, so the modifier wraps every note the function
+sounds:
+
+- **Pizzicato**: on key-on the note plays and a timer node is scheduled for the
+  table's time for that key (word per note, ms); when it fires the note is
+  released early (`piz_release`, `$BB9A`); a key released before that cancels
+  the timer. Jerry's "Solo To Accomp Pizz" is 50 ms, 30 ms in the treble.
+- **Reiterate**: on key-on the note plays and a timer re-strikes it: on for
+  cycle × duty / 10 ms, off for the rest (`rit_tick`, `$BACA`), with 0–3 ms of
+  jitter if the table's "random timing" word is set, and stepping through the
+  function's list of pitch offsets (+6..+12) at each cycle, so a reiterate with
+  offsets 0 and 2 is a trill. Jerry's glockenspiel reiterates every 80 ms, the
+  xylophone and marimba every 120 ms.
+
+### Board test routines
+
+`Tstadr` (`addr_test`, `$DDF4`) sets control word `$0300` and writes the data
+word 255 down to 0 for ever, so the address-selector outputs can be checked with
+a scope. `Tstinp` (`input_test`, `$DE5C`) takes a board address (two letters),
+then scans its 128 pins with control `$15FE`, printing the pin name (`A1`..`P8`)
+of every active input and, for inputs that read as analog, the value from a
+successive-approximation read with control `$35xx`. `Tstotp` (`output_test`,
+`$DFAA`) sets control `$0F00` and, with interrupts off, walks the board's
+outputs 1..96, each on then off with a short delay, over and over, so magnets
+and lamps can be watched.
 
 ### Channels (swell shoes, crescendo)
 
@@ -870,13 +970,12 @@ shows:
    MIDI. Still unknown in it: `Stp` body words +2 and +4, `Rnk` word 0,
    `Kbd` word 122, and the layout of the `Piz`/`Rit` timing tables. The
    combination (`C`) file format is now decoded (section above).
-   `dev2midi.py --ranks` does not
-   model traps/units, tremulants, expression or pizzicato/reiterate timing.
+   `dev2midi.py --ranks` now models traps, tremulants, expression and the
+   pizzicato/reiterate timing (approximately, see "devdef.py and dev2midi.py").
 2. ~~Confirm the tempo assumption on a real recording.~~ Done: the renders have
    been listened to and sound right at 120 BPM (192 pulses/s).
-3. The relay (scanner, keys, stops, outputs) is now annotated, see "The relay".
-   Not followed in detail: the melody/bass coupler variants, the pizzicato and
-   reiterate timing, and the board test routines (`Tstadr`, `Tstinp`, `Tstotp`).
+3. The relay (scanner, keys, stops, outputs, couplers, units, modifiers and the
+   board tests) is annotated, see "The relay".
 4. `monitor-183.asm` has 32 `spec_` routines reached only through data
    structures; a few hundred bytes of the editor may still be data mistaken for
    code or vice versa.

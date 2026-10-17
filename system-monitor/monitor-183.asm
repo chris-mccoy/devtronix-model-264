@@ -11675,7 +11675,7 @@
 09E8E  6710                   beq.b   L_09EA0
 09E90  38D9                   move.w  (a1)+,(a4)+
 09E92  429C                   clr.l   (a4)+
-09E94  487A 0E30              pea.l   $acc6(pc)
+09E94  487A 0E30              pea.l   hold_hook(pc)
 09E98  28DF                   move.l  (a7)+,(a4)+
 09E9A  38EC FFF6              move.w  -$a(a4),(a4)+
 09E9E  38C1                   move.w  d1,(a4)+
@@ -11711,7 +11711,7 @@
 09ED4  4EBA 01B8              jsr     sub_0A08E(pc)
 09ED8  6710                   beq.b   L_09EEA
 09EDA  38D9                   move.w  (a1)+,(a4)+
-09EDC  487A 1C5A              pea.l   $bb38(pc)
+09EDC  487A 1C5A              pea.l   piz_hook(pc)
 09EE0  28DF                   move.l  (a7)+,(a4)+
 09EE2  4EBA 0158              jsr     sub_0A03C(pc)
 09EE6  4EBA 017C              jsr     sub_0A064(pc)
@@ -11726,7 +11726,7 @@
 09EFA  4EBA 0192              jsr     sub_0A08E(pc)
 09EFE  671E                   beq.b   L_09F1E
 09F00  38D9                   move.w  (a1)+,(a4)+
-09F02  487A 1B46              pea.l   $ba4a(pc)
+09F02  487A 1B46              pea.l   rit_hook(pc)
 09F06  28DF                   move.l  (a7)+,(a4)+
 09F08  4EBA 0146              jsr     sub_0A050(pc)
 09F0C  2850                   movea.l (a0),a4
@@ -11810,42 +11810,42 @@
 09FA8  B07C 0001              cmp.w   #$1,d0
 09FAC  660A                   bne.b   L_09FB8
 09FAE  429C                   clr.l   (a4)+
-09FB0  487A 1824              pea.l   spec_0B7D6(pc)
+09FB0  487A 1824              pea.l   melody_hook(pc)
 09FB4  28DF                   move.l  (a7)+,(a4)+
 09FB6  4E75                   rts     
 09FB8                         L_09FB8:
 09FB8  B07C 0002              cmp.w   #$2,d0
 09FBC  660A                   bne.b   L_09FC8
 09FBE  429C                   clr.l   (a4)+
-09FC0  487A 182C              pea.l   spec_0B7EE(pc)
+09FC0  487A 182C              pea.l   melody_hold_hook(pc)
 09FC4  28DF                   move.l  (a7)+,(a4)+
 09FC6  4E75                   rts     
 09FC8                         L_09FC8:
 09FC8  B07C 0003              cmp.w   #$3,d0
 09FCC  660A                   bne.b   L_09FD8
 09FCE  429C                   clr.l   (a4)+
-09FD0  487A 1842              pea.l   spec_0B814(pc)
+09FD0  487A 1842              pea.l   bass_hook(pc)
 09FD4  28DF                   move.l  (a7)+,(a4)+
 09FD6  4E75                   rts     
 09FD8                         L_09FD8:
 09FD8  B07C 0004              cmp.w   #$4,d0
 09FDC  660A                   bne.b   L_09FE8
 09FDE  429C                   clr.l   (a4)+
-09FE0  487A 184E              pea.l   spec_0B830(pc)
+09FE0  487A 184E              pea.l   bass_hold_hook(pc)
 09FE4  28DF                   move.l  (a7)+,(a4)+
 09FE6  4E75                   rts     
 09FE8                         L_09FE8:
 09FE8  B07C 0005              cmp.w   #$5,d0
 09FEC  660A                   bne.b   L_09FF8
 09FEE  429C                   clr.l   (a4)+
-09FF0  487A 1914              pea.l   spec_0B906(pc)
+09FF0  487A 1914              pea.l   single_hook(pc)
 09FF4  28DF                   move.l  (a7)+,(a4)+
 09FF6  4E75                   rts     
 09FF8                         L_09FF8:
 09FF8  B07C 0006              cmp.w   #$6,d0
 09FFC  660A                   bne.b   L_0A008
 09FFE  429C                   clr.l   (a4)+
-0A000  487A 1904              pea.l   spec_0B906(pc)
+0A000  487A 1904              pea.l   single_hook(pc)
 0A004  28DF                   move.l  (a7)+,(a4)+
 0A006  4E75                   rts     
 0A008                         L_0A008:
@@ -13075,11 +13075,39 @@
 0ACC0  6AF6                   bpl.b   L_0ACB8
 0ACC2  588F                   addq.l  #$4,a7
 0ACC4  4E75                   rts     
-0ACC6  4A04 6B46 2C6D 06BA 3E18 E747 2476 7000  |.JFkm,...>G.v$.p|
-0ACD6  3018 B03C 0002 6732 01F2 3000 B03C 0004  |.0<...2g...0<...|
-0ACE6  6628 3F03 486A 0001 78FF 011A 67FC 1E2A  |(f.?jH...x...g*.|
-0ACF6  FFFF 6B10 0807 0000 66F0 260A 9697 4EBA  |...k.....f.&...N|
-0AD06  FE64 60E6 588F 361F 7801 4E75            |d..`.X.6.xuN|
+0ACC6                         hold_hook:
+0ACC6  4A04                   tst.b   d4                     ; sustain (bit 1) / legato (bit 4) hook on key-on: set the bit on the key; legato also releases keys only it was holding
+0ACC8  6B46                   bmi.b   L_0AD10
+0ACCA  2C6D 06BA              movea.l kbd_states(a5),a6
+0ACCE  3E18                   move.w  (a0)+,d7
+0ACD0  E747                   asl.w   #$3,d7
+0ACD2  2476 7000              movea.l (a6,d7.w),a2
+0ACD6  3018                   move.w  (a0)+,d0
+0ACD8  B03C 0002              cmp.b   #$2,d0
+0ACDC  6732                   beq.b   L_0AD10
+0ACDE  01F2 3000              bset.b  d0,(a2,d3.w)
+0ACE2  B03C 0004              cmp.b   #$4,d0
+0ACE6  6628                   bne.b   L_0AD10
+0ACE8  3F03                   move.w  d3,-(a7)
+0ACEA  486A 0001              pea.l   $1(a2)
+0ACEE  78FF                   moveq   #$ff,d4
+0ACF0                         L_0ACF0:
+0ACF0  011A                   btst.l  d0,(a2)+
+0ACF2  67FC                   beq.b   L_0ACF0
+0ACF4  1E2A FFFF              move.b  -$1(a2),d7
+0ACF8  6B10                   bmi.b   L_0AD0A
+0ACFA  0807 0000              btst.b  #$0,d7
+0ACFE  66F0                   bne.b   L_0ACF0
+0AD00  260A                   move.l  a2,d3
+0AD02  9697                   sub.l   (a7),d3
+0AD04  4EBA FE64              jsr     key_state_update(pc)
+0AD08  60E6                   bra.b   L_0ACF0
+0AD0A                         L_0AD0A:
+0AD0A  588F                   addq.l  #$4,a7
+0AD0C  361F                   move.w  (a7)+,d3
+0AD0E  7801                   moveq   #$1,d4
+0AD10                         L_0AD10:
+0AD10  4E75                   rts     
 0AD12                         note_offset_hook:
 0AD12  48E7 9000              movem.l d0/d3,-(a7)            ; hook: note d3 + offset, within [low, high] -> note_set_change on the target set
 0AD16  2458                   movea.l (a0)+,a2
@@ -13338,8 +13366,8 @@
 0AF94  002E                   dc.w    tbl_0AF80_0-$0AF80  ; 10 ($0A)
 0AF96  002E                   dc.w    tbl_0AF80_0-$0AF80  ; 11 ($0B)
 0AF98  010C                   dc.w    tbl_0AF80_12-$0AF80  ; 12 ($0C)
-0AF9A  0046                   dc.w    tbl_0AF80_13-$0AF80  ; 13 ($0D)
-0AF9C  0046                   dc.w    tbl_0AF80_13-$0AF80  ; 14 ($0E)
+0AF9A  0046                   dc.w    modifier_activate-$0AF80  ; 13 ($0D)
+0AF9C  0046                   dc.w    modifier_activate-$0AF80  ; 14 ($0E)
 0AF9E  181A                   dc.w    tbl_0AF80_15-$0AF80  ; 15 ($0F)
 0AFA0  011C                   dc.w    tbl_0AF80_16-$0AF80  ; 16 ($10)
 0AFA2  0124                   dc.w    tbl_0AF80_17-$0AF80  ; 17 ($11)
@@ -13360,8 +13388,8 @@
 0AFC0  4EBA 07FA              jsr     sub_0B7BC(pc)
 0AFC4                         L_0AFC4:
 0AFC4  4E75                   rts     
-0AFC6                         tbl_0AF80_13:
-0AFC6  264C                   movea.l a4,a3
+0AFC6                         modifier_activate:
+0AFC6  264C                   movea.l a4,a3                  ; fn_activate types 13/14: swap the modified function's hook handler for piz_hook/rit_hook and re-activate it
 0AFC8  2075 580C              movea.l $c(a5,d5.l),a0
 0AFCC  3E14                   move.w  (a4),d7
 0AFCE  E547                   asl.w   #$2,d7
@@ -13575,16 +13603,16 @@
 0B1C8                         unit_type_table:
 0B1C8  000E                   dc.w    tbl_0B1C8_0-unit_type_table  ;  0 ($00)
 0B1CA  000C                   dc.w    tbl_0B1C8_1-unit_type_table  ;  1 ($01)
-0B1CC  0010                   dc.w    tbl_0B1C8_2-unit_type_table  ;  2 ($02)
-0B1CE  00A6                   dc.w    tbl_0B1C8_3-unit_type_table  ;  3 ($03)
-0B1D0  0162                   dc.w    tbl_0B1C8_4-unit_type_table  ;  4 ($04)
-0B1D2  018C                   dc.w    tbl_0B1C8_5-unit_type_table  ;  5 ($05)
+0B1CC  0010                   dc.w    unit_oneshot-unit_type_table  ;  2 ($02)
+0B1CE  00A6                   dc.w    unit_reiterate-unit_type_table  ;  3 ($03)
+0B1D0  0162                   dc.w    unit_weighted-unit_type_table  ;  4 ($04)
+0B1D2  018C                   dc.w    unit_midi_note-unit_type_table  ;  5 ($05)
 0B1D4                         tbl_0B1C8_1:
 0B1D4  4E90                   jsr     (a0)
 0B1D6                         tbl_0B1C8_0:
 0B1D6  4E75                   rts     
-0B1D8                         tbl_0B1C8_2:
-0B1D8  3F04                   move.w  d4,-(a7)
+0B1D8                         unit_oneshot:
+0B1D8  3F04                   move.w  d4,-(a7)               ; unit type 2: on, then off after the maximum time (timer), at least the minimum time; optionally on key-up
 0B1DA  4A6A 0004              tst.w   $4(a2)
 0B1DE  6702                   beq.b   L_0B1E2
 0B1E0  4444                   neg.w   d4
@@ -13654,8 +13682,8 @@
 0B268  7E09                   moveq   #$9,d7
 0B26A  4E40                   trap    #$0                    ; sys $09 sys_free
 0B26C  4E75                   rts     
-0B26E                         tbl_0B1C8_3:
-0B26E  4A52                   tst.w   (a2)
+0B26E                         unit_reiterate:
+0B26E  4A52                   tst.w   (a2)                   ; unit type 3: on for cycle*duty/10 ms, off for the rest, while in use (rit_unit_tick at $B2C4)
 0B270  672A                   beq.b   L_0B29C
 0B272  4A04                   tst.b   d4
 0B274  6E28                   bgt.b   L_0B29E
@@ -13682,16 +13710,16 @@
 0B2A4  284E                   movea.l a6,a4
 0B2A6  228C                   move.l  a4,(a1)
 0B2A8  429E                   clr.l   (a6)+
-0B2AA  487A 0018              pea.l   L_0B2C4(pc)
+0B2AA  487A 0018              pea.l   rit_unit_tick(pc)
 0B2AE  2CDF                   move.l  (a7)+,(a6)+
 0B2B0  204E                   movea.l a6,a0
 0B2B2  2CCA                   move.l  a2,(a6)+
 0B2B4  3CFC FFFF              move.w  #$ffff,(a6)+
 0B2B8  4256                   clr.w   (a6)
 0B2BA  4A6A 0004              tst.w   $4(a2)
-0B2BE  6704                   beq.b   L_0B2C4
+0B2BE  6704                   beq.b   rit_unit_tick
 0B2C0  3CFC FFFF              move.w  #$ffff,(a6)+
-0B2C4                         L_0B2C4:
+0B2C4                         rit_unit_tick:
 0B2C4  2E18                   move.l  (a0)+,d7
 0B2C6  660A                   bne.b   L_0B2D2
 0B2C8  4DE8 FFF4              lea.l   -$c(a0),a6
@@ -13736,8 +13764,8 @@
 0B322  4EFA 0168              jmp     output_chamber(pc)
 0B326                         L_0B326:
 0B326  4EFA 0128              jmp     output_console(pc)
-0B32A                         tbl_0B1C8_4:
-0B32A  48E7 3C00              movem.l d2-d5,-(a7)
+0B32A                         unit_weighted:
+0B32A  48E7 3C00              movem.l d2-d5,-(a7)            ; unit type 4: channel value as 8 weighted outputs
 0B32E  4A04                   tst.b   d4
 0B330  6B1C                   bmi.b   L_0B34E
 0B332  3A01                   move.w  d1,d5
@@ -13760,8 +13788,8 @@
 0B34E                         L_0B34E:
 0B34E  4CDF 003C              movem.l (a7)+,d2-d5
 0B352  4E75                   rts     
-0B354                         tbl_0B1C8_5:
-0B354  5341                   subq.w  #$1,d1
+0B354                         unit_midi_note:
+0B354  5341                   subq.w  #$1,d1                 ; unit type 5: MIDI note on/off, channel B
 0B356  0241 000F              andi.w  #$f,d1
 0B35A  0041 0090              ori.w   #$90,d1
 0B35E  4EBA DD16              jsr     sub_09076(pc)
@@ -14250,49 +14278,49 @@
 0B7C8  4A04                   tst.b   d4
 0B7CA  6E08                   bgt.b   L_0B7D4
 0B7CC  41EC 000C              lea.l   $c(a4),a0
-0B7D0  4EBA 00BA              jsr     sub_0B88C(pc)
+0B7D0  4EBA 00BA              jsr     tracked_release(pc)
 0B7D4                         L_0B7D4:
 0B7D4  4E75                   rts     
-0B7D6                         spec_0B7D6:
-0B7D6  B668 0012              cmp.w   $12(a0),d3
+0B7D6                         melody_hook:
+0B7D6  B668 0012              cmp.w   $12(a0),d3             ; coupler special 1: only the highest held source key sounds on the target; falls back on release
 0B7DA  6510                   bcs.b   L_0B7EC
-0B7DC  4EBA 00AE              jsr     sub_0B88C(pc)
-0B7E0  4EBA 0078              jsr     sub_0B85A(pc)
+0B7DC  4EBA 00AE              jsr     tracked_release(pc)
+0B7E0  4EBA 0078              jsr     held_highest(pc)
 0B7E4  3141 0012              move.w  d1,$12(a0)
-0B7E8  4EBA 00B2              jsr     sub_0B89C(pc)
+0B7E8  4EBA 00B2              jsr     tracked_press(pc)
 0B7EC                         L_0B7EC:
 0B7EC  4E75                   rts     
-0B7EE                         spec_0B7EE:
-0B7EE  B668 0012              cmp.w   $12(a0),d3
+0B7EE                         melody_hold_hook:
+0B7EE  B668 0012              cmp.w   $12(a0),d3             ; coupler special 2: melody without fall-back (note stays until released or a higher key is pressed)
 0B7F2  651E                   bcs.b   L_0B812
 0B7F4  670C                   beq.b   L_0B802
 0B7F6  4A04                   tst.b   d4
 0B7F8  6B18                   bmi.b   L_0B812
-0B7FA  4EBA 005E              jsr     sub_0B85A(pc)
+0B7FA  4EBA 005E              jsr     held_highest(pc)
 0B7FE  B641                   cmp.w   d1,d3
 0B800  6510                   bcs.b   L_0B812
 0B802                         L_0B802:
-0B802  4EBA 0088              jsr     sub_0B88C(pc)
+0B802  4EBA 0088              jsr     tracked_release(pc)
 0B806  4A04                   tst.b   d4
 0B808  6B08                   bmi.b   L_0B812
 0B80A  3143 0012              move.w  d3,$12(a0)
-0B80E  4EBA 008C              jsr     sub_0B89C(pc)
+0B80E  4EBA 008C              jsr     tracked_press(pc)
 0B812                         L_0B812:
 0B812  4E75                   rts     
-0B814                         spec_0B814:
-0B814  3E28 0012              move.w  $12(a0),d7
+0B814                         bass_hook:
+0B814  3E28 0012              move.w  $12(a0),d7             ; coupler special 3: only the lowest held key, falling back upward
 0B818  6708                   beq.b   L_0B822
 0B81A  B647                   cmp.w   d7,d3
 0B81C  6210                   bhi.b   L_0B82E
-0B81E  4EBA 006C              jsr     sub_0B88C(pc)
+0B81E  4EBA 006C              jsr     tracked_release(pc)
 0B822                         L_0B822:
-0B822  4EBA 004E              jsr     sub_0B872(pc)
+0B822  4EBA 004E              jsr     held_lowest(pc)
 0B826  3141 0012              move.w  d1,$12(a0)
-0B82A  4EBA 0070              jsr     sub_0B89C(pc)
+0B82A  4EBA 0070              jsr     tracked_press(pc)
 0B82E                         L_0B82E:
 0B82E  4E75                   rts     
-0B830                         spec_0B830:
-0B830  3E28 0012              move.w  $12(a0),d7
+0B830                         bass_hold_hook:
+0B830  3E28 0012              move.w  $12(a0),d7             ; coupler special 4: bass without fall-back
 0B834  6706                   beq.b   L_0B83C
 0B836  B647                   cmp.w   d7,d3
 0B838  621E                   bhi.b   L_0B858
@@ -14300,19 +14328,19 @@
 0B83C                         L_0B83C:
 0B83C  4A04                   tst.b   d4
 0B83E  6B18                   bmi.b   L_0B858
-0B840  4EBA 0030              jsr     sub_0B872(pc)
+0B840  4EBA 0030              jsr     held_lowest(pc)
 0B844  B641                   cmp.w   d1,d3
 0B846  6210                   bhi.b   L_0B858
 0B848                         L_0B848:
-0B848  4EBA 0042              jsr     sub_0B88C(pc)
+0B848  4EBA 0042              jsr     tracked_release(pc)
 0B84C  4A04                   tst.b   d4
 0B84E  6B08                   bmi.b   L_0B858
 0B850  3143 0012              move.w  d3,$12(a0)
-0B854  4EBA 0046              jsr     sub_0B89C(pc)
+0B854  4EBA 0046              jsr     tracked_press(pc)
 0B858                         L_0B858:
 0B858  4E75                   rts     
-0B85A                         sub_0B85A:
-0B85A  2468 FFF4              movea.l -$c(a0),a2
+0B85A                         held_highest:
+0B85A  2468 FFF4              movea.l -$c(a0),a2             ; highest note with a nonzero count in the source set -> d1
 0B85E  5C8A                   addq.l  #$6,a2
 0B860  4DEA 0079              lea.l   $79(a2),a6
 0B864                         L_0B864:
@@ -14324,8 +14352,8 @@
 0B86C  220E                   move.l  a6,d1
 0B86E  928A                   sub.l   a2,d1
 0B870  4E75                   rts     
-0B872                         sub_0B872:
-0B872  2468 FFF4              movea.l -$c(a0),a2
+0B872                         held_lowest:
+0B872  2468 FFF4              movea.l -$c(a0),a2             ; lowest note with a nonzero count in the source set -> d1
 0B876  5E8A                   addq.l  #$7,a2
 0B878  4DEA 0078              lea.l   $78(a2),a6
 0B87C  2F0A                   move.l  a2,-(a7)
@@ -14338,15 +14366,15 @@
 0B886  220A                   move.l  a2,d1
 0B888  929F                   sub.l   (a7)+,d1
 0B88A  4E75                   rts     
-0B88C                         sub_0B88C:
-0B88C  2F04                   move.l  d4,-(a7)
+0B88C                         tracked_release:
+0B88C  2F04                   move.l  d4,-(a7)               ; release the coupler's current note (+$12 of its args) through note_offset_hook
 0B88E  78FF                   moveq   #$ff,d4
 0B890  4EBA 0016              jsr     sub_0B8A8(pc)
 0B894  4268 0012              clr.w   $12(a0)
 0B898  281F                   move.l  (a7)+,d4
 0B89A  4E75                   rts     
-0B89C                         sub_0B89C:
-0B89C  2F04                   move.l  d4,-(a7)
+0B89C                         tracked_press:
+0B89C  2F04                   move.l  d4,-(a7)               ; press the coupler's current note
 0B89E  7801                   moveq   #$1,d4
 0B8A0  4EBA 0006              jsr     sub_0B8A8(pc)
 0B8A4  281F                   move.l  (a7)+,d4
@@ -14390,8 +14418,8 @@
 0B900  4E40                   trap    #$0                    ; sys $09 sys_free
 0B902  285F                   movea.l (a7)+,a4
 0B904  4E75                   rts     
-0B906                         spec_0B906:
-0B906  4AE8 0014              tas.b   $14(a0)
+0B906                         single_hook:
+0B906  4AE8 0014              tas.b   $14(a0)                ; coupler special 5/6: note_offset_hook with a re-entrancy guard (tas)
 0B90A  6B10                   bmi.b   L_0B91C
 0B90C  48E7 0080              movem.l a0,-(a7)
 0B910  4EBA F400              jsr     note_offset_hook(pc)
@@ -14417,30 +14445,169 @@
 0BA0E  0302 0504 0706 0908 0B0A 0100 0302 0504  |................|
 0BA1E  0706 0908 0B0A 0100 0302 0504 0706 0908  |................|
 0BA2E  0B0A 0100 0302 0504 0706 0908 0B0A 0100  |................|
-0BA3E  0302 0504 0706 0908 0B0A FFFF 48E7 9000  |.............H..|
-0BA4E  2668 000A 2268 000E 2451 4DE9 01E8 200E  |h&..h"..Q$.M... |
-0BA5E  3203 E541 D2C1 E249 4A73 1000 6758 4A04  |.2A...I.sJ..Xg.J|
-0BA6E  6E2C 46FC 2700 2851 42AC 0008 4291 4A6C  |,n.F.'Q(.B...BlJ|
-0BA7E  000C 6E06 46FC 2000 603C 2C6C 0018 3E2C  |...n.F. <`l,..,>|
-0BA8E  001C D676 7002 46FC 2000 4E92 6028 7C1E  |..v..p.F. .N(`.||
-0BA9E  7E08 4E40 284E 228C 429E 487A 0020 2CDF  |.~@NN(.".BzH ..,|
-0BAAE  2CCB 3CFC FFFF 2CCA 2CC8 3CC3 2CC0 41EC  |.,.<...,.,.<.,.A|
-0BABE  0008 4EBA 0008 4CDF 0009 4E75 2E18 660A  |...N...L..uN...f|
-0BACE  4DE8 FFF4 7E09 4E40 4E75 2647 3C13 670E  |.M...~@NuNG&.<.g|
-0BADE  7E03 526D 011E 2C6D 011C 1C1E CC47 3E28  |.~mR..m,....G.(>|
-0BAEE  000A E347 3233 7000 4282 1401 E049 C2C2  |..G.32.p.B..I...|
-0BAFE  82FC 000A 4450 3818 6E04 9441 3202 D246  |....PD.8.nA..2F.|
-0BB0E  4DE8 FFF2 3C01 4E43 2458 2258 3618 2C58  |.M...<CNX$X".6X,|
-0BB1E  3E10 D676 7002 4A04 6E0C 5847 4A76 7000  |.>v..p.J.nGXvJ.p|
-0BB2E  6602 4287 3087 2049 4ED2 48E7 9000 2668  |.f.B.0I .N.H..h&|
-0BB3E  000A 2268 000E 2451 3203 E541 D2C1 4A04  |..h"..Q$.2A....J|
-0BB4E  6E1E 46FC 2700 2E11 6606 46FC 2000 6036  |.n.F.'...f.F. 6`|
-0BB5E  2C47 426E 0010 46FC 2000 4291 4E92 6026  |G,nB...F. .B.N&`|
-0BB6E  7C16 7E08 4E40 284E 228C 429E 487A 001E  |.|.~@NN(.".BzH..|
-0BB7E  2CDF 2CCA 2CC8 3CC3 2CC9 E249 3C33 1000  |.,.,.,.<.,I.3<..|
-0BB8E  4DD4 4E43 4E92 4CDF 0009 4E75 2F08 2458  |.MCN.N.L..uN./X$|
-0BB9E  2258 3618 670A 2C58 4296 78FF 2049 4E92  |X".6.gX,.B.xI .N|
-0BBAE  205F 4DE8 FFF8 7E09 4E40 4E75            |_ .M...~@NuN|
+0BA3E  0302 0504 0706 0908 0B0A FFFF            |............|
+0BA4A                         rit_hook:
+0BA4A  48E7 9000              movem.l d0/d3,-(a7)            ; reiterate modifier hook: play the note and schedule rit_tick per the Rit table (cycle ms low byte, duty high byte)
+0BA4E  2668 000A              movea.l $a(a0),a3
+0BA52  2268 000E              movea.l $e(a0),a1
+0BA56  2451                   movea.l (a1),a2
+0BA58  4DE9 01E8              lea.l   $1e8(a1),a6
+0BA5C  200E                   move.l  a6,d0
+0BA5E  3203                   move.w  d3,d1
+0BA60  E541                   asl.w   #$2,d1
+0BA62  D2C1                   adda.w  d1,a1
+0BA64  E249                   lsr.w   #$1,d1
+0BA66  4A73 1000              tst.w   (a3,d1.w)
+0BA6A  6758                   beq.b   L_0BAC4
+0BA6C  4A04                   tst.b   d4
+0BA6E  6E2C                   bgt.b   L_0BA9C
+0BA70  46FC 2700              move.w  #$2700,sr
+0BA74  2851                   movea.l (a1),a4
+0BA76  42AC 0008              clr.l   $8(a4)
+0BA7A  4291                   clr.l   (a1)
+0BA7C  4A6C 000C              tst.w   $c(a4)
+0BA80  6E06                   bgt.b   L_0BA88
+0BA82  46FC 2000              move.w  #$2000,sr
+0BA86  603C                   bra.b   L_0BAC4
+0BA88                         L_0BA88:
+0BA88  2C6C 0018              movea.l $18(a4),a6
+0BA8C  3E2C 001C              move.w  $1c(a4),d7
+0BA90  D676 7002              add.w   $2(a6,d7.w),d3
+0BA94  46FC 2000              move.w  #$2000,sr
+0BA98  4E92                   jsr     (a2)
+0BA9A  6028                   bra.b   L_0BAC4
+0BA9C                         L_0BA9C:
+0BA9C  7C1E                   moveq   #$1e,d6
+0BA9E  7E08                   moveq   #$8,d7
+0BAA0  4E40                   trap    #$0                    ; sys $08 sys_malloc
+0BAA2  284E                   movea.l a6,a4
+0BAA4  228C                   move.l  a4,(a1)
+0BAA6  429E                   clr.l   (a6)+
+0BAA8  487A 0020              pea.l   rit_tick(pc)
+0BAAC  2CDF                   move.l  (a7)+,(a6)+
+0BAAE  2CCB                   move.l  a3,(a6)+
+0BAB0  3CFC FFFF              move.w  #$ffff,(a6)+
+0BAB4  2CCA                   move.l  a2,(a6)+
+0BAB6  2CC8                   move.l  a0,(a6)+
+0BAB8  3CC3                   move.w  d3,(a6)+
+0BABA  2CC0                   move.l  d0,(a6)+
+0BABC  41EC 0008              lea.l   $8(a4),a0
+0BAC0  4EBA 0008              jsr     rit_tick(pc)
+0BAC4                         L_0BAC4:
+0BAC4  4CDF 0009              movem.l (a7)+,d0/d3
+0BAC8  4E75                   rts     
+0BACA                         rit_tick:
+0BACA  2E18                   move.l  (a0)+,d7               ; timer: toggle the note, step the pitch-offset list, reschedule; 0-3 ms random jitter if Rit word 0 is set
+0BACC  660A                   bne.b   L_0BAD8
+0BACE  4DE8 FFF4              lea.l   -$c(a0),a6
+0BAD2  7E09                   moveq   #$9,d7
+0BAD4  4E40                   trap    #$0                    ; sys $09 sys_free
+0BAD6  4E75                   rts     
+0BAD8                         L_0BAD8:
+0BAD8  2647                   movea.l d7,a3
+0BADA  3C13                   move.w  (a3),d6
+0BADC  670E                   beq.b   L_0BAEC
+0BADE  7E03                   moveq   #$3,d7
+0BAE0  526D 011E              addq.w  #$1,$11e(a5)
+0BAE4  2C6D 011C              movea.l $11c(a5),a6
+0BAE8  1C1E                   move.b  (a6)+,d6
+0BAEA  CC47                   and.w   d7,d6
+0BAEC                         L_0BAEC:
+0BAEC  3E28 000A              move.w  $a(a0),d7
+0BAF0  E347                   asl.w   #$1,d7
+0BAF2  3233 7000              move.w  (a3,d7.w),d1
+0BAF6  4282                   clr.l   d2
+0BAF8  1401                   move.b  d1,d2
+0BAFA  E049                   lsr.w   #$8,d1
+0BAFC  C2C2                   mulu.w  d2,d1
+0BAFE  82FC 000A              divu.w  #$a,d1
+0BB02  4450                   neg.w   (a0)
+0BB04  3818                   move.w  (a0)+,d4
+0BB06  6E04                   bgt.b   L_0BB0C
+0BB08  9441                   sub.w   d1,d2
+0BB0A  3202                   move.w  d2,d1
+0BB0C                         L_0BB0C:
+0BB0C  D246                   add.w   d6,d1
+0BB0E  4DE8 FFF2              lea.l   -$e(a0),a6
+0BB12  3C01                   move.w  d1,d6
+0BB14  4E43                   trap    #$3
+0BB16  2458                   movea.l (a0)+,a2
+0BB18  2258                   movea.l (a0)+,a1
+0BB1A  3618                   move.w  (a0)+,d3
+0BB1C  2C58                   movea.l (a0)+,a6
+0BB1E  3E10                   move.w  (a0),d7
+0BB20  D676 7002              add.w   $2(a6,d7.w),d3
+0BB24  4A04                   tst.b   d4
+0BB26  6E0C                   bgt.b   L_0BB34
+0BB28  5847                   addq.w  #$4,d7
+0BB2A  4A76 7000              tst.w   (a6,d7.w)
+0BB2E  6602                   bne.b   L_0BB32
+0BB30  4287                   clr.l   d7
+0BB32                         L_0BB32:
+0BB32  3087                   move.w  d7,(a0)
+0BB34                         L_0BB34:
+0BB34  2049                   movea.l a1,a0
+0BB36  4ED2                   jmp     (a2)
+0BB38                         piz_hook:
+0BB38  48E7 9000              movem.l d0/d3,-(a7)            ; pizzicato modifier hook: play the note and schedule piz_release after the Piz table's ms for the key
+0BB3C  2668 000A              movea.l $a(a0),a3
+0BB40  2268 000E              movea.l $e(a0),a1
+0BB44  2451                   movea.l (a1),a2
+0BB46  3203                   move.w  d3,d1
+0BB48  E541                   asl.w   #$2,d1
+0BB4A  D2C1                   adda.w  d1,a1
+0BB4C  4A04                   tst.b   d4
+0BB4E  6E1E                   bgt.b   L_0BB6E
+0BB50  46FC 2700              move.w  #$2700,sr
+0BB54  2E11                   move.l  (a1),d7
+0BB56  6606                   bne.b   L_0BB5E
+0BB58  46FC 2000              move.w  #$2000,sr
+0BB5C  6036                   bra.b   L_0BB94
+0BB5E                         L_0BB5E:
+0BB5E  2C47                   movea.l d7,a6
+0BB60  426E 0010              clr.w   $10(a6)
+0BB64  46FC 2000              move.w  #$2000,sr
+0BB68  4291                   clr.l   (a1)
+0BB6A  4E92                   jsr     (a2)
+0BB6C  6026                   bra.b   L_0BB94
+0BB6E                         L_0BB6E:
+0BB6E  7C16                   moveq   #$16,d6
+0BB70  7E08                   moveq   #$8,d7
+0BB72  4E40                   trap    #$0                    ; sys $08 sys_malloc
+0BB74  284E                   movea.l a6,a4
+0BB76  228C                   move.l  a4,(a1)
+0BB78  429E                   clr.l   (a6)+
+0BB7A  487A 001E              pea.l   piz_release(pc)
+0BB7E  2CDF                   move.l  (a7)+,(a6)+
+0BB80  2CCA                   move.l  a2,(a6)+
+0BB82  2CC8                   move.l  a0,(a6)+
+0BB84  3CC3                   move.w  d3,(a6)+
+0BB86  2CC9                   move.l  a1,(a6)+
+0BB88  E249                   lsr.w   #$1,d1
+0BB8A  3C33 1000              move.w  (a3,d1.w),d6
+0BB8E  4DD4                   lea.l   (a4),a6
+0BB90  4E43                   trap    #$3
+0BB92  4E92                   jsr     (a2)
+0BB94                         L_0BB94:
+0BB94  4CDF 0009              movem.l (a7)+,d0/d3
+0BB98  4E75                   rts     
+0BB9A                         piz_release:
+0BB9A  2F08                   move.l  a0,-(a7)               ; timer: release the pizzicato note early
+0BB9C  2458                   movea.l (a0)+,a2
+0BB9E  2258                   movea.l (a0)+,a1
+0BBA0  3618                   move.w  (a0)+,d3
+0BBA2  670A                   beq.b   L_0BBAE
+0BBA4  2C58                   movea.l (a0)+,a6
+0BBA6  4296                   clr.l   (a6)
+0BBA8  78FF                   moveq   #$ff,d4
+0BBAA  2049                   movea.l a1,a0
+0BBAC  4E92                   jsr     (a2)
+0BBAE                         L_0BBAE:
+0BBAE  205F                   movea.l (a7)+,a0
+0BBB0  4DE8 FFF8              lea.l   -$8(a0),a6
+0BBB4  7E09                   moveq   #$9,d7
+0BBB6  4E40                   trap    #$0                    ; sys $09 sys_free
+0BBB8  4E75                   rts     
 0BBBA                         chan_input_event:
 0BBBA  48E7 0018              movem.l a3-a4,-(a7)            ; channel d2 input value d3 on/off: keep a sorted list of active inputs; highest wins
 0BBBE  4A43                   tst.w   d3
@@ -17747,8 +17914,8 @@
 0DDEE  7E22                   moveq   #$22,d7
 0DDF0  4E40                   trap    #$0                    ; sys $22 sys_closewin
 0DDF2  4E75                   rts     
-0DDF4                         sub_0DDF4:
-0DDF4  4DFA 0284              lea.l   dat_0E07A(pc),a6
+0DDF4                         addr_test:
+0DDF4  4DFA 0284              lea.l   dat_0E07A(pc),a6       ; Tstadr: control $0300, data 255..0 for ever
 0DDF8  7E21                   moveq   #$21,d7
 0DDFA  4E40                   trap    #$0                    ; sys $21 sys_openwin
 0DDFC  224E                   movea.l a6,a1
@@ -17773,12 +17940,12 @@
 0DE56  7E22                   moveq   #$22,d7
 0DE58  4E40                   trap    #$0                    ; sys $22 sys_closewin
 0DE5A  4E75                   rts     
-0DE5C                         sub_0DE5C:
-0DE5C  4DFA 0226              lea.l   dat_0E084(pc),a6
+0DE5C                         input_test:
+0DE5C  4DFA 0226              lea.l   dat_0E084(pc),a6       ; Tstinp: scan a board's 128 inputs (control $15FE), analog values with $35xx
 0DE60  7E21                   moveq   #$21,d7
 0DE62  4E40                   trap    #$0                    ; sys $21 sys_openwin
 0DE64  224E                   movea.l a6,a1
-0DE66  4EBA 01E6              jsr     sub_0E04E(pc)
+0DE66  4EBA 01E6              jsr     parse_board(pc)
 0DE6A  207C FFFF FF80         movea.l #$ffffff80,a0
 0DE70  2C3C 0000 0100         move.l  #$100,d6
 0DE76  7E08                   moveq   #$8,d7
@@ -17902,12 +18069,12 @@
 0DFA4  7E00                   moveq   #$0,d7
 0DFA6  4E40                   trap    #$0                    ; sys $00 sys_puts
 0DFA8  4E75                   rts     
-0DFAA                         sub_0DFAA:
-0DFAA  4DFA 00CE              lea.l   dat_0E07A(pc),a6
+0DFAA                         output_test:
+0DFAA  4DFA 00CE              lea.l   dat_0E07A(pc),a6       ; Tstotp: control $0F00, walk outputs 1..96 on/off
 0DFAE  7E21                   moveq   #$21,d7
 0DFB0  4E40                   trap    #$0                    ; sys $21 sys_openwin
 0DFB2  224E                   movea.l a6,a1
-0DFB4  4EBA 0098              jsr     sub_0E04E(pc)
+0DFB4  4EBA 0098              jsr     parse_board(pc)
 0DFB8  207C FFFF FF80         movea.l #$ffffff80,a0
 0DFBE  31FC 0F00 FF82         move.w  #$f00,$ff82.w
 0DFC4  3C3C 0300              move.w  #$300,d6
@@ -17954,8 +18121,8 @@
 0E048  7E22                   moveq   #$22,d7
 0E04A  4E40                   trap    #$0                    ; sys $22 sys_closewin
 0E04C  4E75                   rts     
-0E04E                         sub_0E04E:
-0E04E  4EBA 001A              jsr     sub_0E06A(pc)
+0E04E                         parse_board:
+0E04E  4EBA 001A              jsr     sub_0E06A(pc)          ; two letters A-P -> board address bits
 0E052  6212                   bhi.b   L_0E066
 0E054  E141                   asl.w   #$8,d1
 0E056  E741                   asl.w   #$3,d1

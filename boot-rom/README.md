@@ -33,11 +33,11 @@ this folder decodes, and the HM50256 DRAMs of the 512 KB main memory at the righ
   accelerator option existed.
 - **ROM** at `$800000`. The loader occupies `$800000-$8005EF`; the rest of the 2 KB
   dump is `$FF`.
-- **The ROM dump covers 2 KB of an 8 KB pair.** The photo above settles it: the boot
-  PROMs are two 2732A EPROMs (4K x 8 each, high and low byte), 8 KB in all. The dumper
-  (`devtronix.py`) only read addresses `$000-$3FF` (1024 words = 2 KB), though it can
-  drive 12 address bits, and the loader copies **8000 bytes** of ROM to RAM at
-  start-up. Re-dump `$400-$FFF` to see whether anything follows the loader.
+- **The ROM is 8 KB and the loader is all there is in it.** The boot PROMs are two
+  2732A EPROMs (4K x 8 each, high and low byte), 8 KB in all. The 2011 dump read the
+  first 2 KB (`$000-$3FF`, 1024 words); the remaining 6 KB has since been read and is
+  entirely `$FF`, so `loader-c04.bin` holds every programmed byte. The loader copies
+  8000 bytes of ROM to RAM at start-up, most of it that `$FF` padding.
 - **The loader relocates itself** to RAM at `$07E000` and runs there (so it can patch
   a terminal escape-sequence template in place). Stack is just below it.
 
@@ -169,8 +169,6 @@ Byte-swapped, the monitor begins `lea 0(pc),a5 ; bra.s` past the version strings
 
 ## Open questions / next steps
 
-1. Re-dump ROM addresses `$400-$FFF` (change `range(0x0000,0x0400)` in `devtronix.py`);
-   the EPROMs are 2732As, so there are 6 KB still unread.
 3. Identify `$FFFFFE03` on the schematic (`$FFFFFE00` is the board's LED display).
 4. Disassemble the System Monitor 2.6 (183): it owns the filesystem, the relay I/O
    scanning, MIDI, and the record/playback file format the music disks use.
