@@ -34,7 +34,7 @@ as they exist in a local copy. Nothing under `disk-images/` is ever modified.
   why the monitor, once its `movec` probe succeeds, goes on to size memory above
   512 KB.
 - **The PC-hosted 264: the Falcon.** Besides the console-and-floppy machine in the
-  photos, Devtronix shipped the 264 inside an IBM PC compatible, built (Chris
+  photos, the 264 also ran inside an IBM PC compatible, built (Chris
   confirms) on Alpha Micro's **Falcon card**: an ISA card carrying a 68030, a
   68000-series CPU running the same byte-swapped code, that let "standard DOS and
   later Windows-based PCs" run 68K software, with the PC supplying console, disks
