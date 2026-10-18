@@ -197,8 +197,9 @@ than decoding:
 - [devtronix.org](https://devtronix.org/), Dominic Cheshire's Devtronix organ fan site and
   repository: the place for everything Devtronix that is not in this project (the company's
   history, products and documentation).
-- [ampm.floodgap.com](https://ampm.floodgap.com/), the Alpha Micro Phun Machine at
-  Floodgap Retrobits, with a [model list](https://ampm.floodgap.com/www/models.htm):
+- [ampm.floodgap.com](https://ampm.floodgap.com/), the Alpha Micro Phun Machine:
+  Cameron Kaiser's Alpha Micro site, served from a real Alpha Micro running AMOS,
+  with a history of the company and a [model list](https://ampm.floodgap.com/www/models.htm):
   the AM-1000 (1982, 8 MHz 68000, 128 KB to 3.5 MB, 3 to 11 serial ports, optional
   5.25" 800 KB floppy, the same 800 KB format the 264 uses), the AM-680 PC with the
   AM-170 AMOS/L board (1985), the AM-1200CS PC card (1988) and the Falcon.

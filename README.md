@@ -34,6 +34,7 @@ found, with links to the detailed write-ups:
 
 - [devtronix.org](https://devtronix.org/): Dominic Cheshire's Devtronix organ fan site and repository.
 - [Alpha Micro AM-1000E and AM-1200 refurb](https://oldvcr.blogspot.com/2026/03/refurb-weekend-double-header-alpha.html): Cameron Kaiser's hands-on account of the computer the 264 is built on.
+- [ampm.floodgap.com](https://ampm.floodgap.com/): Cameron Kaiser's Alpha Micro site, served from a real Alpha Micro, with the company's history and a list of its models.
 
 ## What is not in this repository
 
