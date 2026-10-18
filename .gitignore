@@ -3,3 +3,4 @@ renders/
 decoded-images/
 .DS_Store
 .venv/
+__pycache__/

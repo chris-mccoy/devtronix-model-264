@@ -28,11 +28,24 @@ as they exist in a local copy. Nothing under `disk-images/` is ever modified.
   6840 timer, WD2791 floppy controller, and the Alpha Micro byte-swapped bus. The
   "Dimension-030" is InterLink Systems' 1991 68030 accelerator for Alpha Micro
   machines, and the monitor's "Turbo Mode" enables its instruction cache with
-  `movec CACR`, exactly as Alpha Micro's own TURBO utility does. Chris recalls the
-  Dimension-030 as possibly an ISA card for IBM PC compatibles, which is not certain
-  either way; what the code shows is that the monitor executes `movec` on its own
-  CPU, so whatever the card's form, in the 264 it replaced or carried the processor
-  that runs the monitor.
+  `movec CACR`, exactly as Alpha Micro's own TURBO utility does. Physically the
+  Dimension-030 is a board that plugs into the 68000's socket and carries the 68030
+  plus two SIMM slots of its own RAM (Kaiser's article shows one fitted), which is
+  why the monitor, once its `movec` probe succeeds, goes on to size memory above
+  512 KB.
+- **The PC-hosted 264: the Falcon.** Besides the console-and-floppy machine in the
+  photos, Devtronix shipped the 264 inside an IBM PC compatible, built (Chris
+  confirms) on Alpha Micro's **Falcon card**: an ISA card carrying a 68030, a
+  68000-series CPU running the same byte-swapped code, that let "standard DOS and
+  later Windows-based PCs" run 68K software, with the PC supplying console, disks
+  and file transfer through Alpha Micro's AMPC utility. Alpha Micro had sold its
+  system that way twice before, as the AM-170 AMOS/L board in the 1985 AM-680 "Entry
+  Level System" (an AM-1000 on an ISA card) and the AM-1200CS card of 1988, which the
+  Falcon replaced in the 1990s. The monitor carries the software side of this
+  configuration: terminal type 5 is "Devtronix PC terminal program", drive 3 is "PC
+  disk" served over the serial link (`Topc`, `Frompc`, `Pcdisk`, the PCL task), and
+  when the console answers on channel B the other channel becomes a 38400-baud PC
+  link. Monitor 189 (06/01/94) is from the Falcon's era.
 - **Memory** 512 KB RAM at `$000000` (sixteen HM50256 DRAMs); 8 KB boot ROM at
   `$800000` (two 2732A EPROMs, high and low byte).
 - **I/O** MC68681 DUART at `$FFFFFE21` (channel A = terminal, 9600 baud;
@@ -176,7 +189,8 @@ than decoding:
 1. The MIDI rendering of tremulants (modulation), shades (expression) and traps
    (General MIDI percussion by name) is an approximation of what the organ does;
    a proper rendering would need samples of the actual ranks.
-2. The Dimension-030's physical form (see "The machine").
+2. How the Falcon-hosted 264 used the PC for its disks: the PC-link protocol of
+   the PCL task is not decoded.
 
 ## References
 
