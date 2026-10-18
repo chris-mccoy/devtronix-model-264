@@ -24,7 +24,11 @@ framework fits.
 | Console scanner | `$FFFFFF80` data, `$FFFFFF82` control, `$FFFFFF84`/`$86` strobes | Writes an address, reads the input state in bit 15; outputs and the analog A/D by control word; see section 4 | monitor "The relay", "Console scanner hardware" |
 | Terminal | on DUART channel A | Wyse WY-50 (default on most disks) or TeleVideo 950 escape sequences | monitor "Terminals" |
 
-Nothing else is addressed by either program. The Dimension-030 is reached only
+Nothing else is addressed by either program. This describes the stand-alone 264
+(console, floppy, scanner). The PC-hosted 264 on Alpha Micro's Falcon ISA card ran the
+same monitor with the PC as console and disk over the serial PC link; emulating that
+form means the same machine with channel B as the console (terminal type 5) and the
+PC-disk protocol of the PCL task on the other channel, which is not decoded. The Dimension-030 is reached only
 through `movec CACR`, which a plain 68000 core can treat as a no-op or an illegal
 instruction the monitor never executes unless `Turbo` is typed.
 

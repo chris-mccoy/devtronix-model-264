@@ -112,7 +112,7 @@ on, line-graphics off, the box-drawing glyph string (blank, then ┌ ┐ └ ┘
 | 2 | TeleVideo, cursor never hidden | as 0 | `ESC =` | as 0 | as 0 | `ESC . 3` / `ESC . 1` |
 | 3 | TeleVideo without line graphics | as 0 | `ESC =` | none | `+++++++++-\|` | `ESC . 3` / `ESC . 0` |
 | 4 | Minimal: cursor addressing and clear only (ADM-3A class) | as 0 | `ESC =` | none | `+++++++++-\|` | none |
-| 5 | Devtronix PC terminal program (IBM PC, code page 437) | `FS` ($1C) | `GS` ($1D) | none | `┌┐└┘├┤┬┴┼─│` | `US` ($1F) / `RS` ($1E) |
+| 5 | Devtronix PC terminal program (IBM PC, code page 437): the PC-hosted 264 on Alpha Micro's Falcon card, see `../docs/README.md` | `FS` ($1C) | `GS` ($1D) | none | `┌┐└┘├┤┬┴┼─│` | `US` ($1F) / `RS` ($1E) |
 | 6 | **[Wyse WY-50](https://terminals-wiki.org/wiki/index.php/Wyse_WY-50)** | `ESC ; ESC \` 3` | `ESC =` | `ESC H ^B` / `ESC H ^C` | `2315490=8:6` | `ESC \` 1` / `ESC \` 0` |
 
 Type 6 is the WY-50 as its manual describes it: `ESC ;` clears, `ESC \` n`
