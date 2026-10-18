@@ -23,6 +23,29 @@ recipients of the
 
 ![Devtronix Front](img/dev.jpg)
 
+## About this project
+
+Allow me to introduce myself. I'm Chris McCoy, and I'm helping my dad, Gerald
+(Jerry) McCoy, document the Devtronix Model 264 for himself and for others. Jerry is
+a master pipe-organ technician and the former caretaker of the
+[Nethercutt Collection](https://nethercuttcollection.org/the-collection/music-room/)
+in Sylmar, California. He knew both Dick Wilcox and Tim Rickman
+personally and worked with them on product development, installations and bug
+hunting through the 1980s and 1990s. Dick and Tim have both since passed away.
+
+The floppy images were captured with a [KryoFlux](https://kryoflux.com/?page=kf_features)
+(a proprietary cousin of the Greaseweazle, which I'm sure would do just as well) and a
+[Samsung SFD-321B](https://floppy.cafe/resources/SAMSUNG-SFD321B-070103.pdf) drive; the
+pair read and dumped the Model 264 format without trouble, though it took several
+drives to find one that would. Many of the floppies are deteriorating quickly, so the
+machine now boots from an
+[HxC SD-card floppy emulator](https://hxc2001.com/floppy_drive_emulator/#SDCARDFloppyemulator)
+instead.
+
+The boot ROMs were dumped with a [Bus Pirate](https://buspirate.com/), luckily
+before I plugged both chips in upside down and destroyed them. 🤦 I was able to recover
+from that and bring the machine back to life.
+
 Start with **[docs/README.md](docs/README.md)**, the one-page summary of what was
 found, with links to the detailed write-ups:
 
