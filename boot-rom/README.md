@@ -73,7 +73,7 @@ that 16-bit values keep the layout of the company's earlier WD-16 systems (see
 | `$000044.w` | Left for the loaded program: DUART CSR codes, high byte = channel B, low byte = channel A |
 | `$000046.b` | Left for the loaded program: `$FF` if the console terminal is on channel B |
 | `$001032` | Where the System Monitor 2.6 loads and starts (from the monitor disk's boot block) |
-| `$040000` | 1 KB sector buffer for boot block and file header |
+| `$040000` | the loader's own 1 KB buffer in main RAM for the boot block and the file header sector (not the controller's SRAM) |
 | `$07E000` | Relocated loader; stack grows down from here |
 | `$07F000` | Reset-time SSP |
 | `$800000` | Boot ROM (this loader) |
@@ -109,7 +109,10 @@ single port `$FFE4`, whose address counter advances on every access; writing `$F
 the counter. On a write the monitor fills the buffer through the same port first, sets
 `$FFE7` to `$84` (bit 2 = buffer-to-controller direction), and only then issues WRITE
 SECTOR. So the drive does DMA, but into its own buffer, which the 68000 sees as a one-byte
-window rather than as memory.
+window rather than as memory. The chip is a 2K x 8 part because that was the smallest
+common SRAM that holds a 1024-byte sector; only 1024 bytes of it are used per transfer.
+The monitor's track formatting does not go through it at all: with `$FFE7` set to `$8C`
+the CPU writes the 7400-byte track image straight into the controller's data register.
 
 ### Status display codes (`$FFFFFE00`)
 

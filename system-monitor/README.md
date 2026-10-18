@@ -222,9 +222,15 @@ in a tight loop; the hardware has already clocked the sector from the
 controller into the 2 KB AM9128 on every DRQ, and each read of the port
 advances the buffer's address counter. On a write it clears the counter
 (`$FFE5`), copies the sector *into* `$FFE4`, sets `$FFE7` to `$84` (bit 2 =
-buffer-to-controller), and then issues WRITE SECTOR, which drains the buffer;
-formatting uses `$8C`. The CPU never sees the buffer as memory, only as this
-one-byte window. Errors (RNF, CRC, lost data: status bits 2–4) reset the
+buffer-to-controller), and then issues WRITE SECTOR, which drains the buffer.
+The CPU never sees the buffer as memory, only as this one-byte window, and only
+1024 of the chip's 2048 bytes are ever used. Formatting (`fdc_format_track`,
+`$4B84`) does not use the buffer: it builds the whole track image in main RAM
+(a leading gap, five sector fields of 1107 bytes, 1000 bytes of trailing gap),
+sets `$FFE7` to `$8C` (bit 3 = the CPU talks to the controller's data register
+directly), issues WRITE TRACK (`$F4`) and, with interrupts off, writes 7400
+bytes to `$FFE3`, each write held until the controller has taken the previous
+byte. Errors (RNF, CRC, lost data: status bits 2–4) reset the
 controller, RESTORE to track 0, wait 50 ms and retry; a write-protected disk is
 noticed from status bit 6 after the seek and shown on the console indicator.
 
@@ -276,7 +282,7 @@ Each file owns one sector that holds its header; the directory points at it.
 
 File size = (sectors − 1) × 1024 + header[`$02`]. Reading is sequential: the
 monitor maps block *n* through the extent list ("Illegal disk record number" if
-*n* is past the end), reads it into a 1 KB buffer and hands out bytes
+*n* is past the end), reads it into a 1 KB buffer in main RAM and hands out bytes
 (`dsk_getbyte`). The first 4 bytes of a sector buffer in RAM are a link to the
 next buffer; on disk the sectors are plain data.
 

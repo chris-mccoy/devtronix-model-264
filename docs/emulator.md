@@ -18,7 +18,7 @@ framework fits.
 | MC68681 DUART, 3.6864 MHz crystal, IP2 = 8 MHz CPU clock | `$FFFFFE21`–`$FFFFFE3F`, odd bytes | Channel A = terminal 9600 (CSR `$BB`) or PC link 38400 (`$CC`); channel B = modem 300–38400 or MIDI at 31250 via the counter/timer (ACR `$40`, CTUR:CTLR = 8, CSR `$DD`); interrupt vector `$3C`, IMR `$33` | monitor "Serial ports and the MIDI baud rate" |
 | MC6840 PTM | `$FFFFFE11`–`$FFFFFE1F`, odd bytes, 800 kHz clock | T1 = 1 ms system tick, level-6 interrupt (vector `$78`); T2 = tempo pulse (latch = 500000 / BPM, 96 per beat); T3 = one-shot used with `movep` to time key events | monitor "Hardware the monitor touches", "Timer" |
 | WD2791 floppy controller | `$FFFFFFE0`–`$FFFFFFE3` | Command/status at `$E0`, sector at `$E2`, data (seek target) at `$E3`; commands `$08` restore, `$18` seek, `$84` read sector, `$A4` write sector, format | boot ROM "Floppy"; monitor "The floppy driver" |
-| Floppy sector buffer | `$FFFFFFE4` (port), `$FFFFFFE5` (counter reset), `$FFFFFFE6` (drive/side latch, INTRQ in bit 1), `$FFFFFFE7` (`$80` run, `$84` write direction, `$8C` format, `$00` reset) | 2 KB SRAM between controller and CPU; the CPU streams a sector through the port, see section 3 | boot ROM "The sector buffer" |
+| Floppy sector buffer | `$FFFFFFE4` (port), `$FFFFFFE5` (counter reset), `$FFFFFFE6` (drive/side latch, INTRQ in bit 1), `$FFFFFFE7` (`$80` run, `$84` write direction, `$8C` direct: CPU writes the data register itself, used for formatting, `$00` reset) | 2 KB SRAM between controller and CPU, 1024 bytes used per sector; the CPU streams a sector through the port, see section 3 | boot ROM "The sector buffer" |
 | Status display | `$FFFFFE00` (write) | Two hex digits on the board; boot codes `A1 B1 B2 B3 C1 EE` and sector numbers | boot ROM "Status display codes" |
 | Unknown port | `$FFFFFE03` (read once at reset), `$FFFFFE06` | Value discarded; return anything | boot ROM |
 | Console scanner | `$FFFFFF80` data, `$FFFFFF82` control, `$FFFFFF84`/`$86` strobes | Writes an address, reads the input state in bit 15; outputs and the analog A/D by control word; see section 4 | monitor "The relay", "Console scanner hardware" |
@@ -66,7 +66,10 @@ and an emulator only has to honour the sequence:
    and expects successive bytes.
 4. Write: `$FFE5` cleared, 1024 bytes written to `$FFE4`, `$FFE7 = $84`, command
    `$A4`; the emulator stores the buffer to the sector image and raises INTRQ.
-5. Status bits the firmware checks: 7 NOT READY (it waits for it to clear), 6 WRITE
+5. Formatting: `$FFE7 = $8C`, WRITE TRACK (`$F4`), then 7400 bytes written to
+   `$FFE3` one at a time; an emulator can take the sector IDs and data from that
+   stream or simply mark the track formatted.
+6. Status bits the firmware checks: 7 NOT READY (it waits for it to clear), 6 WRITE
    PROTECT, 4 RNF, 3 CRC, 2 LOST DATA, 0 BUSY. Errors make the firmware pulse
    `$FFE7` low (reset), RESTORE and retry.
 
