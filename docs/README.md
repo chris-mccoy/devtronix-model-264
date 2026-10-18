@@ -183,6 +183,11 @@ than decoding:
 - [devtronix.org](https://devtronix.org/), Dominic Cheshire's Devtronix organ fan site and
   repository: the place for everything Devtronix that is not in this project (the company's
   history, products and documentation).
+- [ampm.floodgap.com](https://ampm.floodgap.com/), the Alpha Micro Phun Machine at
+  Floodgap Retrobits, with a [model list](https://ampm.floodgap.com/www/models.htm):
+  the AM-1000 (1982, 8 MHz 68000, 128 KB to 3.5 MB, 3 to 11 serial ports, optional
+  5.25" 800 KB floppy, the same 800 KB format the 264 uses), the AM-680 PC with the
+  AM-170 AMOS/L board (1985), the AM-1200CS PC card (1988) and the Falcon.
 - Cameron Kaiser, "Refurb weekend double header: Alpha Micro AM-1000E and AM-1200",
   Old Vintage Computing Research, 21 March 2026:
   <https://oldvcr.blogspot.com/2026/03/refurb-weekend-double-header-alpha.html>. A hands-on account of the Alpha Micro 68000 machines the 264 is built
