@@ -103,8 +103,8 @@ The floppy disk images, the flux dumps, the HFE images, the decoded sector image
 and the rendered MIDI files are deliberately left out (`disk-images/`,
 `decoded-images/`, `renders/`) until permission to publish the recordings is
 settled. Links into those folders from the write-ups will not resolve here. The
-tools work on a local copy that has them.  Publishing the artists work to the
-world wouldn't be a good move on my part.  If you have any works on the 264,
-contact me.
+tools work on a local copy that has them.  Publishing the artists' work to the
+world wouldn't be a good move on my part.  
 
+If you have any works on the Model 264, contact me.
 
