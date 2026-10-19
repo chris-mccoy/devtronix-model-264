@@ -6,7 +6,6 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "capstone>=5.0",   # 68000 disassembler used by boot-rom/disasm.py and system-monitor/mdisasm.py
-    "pypdf>=4.0",
 ]
 
 [tool.uv]

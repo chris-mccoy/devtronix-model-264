@@ -458,8 +458,7 @@ monitor prints it exactly like a board pin:
 | program change 40 on channel 1 | `$6829` | `NA-F1` |
 
 Board letters `M` to `P` are therefore not available for real boards on the 264.
-A MIDI address
-on a **key** or **stop contact** means the input is played by that MIDI note:
+A MIDI address on a **key** or **stop contact** means the input is played by that MIDI note:
 `scan_add_input` (`$9916`) puts it in `midi_map[channel][note]` instead of the
 scan table, and `midi_dispatch` (`$A8A8`) fires its hooks when the note arrives on
 channel B (note on = +1, note off or velocity 0 = −1). A MIDI address on a **rank
