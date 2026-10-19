@@ -8,10 +8,14 @@ For each disk image under --images (a *_s0/*_s1 pair, or a single 819200-byte
 *.img with no such pair beside it) the directory is listed with devfs.py, a
 definition is chosen for each T file, and the file is rendered twice with
 dev2midi.py's render(): plain (one MIDI channel per keyboard) and through the
-stops and ranks (--ranks).  Output:
+stops and ranks (--ranks).  When the definition is one paramount332.py maps
+(its keyboards all appear in KEYBOARDS: the theatre organs of Jerry's Disc,
+the Tour Disc and New Console) it is also rendered for Hauptwerk's Paramount
+332 (--paramount).  Output:
 
   <out>/<disk>/<slot>-<name>.mid         keyboards rendering
   <out>/<disk>/<slot>-<name>-ranks.mid   ranks rendering
+  <out>/<disk>/<slot>-<name>-paramount.mid   for Hauptwerk's Paramount 332
   <out>/INDEX.md                         one table per disk
   <out>/index.json                       the same data for programs
 
@@ -45,7 +49,8 @@ import argparse, collections, hashlib, json, os, pathlib, re, struct, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from devfs import Disk, iter_events, SECTOR  # noqa: E402
 from devdef import Definition, NOTES  # noqa: E402
-from dev2midi import render, write_midi, PPQ  # noqa: E402
+from dev2midi import render, render_paramount, write_midi, PPQ  # noqa: E402
+import paramount332  # noqa: E402
 
 HERE = pathlib.Path(__file__).resolve().parent
 PULSES_PER_SECOND = 192            # 96 per beat at 120 BPM
@@ -429,10 +434,16 @@ def run(images_roots, out_root, tempo, velocity, verify):
                 tr["problems"].append(f"{len(over)} stop numbers above the definition's {de.nstops}")
             out_dir.mkdir(parents=True, exist_ok=True)
             base = e.slot + (f"-{safe_name(e.name)}" if safe_name(e.name) else "")
-            for ranks, suffix in ((False, ""), (True, "-ranks")):
+            modes = [(False, ""), (True, "-ranks")]
+            if paramount332.fits(de.d):
+                modes.append(("paramount", "-paramount"))
+            for ranks, suffix in modes:
                 path = out_dir / f"{base}{suffix}.mid"
                 try:
-                    tracks, end, stats = render(data, de.d, tempo, velocity, ranks)
+                    if ranks == "paramount":
+                        tracks, end, stats = render_paramount(data, de.d, tempo, velocity)
+                    else:
+                        tracks, end, stats = render(data, de.d, tempo, velocity, ranks)
                     write_midi(path, tracks, end + PPQ)
                     tr["files"][suffix or "plain"] = {"path": str(path.relative_to(out_root)),
                                                       "tracks": len(tracks) - 1, "notes": stats["notes"]}
@@ -441,9 +452,9 @@ def run(images_roots, out_root, tempo, velocity, verify):
                         v = verify_midi(path, end)
                         tr["verify"][suffix or "plain"] = v
                         if v:
-                            tr["problems"].append(f"{'ranks' if ranks else 'plain'} MIDI: " + "; ".join(v))
+                            tr["problems"].append(f"{suffix[1:] or 'plain'} MIDI: " + "; ".join(v))
                 except Exception as ex:          # noqa: BLE001
-                    tr["problems"].append(f"{'ranks' if ranks else 'plain'} render failed: {type(ex).__name__}: {ex}")
+                    tr["problems"].append(f"{suffix[1:] or 'plain'} render failed: {type(ex).__name__}: {ex}")
             print(f"{rec['disk']:40} {e.slot:5} {e.name[:26]:26} {fmt_duration(st['last_time']):>8} "
                   f"{st['key_on']:6d} notes  {str(de):28} {'; '.join(tr['problems'])}")
 
@@ -477,7 +488,9 @@ def write_index(path, disks, summary, images_roots):
              f"stops and ranks of the definition (what the organ sounded like, minus traps, tremulants and "
              f"expression). The tempo is not stored in a track; all durations assume {summary['tempo']:g} BPM "
              f"(192 pulses per second). Note count = key presses in the track; the ranks rendering sounds more "
-             f"notes (one per rank and pitch).\n")
+             f"notes (one per rank and pitch). Tracks recorded on the theatre organs (Jerry's Disc, the Tour Disc, "
+             f"New Console) also have `<slot>-<name>-paramount.mid`, for Hauptwerk's MIDI player with the "
+             f"Paramount 332 loaded (see `../docs/paramount332-mapping.md`).\n")
     L.append("| | |\n|---|---|")
     L.append(f"| Image sets found | {summary['disks']} |")
     L.append(f"| System disks | {summary['system_disks']} |")
@@ -541,6 +554,8 @@ def write_index(path, disks, summary, images_roots):
                 slot = f"[{t['slot']}]({md(files['plain']['path'])})"
             if "-ranks" in files:
                 slot += f" ([ranks]({md(files['-ranks']['path'])}))"
+            if "-paramount" in files:
+                slot += f" ([paramount]({md(files['-paramount']['path'])}))"
             dur = fmt_duration(t["last_time"]) if t.get("last_time") is not None else ""
             defn = f"`{md(t['definition'])}`, {md(t['definition_from'])}" if t["definition"] else ""
             kb = ",".join(str(k) for k in t.get("keyboards", []))

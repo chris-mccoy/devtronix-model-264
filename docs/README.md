@@ -140,7 +140,10 @@ KryoFlux streams or HFE files into sector images.
   one channel per keyboard, or through stops and ranks with `--ranks`, which
   also plays the traps as General MIDI percussion, drives tremulants as
   modulation, follows the swell shades as expression, and applies the
-  pizzicato and reiterate timing tables.
+  pizzicato and reiterate timing tables. With `--paramount` it writes a file
+  for Hauptwerk's MIDI player with the Paramount 332 virtual theatre organ,
+  mapping the registration onto that organ's stops
+  ([paramount332-mapping.md](paramount332-mapping.md)).
 
 ## The collection
 

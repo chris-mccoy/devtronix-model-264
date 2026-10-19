@@ -20,7 +20,8 @@ the format of the music on the disks in `../disk-images/`.
 | `devcomb.py` | Combination (`C`) file decoder: pistons, ranges, stops drawn |
 | `devdef.py` | Organ definition (`D` file) reader: lists keyboards, ranks, stops, links, functions as the editor shows them |
 | `dev2midi.py` | Renders a Track/Song file to a standard MIDI file using its definition |
-| `render_all.py` | Renders every `T` file on every disk image to MIDI (plain and `--ranks`) and writes `../renders/INDEX.md` |
+| `paramount332.py` | Hauptwerk Paramount 332 MIDI implementation and the mapping of the theatre-organ definitions onto it (`dev2midi.py --paramount`) |
+| `render_all.py` | Renders every `T` file on every disk image to MIDI (plain, `--ranks`, and `--paramount` for the theatre organs) and writes `../renders/INDEX.md` |
 | `fluxdecode.py` | Decodes the KryoFlux stream dumps and the HxC `.hfe` to sector images in `../decoded-images/` (own MFM decoder, no external tools) |
 | `COMMANDS.md` | Reference of every command in every mode (Idle, Edit, Run, RunEdit) |
 | `monitor-189.*` | The same for "System Monitor Ver 189" (`A2` of the v189 disk), see the comparison section |
@@ -520,7 +521,19 @@ uv run devdef.py SIDE0 SIDE1 -d D1 --item Stp 2    # every field of one item, li
 uv run devdef.py --file def.bin --list Kbd         # from bytes extracted with devfs.py
 uv run dev2midi.py SIDE0 SIDE1 -t T8 -d D1 -o danny-boy.mid           # one MIDI channel per keyboard
 uv run dev2midi.py SIDE0 SIDE1 -t T8 -d D1 --ranks -o danny-boy-ranks.mid   # through stops and ranks
+uv run dev2midi.py SIDE0 SIDE1 -t T8 -d D1 --paramount -v              # for Hauptwerk's Paramount 332
 ```
+
+`--paramount` writes a file for Hauptwerk's MIDI player with the Paramount 332
+loaded, in the fixed MIDI implementation Hauptwerk uses for that organ: keys on
+the Paramount's keyboard channels, stops, couplers and tremulants as NRPN on
+channel 2, and swells as CC 11. The registration comes from the definition's
+relay logic, with every sounding rank mapped to a Paramount stop tab by the
+tables in `paramount332.py`. Some couplers become the Paramount's own couplers
+and the rest are folded into the registration. With `-v` it lists every
+stand-in, near substitute and pitch the Paramount has no tab for. How the
+mapping comes out over the theatre-organ disks is in
+[`../docs/paramount332-mapping.md`](../docs/paramount332-mapping.md).
 
 `dev2midi.py` writes a format-1 file with 96 ticks per beat (one tick per
 pulse) at 120 BPM unless `--tempo` says otherwise. In `--ranks` mode it also
