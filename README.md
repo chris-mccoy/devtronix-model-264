@@ -15,19 +15,23 @@ The aim was to recover and preserve the performances recorded on the disks I
 have, and that has been done: every recording now renders to a standard MIDI
 file.  Many of the artists that performed are no longer with us.
 
-Most (all?) of this code was written by Dick Wilcox and Tim Rickman, both
-recipients of the
+Most (all?) of the firmware and system monitor was written by 
+Dick Wilcox and Tim Rickman, both recipients of the
 [American Theatre Organ Society (ATOS) Award for Industry Achievement](https://www.atos.org/programs-awards/industry-achievement).
 
 ----
 
+![Devtronix Overview](img/dev-midi-research.jpg)
+
 ![Devtronix Front](img/dev.jpg)
+
+---
 
 ## About this project
 
 Allow me to introduce myself. I'm Chris McCoy, and I'm helping my dad, Gerald
 (Jerry) McCoy, document the Devtronix Model 264 for himself and for others. Jerry is
-a master pipe-organ technician and the former caretaker of the
+a master pipe-organ technician and a former caretaker of the
 [Nethercutt Collection](https://nethercuttcollection.org/the-collection/music-room/)
 in Sylmar, California. He knew both Dick Wilcox and Tim Rickman
 personally and worked with them on product development, installations and bug
@@ -45,6 +49,8 @@ instead.
 The boot ROMs were dumped with a [Bus Pirate](https://buspirate.com/), luckily
 before I plugged both chips in upside down and destroyed them. 🤦 I was able to recover
 from that and bring the machine back to life.
+
+---
 
 Start with **[docs/README.md](docs/README.md)**, the one-page summary of what was
 found, with links to the detailed write-ups:
