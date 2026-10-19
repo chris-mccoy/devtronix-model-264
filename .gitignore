@@ -4,3 +4,6 @@ decoded-images/
 .DS_Store
 .venv/
 __pycache__/
+*.m4a
+*.band
+*.mid
