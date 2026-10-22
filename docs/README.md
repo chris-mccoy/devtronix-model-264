@@ -15,6 +15,7 @@ write-ups are linked from each section.
 | `../renders/INDEX.md` | Catalogue of every recording, rendered to MIDI (not in the public repository) |
 | `../decoded-images/` | Sector images decoded from the flux dumps, plus every HFE image (not in the public repository) |
 | [`emulator.md`](emulator.md) | What an emulator of the 264 needs: every device's expected behaviour, the byte-order rule, stages, and which framework |
+| [`definition-links.md`](definition-links.md) | Diagrams of how a definition's lists link together: what switches a function on, and what an active function does with keys |
 
 Python tools run with `uv run script.py ...` (dependencies are in `../pyproject.toml`, locked in `../uv.lock`; `uv sync` creates the environment).
 The disk images (`disk-images/`), decoded images and renders are kept out of the
@@ -132,7 +133,8 @@ KryoFlux streams or HFE files into sector images.
   stops, links, functions, pistons, channels, ...). Keys and pipes share one
   121-note scale with note 25 = 8' C. A stop sounds a rank pipe at key + pitch
   offset through a link expression and a rank-output function. `devdef.py`
-  dumps one like the editor's list commands.
+  dumps one like the editor's list commands. How the lists link together is
+  drawn in [definition-links.md](definition-links.md).
 - **Combination (`C`)**: 6-byte header, then per piston an OFF bitmap and an
   ON bitmap over the stops; their union is the piston's range. Decoded from the
   Set/Range/piston code. `devcomb.py` decodes one.
