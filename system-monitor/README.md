@@ -375,9 +375,9 @@ Read out of the `Load` code (`sub_057C6`, `$57C6`), the `Save` code
 turns the lists into scanner and relay tables (`$9758`–`$A1E2`) and the
 definition editor's field descriptors (hash table `edit_hash_table`, `$F3C4`,
 one 12-byte entry per screen field: flags, kind, row/column, label, referenced
-list, body offset). Checked against the `D` files of `jerrystourdisk`,
-`58-note-01`, `newconsole`, `mccoy3-mccoyconsole` and `pcc-backup-1-95`
-(`devdef.py` consumes each file exactly to its end).
+list, body offset). Checked against every `D` file in the collection
+(`devdef.py` consumes each file exactly to its end; the one damaged file is
+rebuilt first, see "The definitions in the collection").
 
 ### Container
 
@@ -579,6 +579,76 @@ Jerry's disk and `T1` of `58-note-01` are in `../renders/`; the opening of Joy
 To The World is the descending D-major scale and Danny Boy starts B C D | E D E
 A G E D E D C A on the Great, so the key numbering and the 120 BPM clock are
 right (Danny Boy comes out at 4:29).
+
+### The definitions in the collection
+
+Every `D` slot on every image was extracted and decoded: both image roots and
+every HFE image, which hold the same files. A search for anything the
+directories miss found nothing. A scan of every sector for a definition header
+(a version word followed by a list id) found only the first sectors of listed
+files, and the printable text in free space is all pieces of the same
+definitions. The collection therefore holds **50 distinct `D` files**: 49
+definitions and one empty file, listed here by family. Bytes are the file's
+size; the counts are the items in the `Kbd`, `Rnk`, `Stp` and `Fnc` lists.
+
+| Definition | Where (disk: slot) | Bytes | Kbd/Rnk/Stp/Fnc | What it is |
+|---|---|---|---|---|
+| Tour disc | `copy-1995-tour-disk-backup`: `D1` | 86 933 | 8/109/467/666 | The 1995 tour organ with its 16-channel MIDI orchestra. 9 of its 15 control buttons are wired: record/play, general clear, combination save and file number up/down, on board `AG` |
+| Tour disc "no console inp" | the same: `D2` | 79 560 | 7/109/467/622 | The same organ with every input address removed (keys, stops, pistons, channels): a copy that can only play back |
+| "OUTPUT BOARD TEST" | the same: `D3` | 1 579 | 0/51/0/0 | Six ranks named after output boards (`AA` to `FF`), each mapping notes 25–120 onto that board's pins `A1`..`L8` in order, and 45 empty ranks. Nothing plays them, so they are for the editor, where putting the marker on an output address fires it |
+| "Opus 2 BU" | the same: `D10`, `D20` | 2 193, 2 150 | 4/11/87/87, 4/11/77/77 | An unwired four-manual church-organ template (Pedal, Choir, Great, Swell; 11 ranks; 28 named pistons; no addresses and no `Lnk` list). Saved by Monitor 189: function 72 "Sforzando" is type 25, see below |
+| Jerry's "OLD ORGAN DEFINITION" | `jerrystourdisk`: `D1`, `D2` | 57 102 | 11/60/710/905 | Jerry's theatre organ, with show control: units "Give Control Back" (`DA-L1`) and "Stop Kennedy Deck 2" (`DA-L2`), chamber lights and colour wheels. It also has a one-key "TEST KEYBOARD" (key 25 on `AG-J5`, also the contact of stops 326 and 626) that no function uses, and keypad control buttons that are defined but not wired |
+| New Console "Main Definition 12-08-93", "2-13-95" | `newconsole`: `D1`, `D2` | 66 352, 66 370 | 7/81/417/525 | The New Console theatre organ. It has the longest link expressions in the collection, up to 11 RPN words (the echo shade and tremolo cut-outs, such as six stops or-ed together) |
+| "PCC ORGAN" | `r-rhode-conc`: `D2`, `D3`, `D10`; `last-player`: `D11`; `mccoy3-mccoyconsole`: `D10` | 28 654 | 6/35/250/410 | The PCC theatre organ. Re-saved versions: `pcc-backup-1-95` `D1`/`D2` (28 641); `stephen-ross-copy` `D1`/`D3` "W/NEW SWELL ASSIGNS-'96" (28 641); `dparkerpcc` `D3` (28 665); `stephen-ross-copy` `D2` (61 958, the older `$1A12` format with its `Div` list); and `dparkerpcc` `D2` (28 732, damaged, below) |
+| "SCHANTZ 66" | `mccoy3-mccoyconsole`: `D1`, `D2`, `D6`; `cmm-backup`: `D2` | 10 371 | 4/70/142/105 | McCoy's Schantz console driving a MIDI organ: four division ranks on MIDI channels 1–4, and every stop tab drives a unit that sends MIDI note *n* on channel 5 (stop 1 = note 1). Related: "OLD SWELL" (`D3`, 10 776), the same with the old swell wiring; `D23` (5 523), an earlier, partly filled version; `D4` (2 602), the stop list with the three divisions only |
+| McCoy organ | `last-player`: `D3`; `main`: `D10` "MCCOY ORGAN"; variants `last-player` `D4`–`D8`, `D30`, `D50`, `D51` | 7 155–9 300 | 4/11–15/68–99/72–74 | A four-keyboard church organ of eight ranks (Open Diapason, Gedeckt, Principal, Dulciana, Celeste, Twelfth, Trompette, Chimes) plus mixtures, some versions with MIDI Pedal/Great/Swell ranks. `D5` is named "Octave Player"; `D30` adds four crescendo indicator stops |
+| "AHLBORN" | `last-player`: `D2`, `D13`, `D12`; `mccoy3-mccoyconsole`: `D5` | 1 588, 1 571, 1 275 | 4/3/4/7, 3/3/4/7 | Keyboards into three MIDI divisions, with transposer buttons on `AC-F3`, `AC-F4`, `AC-F5` (−1, reset, +1). `D2`/`D13` also give Great keys 1 and 13 MIDI inputs (channel 1 note 44, channel 2 note 43) |
+| Ahlborn stop control | `main`: `D1`/`D8`, `D5`, `D6`, `D7`; `autoboot`, `startupa`: `D1` | 2 393–2 972 | 4/3/28/31 | The same MIDI divisions with up to 23 stop tabs, each sending a MIDI fixed controller message (type 21); the `autoboot` copy names the Ahlborn stops (Subbass 16', ...) |
+| Small MIDI set-ups | `main`: `D2`, `D3`, `D4`, `D20`/`D30` "newalbornspec"; `last-player`: `D40` | 459–2 095 | 1–4/1–3/1–67/2–4 | The MIDI divisions switched by one "AHLBORN" stop. `D4` adds an analog controller ("ABDD"); `D20`/`D30` define 67 stop inputs but link none of them; `last-player` `D40` is a single MIDI Great |
+| 58 Note Player | `D2` of 23 player disks (848); `58-note-01`: `D5` (856), `D10`/`D11` (1 055); `last-player`: `D9` "58 NOTE PLAYER PRINCIPAL", `D10` (1 087) | 848–1 087 | 1/8/1/8 | The roll player: one 58-key keyboard driving MIDI 16' and 8' ranks (the 4' and five "Voice" ranks are empty) |
+| 58 Note Player with keyboards | `58-note-16-2`, `58-note-17`, `58-note-18`: `D2`; `58-note-16`: `D10` | 2 151, 1 527 | 5/8/67/74, 4/5/5/5 | `D2`: the player plus Pedal, Choir, Great and Swell keyboards, all sent to MIDI. `58-note-16` `D10`: four keyboards (Pedal, Accomp, Great, Solo) sent to MIDI, without the player |
+| "WIRELESS" | `mccoy3-mccoyconsole`: `D21` | 266 | 5/0/20/20 | A skeleton; see the tuner lead in "Open questions" |
+| Empty | `cmm-backup`, `os-backup`, `system-monitor-2.6-v183`: `D1` | 10 | 0/0/0/0 | Only the `Spf` item. `58-note-01` `D6` "new" is a 0-byte file |
+
+**`dparkerpcc` `D2` is damaged but can be rebuilt.** Cylinders 9 and 10 of
+side 1 (logical sectors 95–99 and 105–109) cannot be read in any revolution of
+either KryoFlux dump (`dparkerpcc/`, `new-images/dparkerpcc/`). DTC stored zeros
+there, and they fall in file sectors 5–9 and 15–19 of `D2`, so `devdef.py`
+stops in the `Rnk` list. Around the two holes `D2` matches `D3` of the same
+disk byte for byte, shifted by 69 bytes. The differences in the readable parts
+add up to the whole 67-byte difference in size, so the holes are filled from
+`D3`: `D2[5120:10240] = D3[5051:10171]` and `D2[15360:20480] =
+D3[15291:20411]`. The lost part held `Rnk` 22–35, all 140 units, `Stp` 1–49 and
+`Lnk` 32–186, so an edit there that kept the length would not show. The rebuilt
+file parses to its end and differs from `D3` in three items:
+
+- `Spf`: Set piston `AA-A1` and Range piston `AA-A2` (`D3`: `AD-P8`, `AD-P7`).
+- `Pst` 1 and 2: inputs `AA-A3` and `AA-A4` (`D3`: `AE-A8`, `AE-B1`).
+- `Rnk` 1 "Main Tuba Horn": 24 more pipes, notes 96–119, on outputs
+  `AA-A1`..`AA-C8` in order. The exception is pipe 107, which is `ID-L4` where
+  `AA-B4` would continue the run.
+
+Inputs `AA-A1`..`A4` are also the bottom four pedal keys (C to D♯). In `D3`,
+and so in the rebuilt `D2`, outputs `AA-A1`..`AA-C8` are the on and off magnets
+of stops 1–12, the pedal stops. That version therefore made the bottom of the
+pedalboard double as Set, Range and pistons 1–2. Only two of the new tuba
+pipes can sound: the organ's super couplers (+12, no "couple the couplers")
+lift the top B and C of the Accomp, Great or Solo to notes 96 and 97. With a
+tuba stop drawn, holding either key would energise the 32' Pedal Bombarde's on
+or off magnet. `D3` undoes all of it.
+
+**Other odd entries.** `cmm/cmm1.img` has track data in the header sectors of
+`A1`, `D2` and `T2`, so those three entries cannot be read. The header of
+`mccoy3-mccoyconsole` `D41` is sector 214, the first data sector of `D23`: a
+stale directory entry like `C3` (see "Combination files").
+
+**Function types 23–25 (Monitor 189).** Monitor 189 extends the function type
+table after "Midi set channel note velocity" (`$FC0C` in `monitor-189.asm`):
+**23 "Activate a piston"**, **24 "Function delay"** and **25 "Function
+command"**, a console command string run by the new `FNC` task (see "System
+Monitor Ver 189"). The only definitions that use any of them are the tour
+disc's `D10` and `D20`: their function 72 "Sforzando" is type 25 with an empty
+body, so it has no command. `devdef.py` prints it as "type 25".
 
 ## Combination files (C)
 
@@ -1066,7 +1136,21 @@ decode cleanly here. `58-note-04`, `cmm/cmm3`, `jerrystourdisk` and the
 `new-images/*` folders also hold streams, but their sector images were already
 catalogued; `--include-imaged` decodes them identically (`fenelon-tarantelle`
 and `midi-piano-selections` are 512-byte-sector PC disks and decode to nothing
-with this format).
+with this format: Yamaha Disklavier floppies, `MUSIC.DIR` plus `DRC_nn.MDA`
+piano recordings). Both dumps of `dparkerpcc` share one real loss:
+cylinders 9 and 10 of side 1 have no readable sector in any revolution. DTC
+stored zeros there, and they fall inside that disk's `D2` (rebuilt in "The
+definitions in the collection").
+
+One HFE is not a 264 floppy. `disk-images/58-note-04/58-note-04.hfe`
+(2 008 064 bytes, 80 tracks, copied to
+`decoded-images/58-note-04/58-note-04.disk-images.hfe`) holds the first
+737 280 bytes of `58-note-04.img` (side 0, then side 1) re-encoded as a 720 KB
+PC disk, nine 512-byte sectors per track. `fluxdecode.py` therefore finds
+none of the 1024-byte sectors it expects, and the last 80 KB of the disk are
+missing. The Gotek set's `#04-58-NOTE.HFE` (`decoded-images/58-note-04/58-note-04.hfe`,
+84 tracks) is a proper image of the same disk and decodes to exactly the bytes
+of `58-note-04.img`.
 
 ## What language the monitor is written in
 
@@ -1164,3 +1248,37 @@ shows:
 4. `monitor-183.asm` has 32 `spec_` routines reached only through data
    structures; a few hundred bytes of the editor may still be data mistaken for
    code or vice versa.
+5. **The DTMF tuner is not on any imaged disk.** One definition is remembered
+   that turned the relay into an organ tuner. The tuner in the chamber carried
+   a cordless phone. A separate DTMF decoder chip at the console turned the
+   phone's tones into about twelve discrete inputs, one per key of the phone,
+   and through the definition those inputs advanced the tuner from note to
+   note. All the decoding was in the chip, so the definition saw ordinary
+   inputs. None of the 49 definitions does this (see "The definitions in the
+   collection"):
+   - no item is named for tuning, a phone or DTMF;
+   - no keyboard has twelve keys;
+   - no keypad control button is wired;
+   - no link expression does more than celeste and reversible logic;
+   - no track records a tuning session.
+
+   Its disk is probably not in the collection. Leads, should it turn up or the
+   definition need rebuilding:
+   - **`mccoy3-mccoyconsole` `D21` "WIRELESS"** (266 bytes, a skeleton). A
+     POWER stop's link couples GREAT KEYS into a keyboard `TBK 1`, with
+     "couple the couplers" on, and puts a **legato** function (type 8) on
+     `TBK 1`. Legato holds each key until the next one is pressed, which is
+     the hold-until-the-next-note a hands-free tuner needs. Keyboards `TBK 2`,
+     `TBK 3` and `SWELL KEYS` and a "4' COUPLER" stop are defined but empty.
+     There are no keys, ranks or addresses, and the rest of the file's sector
+     is zeros.
+   - **The relay's building blocks for it:**
+     - sustain and legato (types 7 and 8) to hold a note;
+     - the transposer (type 9; relative ±1 and reset, as wired on the AHLBORN
+       definitions) to step every key by a semitone;
+     - divisional couplers with pitch offsets to pick an octave or division;
+     - control buttons for file number up/down and record/play, to step
+       through prepared tracks;
+     - Monitor 189's function delay and function command (types 24 and 25),
+       which can run console commands such as `. K n` (press key *n*) from the
+       definition itself.
