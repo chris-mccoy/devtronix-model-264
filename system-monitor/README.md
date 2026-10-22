@@ -419,6 +419,8 @@ order of `dat_05ABE`: Kbd Rnk Unt Stp Lnk Fnc Pst Chn Cin Cot Piz Rit Spf Ctl In
 
 The exact field list per list and type, with offsets, is the `FIELDS` table in
 `devdef.py` (generated from the descriptors; `TYPE_NAMES` has the type names).
+How the lists refer to each other is drawn in
+[`../docs/definition-links.md`](../docs/definition-links.md).
 
 **Function types** (`Fnc` +0): 1 divisional coupler (+2 keyboard played, +4
 division whose stops sound, +6 pitch offset, +8/+10 note limits, +12 couple
@@ -640,7 +642,9 @@ This is the part of the monitor that makes the organ play: the SCN task
 (`task_scn`, `$A7FA`), the run-time tables it builds from the definition at
 `Run` time (`relay_build_scan`, `$9758`, and the `build_*` routines before
 it), and the event chain from a console contact to a magnet. Everything below
-is named in `monitor-183.sym`, so the listing can be read alongside.
+is named in `monitor-183.sym`, so the listing can be read alongside. The chain
+from key and stop to pipe is drawn in
+[`../docs/definition-links.md`](../docs/definition-links.md).
 
 ### Console scanner hardware (`$FFFFFF80`–`$FFFFFF86`)
 
