@@ -51,7 +51,6 @@ job."
 
 Jerry knew both Dick Wilcox and Tim Rickman personally and worked with them on
 product development, installations and bug hunting through the 1980s and 1990s.
-Dick and Tim have both since passed away.
 
 _San Sylmar_ as it was once known, has been encoding performances of both the
 Mighty Wurlitzer and the accompanying Bösendorfer Concert Grand Piano **since the
