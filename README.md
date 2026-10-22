@@ -64,10 +64,8 @@ the Devtronix.
 ![A Kennedy Model 9000 9-track tape transport](img/kennedy-9000.jpg)
 
 *A Kennedy Model 9000, the same model as the transport the Sylmar recordings were
-first captured on: the tape reels sit behind the tinted dust door, and the panel at the
-left has the DENSITY SELECT switch (HI, REM, LO), the WRITE, SELECT, READ and WRITE
-ENABLE lamps, and the ON LINE, LOAD and REWIND buttons.
-Credit: [Tektronix 8560 still going strong](https://hydraraptor.blogspot.com/2016/01/tektronix-8560-still-going-strong.html) on the HydraRaptor blog.*
+first captured on: Credit: 
+[Tektronix 8560 still going strong](https://hydraraptor.blogspot.com/2016/01/tektronix-8560-still-going-strong.html) on the HydraRaptor blog.*
 
 The aim is to recover and preserve the performances recorded on the Devtronix
 diskettes I have from several different pipe organs, and that has mostly been
