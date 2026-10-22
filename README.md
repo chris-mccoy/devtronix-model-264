@@ -107,6 +107,12 @@ forward today, for kindly giving his permission to document the Devtronix Model
 generosity made it possible to share this work openly, and it means a great deal
 to my dad and me. I hope this record does justice to the system Dick and Tim built.
 
+To Anthropic for [Claude Mythos 5.1](https://www.anthropic.com/claude-fable-and-mythos-5-1),
+the only LLM that was up to the task to explain this binary code which
+I've had for years, but couldn't make sense until gaining access to it.
+It figured out right away that the code was little-endian on a
+traditionally big-endian CPU.
+
 ## Links
 
 - [devtronix.org](https://devtronix.org/): Dominic Cheshire's Devtronix organ fan site and repository.
