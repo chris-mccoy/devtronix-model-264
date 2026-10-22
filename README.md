@@ -38,15 +38,36 @@ Allow me to introduce myself. I'm Chris McCoy, and I'm helping my dad, Gerald
 (Jerry) McCoy, document the Devtronix Model 264 for himself and for others. Jerry is
 a master pipe-organ technician and a former caretaker of the
 [Nethercutt Collection](https://nethercuttcollection.org/the-collection/music-room/)
-in Sylmar, California. He knew both Dick Wilcox and Tim Rickman
-personally and worked with them on product development, installations and bug
-hunting through the 1980s and 1990s. Dick and Tim have both since passed away.
+in Sylmar, California.
+
+Jerry is a recipient of the [ATOS Award for Technical
+Excellence](https://www.atos.org/programs-awards/technical-excellence), which
+"honors those who exhibit an outstanding level of expertise in maintenance,
+restoration, rebuilding, or renovation of theatre pipe organs in public places.
+It includes excellence of workmanship, professionalism in working with
+organists and others in the field, general knowledge and understanding of organ
+building techniques and materials, and the ability to skillfully complete a
+job."
+
+Jerry knew both Dick Wilcox and Tim Rickman personally and worked with them on
+product development, installations and bug hunting through the 1980s and 1990s.
+Dick and Tim have both since passed away.
 
 _San Sylmar_ as it was once known, has been encoding performances of both the
-Mighty Wurlitzer and the accompanying Bösendorfer Concert Grand Piano since the
-late 1970s.  Many artists and masters of their craft have performed there,
-using [9-track Tape](https://en.wikipedia.org/wiki/9-track_tape)
-originally!
+Mighty Wurlitzer and the accompanying Bösendorfer Concert Grand Piano **since the
+late 1970s**.  Many artists and masters of their craft have captured their
+performances there, first using [9-track tape](https://en.wikipedia.org/wiki/9-track_tape)
+with the [Peterson System](https://www.petersonemp.com/) and a
+heavily modified Kennedy 9000 transport.  This was eventually imported to
+the Devtronix.
+
+![A Kennedy Model 9000 9-track tape transport](img/kennedy-9000.jpg)
+
+*A Kennedy Model 9000, the same model as the transport the Sylmar recordings were
+first captured on: the tape reels sit behind the tinted dust door, and the panel at the
+left has the DENSITY SELECT switch (HI, REM, LO), the WRITE, SELECT, READ and WRITE
+ENABLE lamps, and the ON LINE, LOAD and REWIND buttons.
+Credit: [Tektronix 8560 still going strong](https://hydraraptor.blogspot.com/2016/01/tektronix-8560-still-going-strong.html) on the HydraRaptor blog.*
 
 The aim is to recover and preserve the performances recorded on the Devtronix
 diskettes I have from several different pipe organs, and that has mostly been
