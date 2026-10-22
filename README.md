@@ -135,5 +135,5 @@ settled. Links into those folders from the write-ups will not resolve here. The
 tools work on a local copy that has them.  Publishing the artists' work to the
 world wouldn't be a good move on my part.  
 
-If you have any works on the Model 264, contact me.
+**If you have any works on the Model 264 you'd like to preserve, please contact me.**
 
