@@ -81,6 +81,14 @@ found, with links to the detailed write-ups:
 - [system-monitor/](system-monitor/README.md): the operating software, the file system,
   the Track, Definition and Combination file formats, and the tools that read them
 
+## Acknowledgements
+
+My sincere thanks to Jim Gallops, whose company carries the Devtronix system
+forward today, for kindly giving his permission to document the Devtronix Model
+264 here, including photographs of its Devtronix boards. His
+generosity made it possible to share this work openly, and it means a great deal
+to my dad and me. I hope this record does justice to the system Dick and Tim built.
+
 ## Links
 
 - [devtronix.org](https://devtronix.org/): Dominic Cheshire's Devtronix organ fan site and repository.
