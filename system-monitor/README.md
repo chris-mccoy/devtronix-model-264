@@ -354,6 +354,20 @@ for `T32` of `58-note-01` (the disk is full, the file is cut short) and `T6`
 "Sleigh Ride" on Jerry's disk, which has garbage in logical sectors 308–310 (blocks 19–21 of the file,
 probably a bad read in the image).
 
+With `-d SLOT` (a definition on the same disk, or a definition file extracted
+with `--extract`) each stop event is labelled with the stop's name and the names
+of the links it turns on; a link with no name, as most of Jerry's are, stands
+for its functions' names. A stop that only appears under a `not` is not
+labelled with that link, so Jerry's "String Celeste Off" (stop 324) keeps just
+its own name. This is how to see the swell shoes on Jerry's organ: they are
+not analog channels (its seven `Chn` items are empty) but rows of contacts
+wired as stops, 351–360 "Main Shade 1–10", 361–370 "Solo Shade", 371–380
+"Echo Shade", plus 408–411 "PIANO EXPRESSION 1/2/4/8", a binary level.
+Key events get the keyboard's name and the key's note, `key on  Pedal 8' G# (33)`,
+with key 25 the bottom C (8' C) and middle C 2' C (49); a keyboard with no
+name, or one the definition does not have (the garbage in Jerry's `T6`), keeps
+the plain `kbd 14 key 1`.
+
 ## Definition files (D)
 
 Read out of the `Load` code (`sub_057C6`, `$57C6`), the `Save` code
@@ -917,6 +931,7 @@ own (`../boot-rom/README.md`): `SOH`, 1024 bytes, 8-bit sum, `G`/`E` replies.
 ```
 uv run devfs.py ../disk-images/58-note-01/58-note-1_s0 ../disk-images/58-note-01/58-note-1_s1 [--check]
 uv run devfs.py SIDE0 SIDE1 --events T1 -n 40        # decode a track
+uv run devfs.py SIDE0 SIDE1 --events T1 -d D1        # ... with stops and keys named from definition D1
 uv run devfs.py SIDE0 SIDE1 --extract T1 t1.bin      # raw file bytes
 uv run devfs.py SIDE0 SIDE1 --header T1              # hex dump of the header sector
 ```

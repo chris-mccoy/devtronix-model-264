@@ -10,6 +10,7 @@ usage:
   devfs.py SIDE0 [SIDE1] --extract SLOT OUT   write a file's bytes (header excluded)
   devfs.py SIDE0 [SIDE1] --header SLOT        hex dump of a file's header sector
   devfs.py SIDE0 [SIDE1] --events SLOT [-n N] decode a Track/Song file's event stream
+           ... --events SLOT -d D1            the same, stops and keys named from definition D1
   devfs.py SIDE0 [SIDE1] --check              compare the allocation bitmap with the files
 
 SIDE0/SIDE1 are the per-side *_s0 / *_s1 images (409600 bytes each); a single
@@ -199,8 +200,11 @@ def iter_events(data):
         else:
             yield start, t, "code", b
 
-def decode_events(data, limit=None):
-    """Yield (offset, time_pulses, text) for a Track/Song file (see iter_events)."""
+def decode_events(data, limit=None, stop_names=None, key_label=None):
+    """Yield (offset, time_pulses, text) for a Track/Song file (see iter_events).
+    stop_names (stop number -> text, devdef.Definition.stop_labels) labels the
+    stop events; key_label(kbd, key) -> text or None
+    (devdef.Definition.key_label) names the keys."""
     n = 0
     for off, t, kind, info in iter_events(data):
         if limit is not None and n >= limit and kind != "end":
@@ -208,13 +212,16 @@ def decode_events(data, limit=None):
             return
         if kind == "key":
             kbd, key, on = info
-            txt = f"key {'on ' if on else 'off'} kbd {kbd} key {key}"
+            label = key_label(kbd, key) if key_label else None
+            txt = f"key {'on ' if on else 'off'} {label or f'kbd {kbd} key {key}'}"
         elif kind == "console":
             txt = f"console change ${info:X}"
         elif kind == "channel":
             txt = f"channel {info[0]} = {info[1]}"
         elif kind == "stop":
             txt = f"stop {'on ' if info[1] else 'off'} {info[0]}"
+            if stop_names and info[0] in stop_names:
+                txt = f"{txt:<13} {stop_names[info[0]]}"
         elif kind == "midi":
             txt = "midi " + info.hex(" ")
         elif kind == "sync":
@@ -259,6 +266,8 @@ def main():
     ap.add_argument("--events", metavar="SLOT")
     ap.add_argument("-n", type=int, default=None, help="max events to print")
     ap.add_argument("--tempo", type=float, default=120.0, help="BPM assumed for the time column")
+    ap.add_argument("-d", metavar="SLOT", help="with --events: name stops and keys from this definition "
+                    "(a D slot on the same disk, or an extracted definition file)")
     ap.add_argument("--check", action="store_true")
     a = ap.parse_args()
 
@@ -281,7 +290,22 @@ def main():
     if a.events:
         e = d.find(a.events); data = e.read()
         print(f"{e.slot} {e.name!r}: {len(data)} bytes; times assume {a.tempo:g} BPM")
-        for off, t, txt in decode_events(data, a.n):
+        stop_names = key_label = None
+        if a.d:
+            from devdef import Definition    # devdef imports this module
+            try:
+                if pathlib.Path(a.d).is_file():
+                    defn = Definition(pathlib.Path(a.d).read_bytes()); what = a.d
+                else:
+                    de = d.find(a.d)
+                    if de.letter != "D":
+                        raise SystemExit(f"{de.slot} is a {de.type} file, not a definition")
+                    defn = Definition(de.read()); what = f"{de.slot} {de.name!r}"
+            except (ValueError, KeyError, IndexError, struct.error) as err:
+                raise SystemExit(f"error: definition {a.d}: {err}")
+            stop_names, key_label = defn.stop_labels(), defn.key_label
+            print(f"stops and keys named from {what}")
+        for off, t, txt in decode_events(data, a.n, stop_names, key_label):
             print(f"{off:06X}  {t:8d}  {fmt_time(t, a.tempo)}  {txt}")
         return
 

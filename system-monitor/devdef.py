@@ -367,6 +367,59 @@ class Definition:
     def links_of_stop(self, stop_number):
         return [l for l in self.lists.get("Lnk", []) if stop_number in self.link_stops(l)]
 
+    def link_drivers(self, lnk):
+        """Stops that can turn a link on: those its expression uses without a
+        'not' ("String Celeste Off" only ever appears negated)."""
+        stack = []
+        for i in range(15):
+            v = lnk.w(2 * i)
+            if v == 0:
+                break
+            if v & 0x8000:
+                if v & 0xFF == 1:
+                    if stack:
+                        stack[-1] = stack[-1][::-1]
+                elif len(stack) >= 2:
+                    (p2, n2), (p1, n1) = stack.pop(), stack.pop()
+                    stack.append((p1 | p2, n1 | n2))
+            elif v & 0x4000:
+                stack.append((set(), set()))
+            else:
+                stack.append(({v}, set()))
+        return sorted(set().union(*(p for p, _ in stack)))
+
+    def stop_labels(self):
+        """Stop number -> what it does, for annotating a track: the stop's own
+        name, then the names of the links it turns on (a link with no name, as
+        most of Jerry's are, stands for its functions' names)."""
+        drives = {}
+        for l in self.lists.get("Lnk", []):
+            for s in self.link_drivers(l):
+                drives.setdefault(s, []).append(l)
+        out = {}
+        for s in self.lists.get("Stp", []):
+            names = [s.name]
+            for l in drives.get(s.number, []):
+                if l.name.strip():
+                    names.append(l.name)
+                else:
+                    names += [f.name for f in (self.get("Fnc", n) for n in self.link_functions(l)) if f]
+            seen, keep = set(), []
+            for n in (n.strip() for n in names):
+                if n and n.lower() not in seen:
+                    seen.add(n.lower()); keep.append(n)
+            if keep:
+                out[s.number] = ", ".join(keep)
+        return out
+
+    def key_label(self, kbd, key):
+        """"Pedal 8' G# (33)" for key 33 of keyboard 1, or None when the
+        keyboard has no name or the key number is out of range."""
+        k = self.get("Kbd", kbd)
+        if k is None or not k.name.strip() or not 1 <= key <= NOTES:
+            return None
+        return f"{k.name.strip()} {note_name(key)} ({key})"
+
     def keyboard_keys(self, kbd):
         """Key numbers that have an input address."""
         return [k for k in range(1, 122) if kbd.w(2 * k)]
