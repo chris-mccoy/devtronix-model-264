@@ -101,11 +101,12 @@ found, with links to the detailed write-ups:
 
 ## Acknowledgements
 
-My sincere thanks to Jim Gallops, whose company carries the Devtronix system
-forward today, for kindly giving his permission to document the Devtronix Model
-264 here, including photographs of its Devtronix boards. His
-generosity made it possible to share this work openly, and it means a great deal
-to my dad and me. I hope this record does justice to the system Dick and Tim built.
+My sincere thanks to Jim Gallops, whose [company](https://uniflex.gallops.com/)
+carries forward the evolution of the Devtronix system today, for kindly giving
+his permission to document the Devtronix Model 264 here, including photographs
+of its Devtronix boards.  His generosity made it possible to share this work
+openly, and it means a great deal to my dad and me. I hope this record does
+justice to the system Dick and Tim built.
 
 To Anthropic for [Claude Mythos 5.1](https://www.anthropic.com/claude-fable-and-mythos-5-1),
 the only LLM that was up to the task to explain this binary code which
