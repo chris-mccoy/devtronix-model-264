@@ -154,7 +154,8 @@ KryoFlux streams or HFE files into sector images.
   sector image. `fluxdecode.py` re-decodes the flux independently and agrees with DTC
   on every good sector.
 - 58 image sets, 56 of them Devtronix system disks (many are duplicate dumps of
-  the same floppy). Two are MS-DOS disks, not Devtronix. The two disks that existed
+  the same floppy). Two are MS-DOS disks, not Devtronix (Yamaha Disklavier piano
+  recordings). The two disks that existed
   only as HFE images are now decoded too: `os-backup` is "CMM 2" (both monitor
   versions and the same two definitions as `cmm-backup`) and `startupa` is
   "Startup A" (monitor 180 and one small four-keyboard definition); neither holds
@@ -171,7 +172,10 @@ KryoFlux streams or HFE files into sector images.
   1995 tour disc (467 stops, 109 ranks), New Console 12-08-93 / 2-13-95 (417
   stops, 81 ranks), the PCC organ family (250 stops, 35 ranks, nine copies),
   McCoy's SCHANTZ 66 and OLD SWELL (142 stops, 70 ranks), and small test,
-  player and MIDI-control definitions.
+  player and MIDI-control definitions. Every one is decoded and catalogued in
+  [system-monitor/README.md](../system-monitor/README.md#the-definitions-in-the-collection).
+  The one damaged file is the PCC's `D2` on `dparkerpcc`, which lost two tracks
+  to the floppy itself; it is rebuilt from that disk's `D3`.
 - **28 combination files** on the real-organ disks, none on the player disks.
   Several were saved under an older definition than the disk's `D1`.
 - All 42 HFE images are gathered in `decoded-images/`. Four HFEs have 84 tracks
@@ -189,13 +193,19 @@ beyond the loader, the renders have been listened to at 120 BPM, the two
 HFE-only disks are decoded, the definition's timing tables and spare fields are
 explained, the relay is annotated, and the renderer models traps, tremulants,
 expression and the pizzicato/reiterate timing. What remains is judgement rather
-than decoding:
+than decoding, plus one disk that is missing:
 
 1. The MIDI rendering of tremulants (modulation), shades (expression) and traps
    (General MIDI percussion by name) is an approximation of what the organ does;
    a proper rendering would need samples of the actual ranks.
 2. How the Falcon-hosted 264 used the PC for its disks: the PC-link protocol of
    the PCL task is not decoded.
+3. A definition is remembered that made the relay an organ tuner, stepped from
+   note to note by a cordless phone through a DTMF decoder wired to about twelve
+   console inputs. It is on none of the imaged disks. What is known, and the
+   closest leads (McCoy3's "WIRELESS" skeleton and the relay features such a
+   tuner would use), are in
+   [system-monitor/README.md](../system-monitor/README.md#open-questions--next-steps).
 
 ## References
 
