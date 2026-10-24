@@ -2,9 +2,9 @@
 """Render a Devtronix Model 264 Track/Song file to a standard MIDI file.
 
 usage:
-  dev2midi.py SIDE0 [SIDE1] -t T8 [-d D1] [-o out.mid] [--tempo 120] [--ranks | --paramount]
+  dev2midi.py SIDE0 [SIDE1] -t T8 [-d D1] [-o out.mid] [--tempo 120] [--ranks | --paramount | --friesach]
 
-Three renderings:
+Four renderings:
 
   keyboards (default): one MIDI channel per keyboard of the definition; every
       key press becomes the note at the key's own pitch (key 25 = 8' C = MIDI
@@ -27,6 +27,11 @@ Three renderings:
       which ranks sound at which pitch on each manual (couplers included);
       paramount332.py maps those onto Paramount stop tabs and reports what it
       had to substitute or leave out (-v lists it).
+
+  --friesach: the same for Hauptwerk's Friesach, a classical organ
+      (friesach.py), with the ranks played on its stops of the nearest
+      family.  The 58 Note Player plays the Hauptwerk and its lowest held key
+      also plays the Pedal while it is in the bottom two octaves.
 
 The pulse clock is 96 per beat, which is used directly as the MIDI division;
 the tempo is not stored in a track (default 120 BPM, see README.md).
@@ -645,7 +650,7 @@ def render(data, d, tempo, velocity, ranks, verbose=False):
               if i == 0 or any(e[2][0] & 0xF0 in (0x80, 0x90) for e in tr.events)]
     return tracks, last_t, stats
 
-# ----------------------------------------------------------------------------- Hauptwerk Paramount 332
+# ----------------------------------------------------------------------------- Hauptwerk organs
 def nrpn(track, t, chan, number, value):
     track.add(t, [0xB0 | chan, 99, number >> 7])
     track.add(t, [0xB0 | chan, 98, number & 0x7F])
@@ -667,21 +672,28 @@ def apply_event(organ, kind, info):
         return False
     return True
 
-def render_paramount(data, d, tempo, velocity):
-    """One track for Hauptwerk's MIDI player with the Paramount 332: keys on
-    the Paramount keyboard channels, registration as its NRPN switches and
-    CC 11 swells.  Registration changes go out before the key presses of the
-    same pulse, after the releases."""
-    import paramount332 as pm
+def hauptwerk_profile(name):
+    """The hauptwerk.Profile of an organ module ("paramount332", "friesach")."""
+    import importlib, hauptwerk
+    return hauptwerk.Profile(importlib.import_module(name))
+
+def render_hauptwerk(data, d, tempo, velocity, prof):
+    """One track for Hauptwerk's MIDI player with the organ of prof (a
+    hauptwerk.Profile) loaded: keys on its keyboard channels, registration as
+    its NRPN switches and CC swells.  Registration changes go out before the
+    key presses of the same pulse, after the releases.  The lowest key held on
+    a BASS keyboard also plays its bass keyboard while it is within BASS_RANGE,
+    decided after each pulse."""
+    import hauptwerk
     events = list(iter_events(data))
     keyboards = {k.number: k.name for k in d.lists.get("Kbd", [])}
-    assign = pm.keyboard_assignment(d)
+    assign = prof.keyboard_assignment(d)
     auto = {}
-    if pm.AUTO in assign.values():
+    if hauptwerk.AUTO in assign.values():
         # first pass: what the Bombarde (and Echo) register while they are played
         organ = Organ(d)
-        con = pm.Console(organ, assign)
-        seen = {k: set() for k, v in assign.items() if v == pm.AUTO}
+        con = hauptwerk.Console(organ, prof, assign)
+        seen = {k: set() for k, v in assign.items() if v == hauptwerk.AUTO}
         for _, t, kind, info in events:
             if kind == "end":
                 break
@@ -695,31 +707,47 @@ def render_paramount(data, d, tempo, velocity):
                 auto[keyboards.get(k, f"keyboard {k}")] = assign[k]
 
     organ = Organ(d)
-    con = pm.Console(organ, assign)
+    played = {info[0] for _, _, kind, info in events if kind == "key" and info[2]}
+    con = hauptwerk.Console(organ, prof, assign, played)
     meta = Track("Devtronix track")
     meta.meta(0, 0x51, struct.pack(">I", int(60e6 / tempo))[1:])
     meta.meta(0, 0x58, bytes([4, 2, 24, 8]))
     for name, div in sorted(auto.items()):
-        meta.text(0, f"{name} plays the Paramount {pm.KEYBOARD_NAMES[div]}")
-    tr = Track("Paramount 332")
+        meta.text(0, f"{name} plays the {prof.SHORT} {prof.KEYBOARD_NAMES[div]}")
+    for kbd, div in sorted(con.bass.items()):
+        meta.text(0, f"{keyboards[kbd]}: lowest key also on the {prof.SHORT} {prof.KEYBOARD_NAMES[div]}")
+    tr = Track(prof.ORGAN)
     sink = NoteSink(velocity)
-    stats = {"keys": 0, "stops": 0, "notes": 0, "dropped": {}, "auto": auto, "unknown_kbd": set()}
-    for name, number in sorted(pm.SWITCHES.items(), key=lambda x: x[1]):      # clear the console
-        nrpn(tr, 0, pm.NRPN_CHANNEL, number, 0)
+    stats = {"keys": 0, "stops": 0, "notes": 0, "dropped": {}, "auto": auto, "unknown_kbd": set(),
+             "bass": {}}
+    for name, number in sorted(prof.SWITCHES.items(), key=lambda x: x[1]):      # clear the console
+        nrpn(tr, 0, prof.NRPN_CHANNEL, number, 0)
     state = {"on": set(), "cc": {}}
+    held = {kbd: {} for kbd in con.bass}            # bass keyboard -> {key: depth}
+    low = dict.fromkeys(con.bass)                   # bass keyboard -> key it sounds on the bass keyboard
+    lowest = dict.fromkeys(con.bass)
+    bass_lo, bass_hi = prof.BASS_RANGE
 
     def registration(t):
         want = con.switches()
         for s in sorted(state["on"] - want):
-            nrpn(tr, t, pm.NRPN_CHANNEL, pm.SWITCHES[s], 0)
+            nrpn(tr, t, prof.NRPN_CHANNEL, prof.SWITCHES[s], 0)
         for s in sorted(want - state["on"]):
-            nrpn(tr, t, pm.NRPN_CHANNEL, pm.SWITCHES[s], 127)
+            nrpn(tr, t, prof.NRPN_CHANNEL, prof.SWITCHES[s], 127)
         state["on"] = want
         for (chan, ctl), v in sorted(con.swells().items()):
             if state["cc"].get((chan, ctl)) != v:
                 tr.add(t, [0xB0 | chan, ctl, v]); state["cc"][(chan, ctl)] = v
 
     def key(t, kbd, k, on):
+        if kbd in held:
+            h = held[kbd]
+            if on:
+                h[k] = h.get(k, 0) + 1
+            elif h.get(k):
+                h[k] -= 1
+                if not h[k]:
+                    del h[k]
         div = assign.get(kbd)
         if div is None:
             if on:
@@ -727,12 +755,29 @@ def render_paramount(data, d, tempo, velocity):
                 stats["dropped"][name] = stats["dropped"].get(name, 0) + 1
                 con.count_key(kbd)            # anything registered there is lost with it
             return
-        chan = pm.KEYBOARD_CHANNELS[div]
+        chan = prof.KEYBOARD_CHANNELS[div]
         if on:
             sink.on(tr, t, chan, midi_note(k)); stats["notes"] += 1
             con.count_key(kbd)
         else:
             sink.off(tr, t, chan, midi_note(k))
+
+    def bass(t):
+        for kbd, div in con.bass.items():
+            k = min(held[kbd]) if held[kbd] else None
+            b = stats["bass"].setdefault(keyboards[kbd], {"div": div, "notes": 0, "high": 0})
+            if k is not None and k != lowest[kbd] and not bass_lo <= midi_note(k) <= bass_hi:
+                b["high"] += 1                # lowest key above BASS_RANGE
+            lowest[kbd] = k
+            if k is not None and not bass_lo <= midi_note(k) <= bass_hi:
+                k = None
+            if k != low[kbd]:
+                chan = prof.KEYBOARD_CHANNELS[div]
+                if low[kbd] is not None:
+                    sink.off(tr, t, chan, midi_note(low[kbd]))
+                if k is not None:
+                    sink.on(tr, t, chan, midi_note(k)); b["notes"] += 1
+                low[kbd] = k
 
     def flush(t, tick_keys, dirty):
         first = {}
@@ -747,6 +792,8 @@ def render_paramount(data, d, tempo, velocity):
         for i, e in enumerate(tick_keys):
             if i not in early:
                 key(t, *e)
+        if any(kbd in held for kbd, _, _ in tick_keys):
+            bass(t)
 
     registration(0)
     tick_keys, dirty, last_t = [], False, 0
@@ -776,14 +823,17 @@ def render_paramount(data, d, tempo, velocity):
     stats["tally"] = con.tally
     return [meta, tr], last_t, stats
 
-def paramount_report(stats, verbose):
+def hauptwerk_report(stats, verbose, prof):
     """Lines summarising how the registered ranks were matched (by key-ons)."""
-    import paramount332 as pm
     lines = []
     for name, div in sorted(stats["auto"].items()):
-        lines.append(f"  {name} plays the Paramount {pm.KEYBOARD_NAMES[div]}")
+        lines.append(f"  {name} plays the {prof.SHORT} {prof.KEYBOARD_NAMES[div]}")
     for name, n in sorted(stats["dropped"].items()):
-        lines.append(f"  {n} key presses on {name} dropped (no Paramount keyboard)")
+        lines.append(f"  {n} key presses on {name} dropped (no {prof.SHORT} keyboard)")
+    for name, b in sorted(stats["bass"].items()):
+        lines.append(f"  {name}: lowest key also on the {prof.SHORT} {prof.KEYBOARD_NAMES[b['div']]}, "
+                     f"{b['notes']} notes" + (f"; {b['high']} times higher, not played"
+                                              if b["high"] else ""))
     tally = stats["tally"]
     total = sum(tally.values())
     if not total:
@@ -791,7 +841,7 @@ def paramount_report(stats, verbose):
     by = {}
     for (status, *_), n in tally.items():
         by[status] = by.get(status, 0) + n
-    order = ["exact", "stand-in", "near", "missing", "silent", "unknown", "no keyboard"]
+    order = ["exact", "stand-in", "near", "bass", "missing", "silent", "unknown", "no keyboard"]
     lines.append("  ranks sounded per key: " + ", ".join(f"{s} {100 * by[s] / total:.0f}%"
                                                       for s in order if s in by))
     if verbose:
@@ -817,8 +867,10 @@ def main():
     mode.add_argument("--ranks", action="store_true", help="render through stops and ranks")
     mode.add_argument("--paramount", action="store_true",
                       help="render for Hauptwerk's MIDI player with the Paramount 332 (see paramount332.py)")
+    mode.add_argument("--friesach", action="store_true",
+                      help="render for Hauptwerk's MIDI player with the Friesach organ (see friesach.py)")
     ap.add_argument("-v", "--verbose", action="store_true",
-                    help="with --paramount, list every stand-in, substitute and missing rank")
+                    help="with --paramount or --friesach, list every stand-in, substitute and missing rank")
     a = ap.parse_args()
 
     disk = Disk(a.side0, a.side1)
@@ -832,20 +884,22 @@ def main():
         if de.letter != "D":
             raise SystemExit(f"{de.slot} is a {de.type} file, not a definition")
         d = Definition(de.read()); dname = f"{de.slot} {de.name!r}"
-    if a.paramount:
-        tracks, end, stats = render_paramount(e.read(), d, a.tempo, a.velocity)
+    organ = "paramount332" if a.paramount else "friesach" if a.friesach else None
+    if organ:
+        prof = hauptwerk_profile(organ)
+        tracks, end, stats = render_hauptwerk(e.read(), d, a.tempo, a.velocity, prof)
     else:
         tracks, end, stats = render(e.read(), d, a.tempo, a.velocity, a.ranks)
-    kind = "paramount" if a.paramount else "ranks" if a.ranks else "keyboards"
-    suffix = "-paramount" if a.paramount else ""
+    kind = "paramount" if a.paramount else "friesach" if a.friesach else "ranks" if a.ranks else "keyboards"
+    suffix = f"-{kind}" if organ else ""
     out = a.out or f"{os.path.basename(a.side0).split('_s')[0].split('.')[0]}-{e.slot}{suffix}.mid"
     write_midi(out, tracks, end + PPQ)
     secs = end * 60 / (PPQ * a.tempo)
     print(f"{e.slot} {e.name!r} with {dname}: {stats['keys']} key events, {stats['stops']} stop changes, "
           f"{stats['notes']} notes on {len(tracks) - 1} tracks, {secs:.1f} s at {a.tempo:g} BPM"
           f" ({kind}) -> {out}")
-    if a.paramount:
-        print("\n".join(paramount_report(stats, a.verbose)))
+    if organ:
+        print("\n".join(hauptwerk_report(stats, a.verbose, prof)))
     if stats["unknown_kbd"]:
         print(f"  note: keyboards {sorted(stats['unknown_kbd'])} are not in the definition")
 

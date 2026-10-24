@@ -1,0 +1,1527 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Note: MIDI channels and program change numbers are shown one-based. MIDI NRPN numbers, note numbers and controller numbers are shown zero-based. The MIDI implementations for master combination system pistons/buttons, the master output level and master crescendo pedal are the same for all organs, and are covered in the Hauptwerk user guide (and the accompanying HTML version of this file for convenience).-->
+<RawHauptwerkMIDIRecorderMIDIImplementationData>
+	<_General>
+			<HauptwerkVersion>9.0.1.019</HauptwerkVersion>
+			<OrganID>002213</OrganID>
+			<OrganVersion>1.06</OrganVersion>
+			<OrganName>Friesach</OrganName>
+	</_General>
+	<VirtualKeyboards>
+		<VirtualKeyboard>
+			<Name>1. Pedal</Name>
+			<RoleCode>1</RoleCode>
+			<RoleDesc>Standard division: Pedal</RoleDesc>
+			<Has2T>N</Has2T>
+			<ChanMain>1</ChanMain>
+			<Chan2T></Chan2T>
+			<SysExObjID>1</SysExObjID>
+			<TypeRecorded>NoteOnOff</TypeRecorded>
+		</VirtualKeyboard>
+		<VirtualKeyboard>
+			<Name>2. Hauptwerk</Name>
+			<RoleCode>2</RoleCode>
+			<RoleDesc>Standard division: manual 1 (Great, Hauptwerk, Grand Orgue or equivalent)</RoleDesc>
+			<Has2T>N</Has2T>
+			<ChanMain>2</ChanMain>
+			<Chan2T></Chan2T>
+			<SysExObjID>2</SysExObjID>
+			<TypeRecorded>NoteOnOff</TypeRecorded>
+		</VirtualKeyboard>
+		<VirtualKeyboard>
+			<Name>3. Schwellwerk</Name>
+			<RoleCode>3</RoleCode>
+			<RoleDesc>Standard division: manual 2 (Swell, Schwellwerk, Recit Expressif, Accompaniment or equivalent)</RoleDesc>
+			<Has2T>N</Has2T>
+			<ChanMain>3</ChanMain>
+			<Chan2T></Chan2T>
+			<SysExObjID>3</SysExObjID>
+			<TypeRecorded>NoteOnOff</TypeRecorded>
+		</VirtualKeyboard>
+		<VirtualKeyboard>
+			<Name>4. Solowerk</Name>
+			<RoleCode>4</RoleCode>
+			<RoleDesc>Standard division: manual 3 (Choir or equivalent)</RoleDesc>
+			<Has2T>N</Has2T>
+			<ChanMain>4</ChanMain>
+			<Chan2T></Chan2T>
+			<SysExObjID>4</SysExObjID>
+			<TypeRecorded>NoteOnOff</TypeRecorded>
+		</VirtualKeyboard>
+	</VirtualKeyboards>
+	<VirtualContinuousControls>
+		<VirtualContinuousControl>
+			<Name>Enclosure</Name>
+			<RoleCode>220</RoleCode>
+			<RoleDesc>Swells: manual 2 main</RoleDesc>
+			<CCChan>3</CCChan>
+			<CCNum>11</CCNum>
+			<NRPNChan>3</NRPNChan>
+			<NRPNNum>220</NRPNNum>
+			<SysExObjID>1</SysExObjID>
+			<TypeRecorded>CC</TypeRecorded>
+		</VirtualContinuousControl>
+	</VirtualContinuousControls>
+	<VirtualSwitches>
+		<VirtualSwitch>
+			<Name>01. P  Untersatz 32'</Name>
+			<RoleCode>2001</RoleCode>
+			<RoleDesc>Stops: Pedal stop 01</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2001</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>8</NoteChan>
+			<NoteNum>36</NoteNum>
+			<SysExObjID>1</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>02. P  Contrabaß 16'</Name>
+			<RoleCode>2002</RoleCode>
+			<RoleDesc>Stops: Pedal stop 02</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2002</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>8</NoteChan>
+			<NoteNum>37</NoteNum>
+			<SysExObjID>2</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>03. P  Subbaß 16'</Name>
+			<RoleCode>2003</RoleCode>
+			<RoleDesc>Stops: Pedal stop 03</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2003</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>8</NoteChan>
+			<NoteNum>38</NoteNum>
+			<SysExObjID>3</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>04. P  Octavbaß 8'</Name>
+			<RoleCode>2004</RoleCode>
+			<RoleDesc>Stops: Pedal stop 04</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2004</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>8</NoteChan>
+			<NoteNum>39</NoteNum>
+			<SysExObjID>4</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>05. P  Gedackt 8'</Name>
+			<RoleCode>2005</RoleCode>
+			<RoleDesc>Stops: Pedal stop 05</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2005</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>8</NoteChan>
+			<NoteNum>40</NoteNum>
+			<SysExObjID>5</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>06. P  Choralbaß 4'</Name>
+			<RoleCode>2006</RoleCode>
+			<RoleDesc>Stops: Pedal stop 06</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2006</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>8</NoteChan>
+			<NoteNum>41</NoteNum>
+			<SysExObjID>6</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>07. P  Posaune 32'</Name>
+			<RoleCode>2007</RoleCode>
+			<RoleDesc>Stops: Pedal stop 07</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2007</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>8</NoteChan>
+			<NoteNum>42</NoteNum>
+			<SysExObjID>7</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>08. P  Posaune 16'</Name>
+			<RoleCode>2008</RoleCode>
+			<RoleDesc>Stops: Pedal stop 08</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2008</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>8</NoteChan>
+			<NoteNum>43</NoteNum>
+			<SysExObjID>8</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>09. P  Trompete 8'</Name>
+			<RoleCode>2009</RoleCode>
+			<RoleDesc>Stops: Pedal stop 09</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2009</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>8</NoteChan>
+			<NoteNum>44</NoteNum>
+			<SysExObjID>9</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>10. HW  Praestant 16'</Name>
+			<RoleCode>2101</RoleCode>
+			<RoleDesc>Stops: manual 1 stop 01</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2101</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>9</NoteChan>
+			<NoteNum>36</NoteNum>
+			<SysExObjID>10</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>11. HW  Principal 8'</Name>
+			<RoleCode>2102</RoleCode>
+			<RoleDesc>Stops: manual 1 stop 02</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2102</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>9</NoteChan>
+			<NoteNum>37</NoteNum>
+			<SysExObjID>11</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>12. HW  Holzflöte 8'</Name>
+			<RoleCode>2103</RoleCode>
+			<RoleDesc>Stops: manual 1 stop 03</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2103</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>9</NoteChan>
+			<NoteNum>38</NoteNum>
+			<SysExObjID>12</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>13. HW  Röhrflöte 8'</Name>
+			<RoleCode>2104</RoleCode>
+			<RoleDesc>Stops: manual 1 stop 04</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2104</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>9</NoteChan>
+			<NoteNum>39</NoteNum>
+			<SysExObjID>13</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>14. HW  Gambe 8'</Name>
+			<RoleCode>2105</RoleCode>
+			<RoleDesc>Stops: manual 1 stop 05</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2105</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>9</NoteChan>
+			<NoteNum>40</NoteNum>
+			<SysExObjID>14</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>15. HW  Octave 4'</Name>
+			<RoleCode>2106</RoleCode>
+			<RoleDesc>Stops: manual 1 stop 06</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2106</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>9</NoteChan>
+			<NoteNum>41</NoteNum>
+			<SysExObjID>15</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>16. HW  Spitzflöte 4'</Name>
+			<RoleCode>2107</RoleCode>
+			<RoleDesc>Stops: manual 1 stop 07</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2107</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>9</NoteChan>
+			<NoteNum>42</NoteNum>
+			<SysExObjID>16</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>17. HW  Quinte 2 2/3'</Name>
+			<RoleCode>2108</RoleCode>
+			<RoleDesc>Stops: manual 1 stop 08</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2108</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>9</NoteChan>
+			<NoteNum>43</NoteNum>
+			<SysExObjID>17</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>18. HW  Octave 2'</Name>
+			<RoleCode>2109</RoleCode>
+			<RoleDesc>Stops: manual 1 stop 09</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2109</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>9</NoteChan>
+			<NoteNum>44</NoteNum>
+			<SysExObjID>18</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>19. HW  Mixtur major 4-5f. 2 2/3'</Name>
+			<RoleCode>2110</RoleCode>
+			<RoleDesc>Stops: manual 1 stop 10</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2110</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>9</NoteChan>
+			<NoteNum>45</NoteNum>
+			<SysExObjID>19</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>20. HW  Mixtur minor 4f. 1 1/3'</Name>
+			<RoleCode>2111</RoleCode>
+			<RoleDesc>Stops: manual 1 stop 11</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2111</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>9</NoteChan>
+			<NoteNum>46</NoteNum>
+			<SysExObjID>20</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>21. HW  Trompete 16'</Name>
+			<RoleCode>2112</RoleCode>
+			<RoleDesc>Stops: manual 1 stop 12</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2112</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>9</NoteChan>
+			<NoteNum>47</NoteNum>
+			<SysExObjID>21</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>22. HW  Trompete 8'</Name>
+			<RoleCode>2113</RoleCode>
+			<RoleDesc>Stops: manual 1 stop 13</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2113</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>9</NoteChan>
+			<NoteNum>48</NoteNum>
+			<SysExObjID>22</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>23. SW  Bourdon 16'</Name>
+			<RoleCode>2201</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 01</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2201</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>36</NoteNum>
+			<SysExObjID>23</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>24. SW  Principal 8'</Name>
+			<RoleCode>2202</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 02</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2202</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>37</NoteNum>
+			<SysExObjID>24</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>25. SW  Nachthorn Gedackt 8'</Name>
+			<RoleCode>2203</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 03</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2203</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>38</NoteNum>
+			<SysExObjID>25</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>26. SW  Corno dolce 8'</Name>
+			<RoleCode>2204</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 04</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2204</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>39</NoteNum>
+			<SysExObjID>26</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>27. SW  Viola 8'</Name>
+			<RoleCode>2205</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 05</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2205</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>40</NoteNum>
+			<SysExObjID>27</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>28. SW  Vox celeste 8'</Name>
+			<RoleCode>2206</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 06</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2206</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>41</NoteNum>
+			<SysExObjID>28</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>29. SW  Geigenprincipal 4'</Name>
+			<RoleCode>2207</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 07</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2207</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>42</NoteNum>
+			<SysExObjID>29</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>30. SW  Querflöte 4'</Name>
+			<RoleCode>2208</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 08</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2208</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>43</NoteNum>
+			<SysExObjID>30</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>31. SW  Nazard 2 2/3'</Name>
+			<RoleCode>2209</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 09</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2209</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>44</NoteNum>
+			<SysExObjID>31</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>32. SW  Flageolett 2'</Name>
+			<RoleCode>2210</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 10</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2210</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>45</NoteNum>
+			<SysExObjID>32</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>33. SW  Tierce 1 3/5'</Name>
+			<RoleCode>2211</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 11</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2211</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>46</NoteNum>
+			<SysExObjID>33</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>34. SW  Larigot 1 1/3'</Name>
+			<RoleCode>2212</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 12</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2212</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>47</NoteNum>
+			<SysExObjID>34</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>35. SW  Plein Jeu 4-5f. 2'</Name>
+			<RoleCode>2213</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 13</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2213</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>48</NoteNum>
+			<SysExObjID>35</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>36. SW  Scharff 4f. 1'</Name>
+			<RoleCode>2214</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 14</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2214</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>49</NoteNum>
+			<SysExObjID>36</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>37. SW  Trompete harmonique 8'</Name>
+			<RoleCode>2215</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 15</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2215</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>50</NoteNum>
+			<SysExObjID>37</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>38. SW  Hautbois 8'</Name>
+			<RoleCode>2216</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 16</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2216</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>51</NoteNum>
+			<SysExObjID>38</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>39. SW  Clairon 4'</Name>
+			<RoleCode>2217</RoleCode>
+			<RoleDesc>Stops: manual 2 stop 17</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2217</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>52</NoteNum>
+			<SysExObjID>39</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>40. SL  Jubalflöte 8'</Name>
+			<RoleCode>2301</RoleCode>
+			<RoleDesc>Stops: manual 3 stop 01</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2301</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>11</NoteChan>
+			<NoteNum>36</NoteNum>
+			<SysExObjID>40</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>41. SL  Trichterflöte 4'</Name>
+			<RoleCode>2302</RoleCode>
+			<RoleDesc>Stops: manual 3 stop 02</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2302</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>11</NoteChan>
+			<NoteNum>37</NoteNum>
+			<SysExObjID>41</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>42. SL  Cornet a pavilon 1-8f. 8'</Name>
+			<RoleCode>2303</RoleCode>
+			<RoleDesc>Stops: manual 3 stop 03</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2303</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>11</NoteChan>
+			<NoteNum>38</NoteNum>
+			<SysExObjID>42</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>43. SL  Trompete en chamade 8'</Name>
+			<RoleCode>2304</RoleCode>
+			<RoleDesc>Stops: manual 3 stop 04</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2304</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>11</NoteChan>
+			<NoteNum>39</NoteNum>
+			<SysExObjID>43</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>44. SL  Englischhorn 8'</Name>
+			<RoleCode>2305</RoleCode>
+			<RoleDesc>Stops: manual 3 stop 05</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>2305</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>11</NoteChan>
+			<NoteNum>40</NoteNum>
+			<SysExObjID>44</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>45. I/P</Name>
+			<RoleCode>1101</RoleCode>
+			<RoleDesc>Couplers: Pedal to manual 1 8ft</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>1101</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>45</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>46. II/P</Name>
+			<RoleCode>1201</RoleCode>
+			<RoleDesc>Couplers: Pedal to manual 2 8ft</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>1201</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>71</NoteNum>
+			<SysExObjID>46</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>47. III/P</Name>
+			<RoleCode>1301</RoleCode>
+			<RoleDesc>Couplers: Pedal to manual 3 8ft</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>1301</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>11</NoteChan>
+			<NoteNum>71</NoteNum>
+			<SysExObjID>47</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>48. II/I</Name>
+			<RoleCode>1111</RoleCode>
+			<RoleDesc>Couplers: manual 2 to manual 1 8ft</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>1111</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>9</NoteChan>
+			<NoteNum>79</NoteNum>
+			<SysExObjID>48</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>49. III/I</Name>
+			<RoleCode>1116</RoleCode>
+			<RoleDesc>Couplers: manual 3 to manual 1 8ft</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>1116</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>9</NoteChan>
+			<NoteNum>84</NoteNum>
+			<SysExObjID>49</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>50. III/II</Name>
+			<RoleCode>1216</RoleCode>
+			<RoleDesc>Couplers: manual 3 to manual 2 8ft</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>1216</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>84</NoteNum>
+			<SysExObjID>50</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>51. Tremulant 2Man</Name>
+			<RoleCode>1720</RoleCode>
+			<RoleDesc>Tremulants: manual 2 main</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>1720</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>10</NoteChan>
+			<NoteNum>93</NoteNum>
+			<SysExObjID>51</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>52. Tremulant 3Man</Name>
+			<RoleCode>1730</RoleCode>
+			<RoleDesc>Tremulants: manual 3 main</RoleDesc>
+			<NRPNChan>2</NRPNChan>
+			<NRPNNum>1730</NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan>11</NoteChan>
+			<NoteNum>93</NoteNum>
+			<SysExObjID>52</SysExObjID>
+			<TypeRecorded>NRPN</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>53. Piston III/P</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>53</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>54. Piston III/II</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>54</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>55. Piston II/P</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>55</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>56. Piston III/I</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>56</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>57. Piston I/P</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>57</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>58. Piston II/I</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>58</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>59. Piston Previous</Name>
+			<RoleCode>900369</RoleCode>
+			<RoleDesc>Registration: stepper: trigger -1</RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>59</SysExObjID>
+			<TypeRecorded>None</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>60. Piston Next</Name>
+			<RoleCode>900366</RoleCode>
+			<RoleDesc>Registration: stepper: trigger +1</RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>60</SysExObjID>
+			<TypeRecorded>None</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>61. Piston A</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>61</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>62. Piston B</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>62</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>63. Piston C</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>63</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>64. Piston D</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>64</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>65. Piston E</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>65</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>66. Piston F</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>66</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>67. Piston G</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>67</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>68. Piston H</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>68</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>69. Button Setter</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>69</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>70. Button 1</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>70</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>71. Button 2</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>71</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>72. Button 3</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>72</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>73. Button 4</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>73</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>74. Button 5</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>74</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>75. Button Previous</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>75</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>76. Button Next</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>76</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>77. Button A</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>77</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>78. Button B</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>78</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>79. Button C</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>79</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>80. Button D</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>80</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>81. Button E</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>81</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>82. Button F</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>82</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>83. Button G</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>83</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>84. Button H</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>84</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>85. Button General Cancel</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>85</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>86. Button Side Previous</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>86</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>87. Button Side Next</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>87</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>88. Button Display Up</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>88</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>89. Button Display Down</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>89</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>Blower</Name>
+			<RoleCode></RoleCode>
+			<RoleDesc></RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>100</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualSwitch>
+		<VirtualSwitch>
+			<Name>Master capture switch</Name>
+			<RoleCode>12</RoleCode>
+			<RoleDesc>Misc: combination setter (capture) switch</RoleDesc>
+			<NRPNChan></NRPNChan>
+			<NRPNNum></NRPNNum>
+			<PrgChan></PrgChan>
+			<PrgNum></PrgNum>
+			<NoteChan></NoteChan>
+			<NoteNum></NoteNum>
+			<SysExObjID>10002</SysExObjID>
+			<TypeRecorded>None</TypeRecorded>
+		</VirtualSwitch>
+	</VirtualSwitches>
+	<VirtualRanks>
+		<VirtualRank>
+			<Name>01. P  Untersatz 32'</Name>
+			<SysExObjID>1</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>02. P  Contrabaß 16'</Name>
+			<SysExObjID>2</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>03. P  Subbaß 16'</Name>
+			<SysExObjID>3</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>04. P  Octavbaß 8'</Name>
+			<SysExObjID>4</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>05. P  Gedackt 8'</Name>
+			<SysExObjID>5</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>06. P  Choralbaß 4'</Name>
+			<SysExObjID>6</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>07. P  Posaune 32'</Name>
+			<SysExObjID>7</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>08. P  Posaune 16'</Name>
+			<SysExObjID>8</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>09. P  Trompete 8'</Name>
+			<SysExObjID>9</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>10. HW  Praestant 16'</Name>
+			<SysExObjID>10</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>11. HW  Principal 8'</Name>
+			<SysExObjID>11</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>12. HW  Holzflöte 8'</Name>
+			<SysExObjID>12</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>13. HW  Röhrflöte 8'</Name>
+			<SysExObjID>13</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>14. HW  Gambe 8'</Name>
+			<SysExObjID>14</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>15. HW  Octave 4'</Name>
+			<SysExObjID>15</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>16. HW  Spitzflöte 4'</Name>
+			<SysExObjID>16</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>17. HW  Quinte 2 2/3'</Name>
+			<SysExObjID>17</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>18. HW  Octave 2'</Name>
+			<SysExObjID>18</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>19. HW  Mixtur major 4-5f. 2 2/3'</Name>
+			<SysExObjID>19</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>20. HW  Mixtur minor 4f. 1 1/3'</Name>
+			<SysExObjID>20</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>21. HW  Trompete 16'</Name>
+			<SysExObjID>21</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>22. HW  Trompete 8'</Name>
+			<SysExObjID>22</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>23. SW  Bourdon 16'</Name>
+			<SysExObjID>23</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>24. SW  Principal 8'</Name>
+			<SysExObjID>24</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>25. SW  Nachthorn Gedackt 8'</Name>
+			<SysExObjID>25</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>26. SW  Corno dolce 8'</Name>
+			<SysExObjID>26</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>27. SW  Viola 8'</Name>
+			<SysExObjID>27</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>28. SW  Vox celeste 8'</Name>
+			<SysExObjID>28</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>29. SW  Geigenprincipal 4'</Name>
+			<SysExObjID>29</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>30. SW  Querflöte 4'</Name>
+			<SysExObjID>30</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>31. SW  Nazard 2 2/3'</Name>
+			<SysExObjID>31</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>32. SW  Flageolett 2'</Name>
+			<SysExObjID>32</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>33. SW  Tierce 1 3/5'</Name>
+			<SysExObjID>33</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>34. SW  Larigot 1 1/3'</Name>
+			<SysExObjID>34</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>35. SW  Plein Jeu 4-5f. 2'</Name>
+			<SysExObjID>35</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>36. SW  Scharff 4f. 1'</Name>
+			<SysExObjID>36</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>37. SW  Trompete harmonique 8'</Name>
+			<SysExObjID>37</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>38. SW  Hautbois 8'</Name>
+			<SysExObjID>38</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>39. SW  Clairon 4'</Name>
+			<SysExObjID>39</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>40. SL  Jubalflöte 8'</Name>
+			<SysExObjID>40</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>41. SL  Trichterflöte 4'</Name>
+			<SysExObjID>41</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>42. SL  Cornet a pavilon 1-8f. 8'</Name>
+			<SysExObjID>42</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>43. SL  Trompete en chamade 8'</Name>
+			<SysExObjID>43</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>44. SL  Englischhorn 8'</Name>
+			<SysExObjID>44</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>45. Noises</Name>
+			<SysExObjID>80</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>46. Stop Action Attack</Name>
+			<SysExObjID>81</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>47. Stop Action Release</Name>
+			<SysExObjID>82</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>48. P Key Action Attack</Name>
+			<SysExObjID>83</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>49. P Key Action Release</Name>
+			<SysExObjID>84</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>50. HW Key Action Attack</Name>
+			<SysExObjID>85</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>51. HW Key Action Release</Name>
+			<SysExObjID>86</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>52. SW Key Action Attack</Name>
+			<SysExObjID>87</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>53. SW Key Action Release</Name>
+			<SysExObjID>88</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>54. SL Key Action Attack</Name>
+			<SysExObjID>89</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+		<VirtualRank>
+			<Name>55. SL Key Action Release</Name>
+			<SysExObjID>90</SysExObjID>
+			<TypeRecorded>SysEx</TypeRecorded>
+		</VirtualRank>
+	</VirtualRanks>
+</RawHauptwerkMIDIRecorderMIDIImplementationData>
