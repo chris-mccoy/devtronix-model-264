@@ -11,11 +11,15 @@ dev2midi.py's render(): plain (one MIDI channel per keyboard) and through the
 stops and ranks (--ranks).  When the definition is one paramount332.py maps
 (its keyboards all appear in KEYBOARDS: the theatre organs of Jerry's Disc,
 the Tour Disc and New Console) it is also rendered for Hauptwerk's Paramount
-332 (--paramount).  Output:
+332 (--paramount).  The 58-note tracks (every track on a "58 Note Player"
+disk, and any track whose definition has the 58 Note Player keyboard) are
+also rendered for Hauptwerk's Friesach (--friesach): the roll on the
+Hauptwerk, its lowest note in the bottom two octaves on the Pedal.  Output:
 
   <out>/<disk>/<slot>-<name>.mid         keyboards rendering
   <out>/<disk>/<slot>-<name>-ranks.mid   ranks rendering
   <out>/<disk>/<slot>-<name>-paramount.mid   for Hauptwerk's Paramount 332
+  <out>/<disk>/<slot>-<name>-friesach.mid    for Hauptwerk's Friesach
   <out>/INDEX.md                         one table per disk
   <out>/index.json                       the same data for programs
 
@@ -49,11 +53,16 @@ import argparse, collections, hashlib, json, os, pathlib, re, struct, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from devfs import Disk, iter_events, SECTOR  # noqa: E402
 from devdef import Definition, NOTES  # noqa: E402
-from dev2midi import render, render_paramount, write_midi, PPQ  # noqa: E402
-import paramount332  # noqa: E402
+from dev2midi import render, render_hauptwerk, hauptwerk_profile, write_midi, PPQ  # noqa: E402
 
 HERE = pathlib.Path(__file__).resolve().parent
 PULSES_PER_SECOND = 192            # 96 per beat at 120 BPM
+ORGANS = {"paramount": hauptwerk_profile("paramount332"), "friesach": hauptwerk_profile("friesach")}
+PLAYER_LABEL = re.compile(r"58 note player", re.I)
+
+def friesach_track(label, d):
+    """A 58-note track: on a 58 Note Player disk, or recorded with the player's definition."""
+    return bool(PLAYER_LABEL.match(label or "") or ORGANS["friesach"].bass_assignment(d))
 
 # ----------------------------------------------------------------------------- discovery
 def discover(images_roots):
@@ -435,13 +444,15 @@ def run(images_roots, out_root, tempo, velocity, verify):
             out_dir.mkdir(parents=True, exist_ok=True)
             base = e.slot + (f"-{safe_name(e.name)}" if safe_name(e.name) else "")
             modes = [(False, ""), (True, "-ranks")]
-            if paramount332.fits(de.d):
+            if ORGANS["paramount"].fits(de.d):
                 modes.append(("paramount", "-paramount"))
+            if friesach_track(rec["label"], de.d):
+                modes.append(("friesach", "-friesach"))
             for ranks, suffix in modes:
                 path = out_dir / f"{base}{suffix}.mid"
                 try:
-                    if ranks == "paramount":
-                        tracks, end, stats = render_paramount(data, de.d, tempo, velocity)
+                    if ranks in ORGANS:
+                        tracks, end, stats = render_hauptwerk(data, de.d, tempo, velocity, ORGANS[ranks])
                     else:
                         tracks, end, stats = render(data, de.d, tempo, velocity, ranks)
                     write_midi(path, tracks, end + PPQ)
@@ -490,7 +501,10 @@ def write_index(path, disks, summary, images_roots):
              f"(192 pulses per second). Note count = key presses in the track; the ranks rendering sounds more "
              f"notes (one per rank and pitch). Tracks recorded on the theatre organs (Jerry's Disc, the Tour Disc, "
              f"New Console) also have `<slot>-<name>-paramount.mid`, for Hauptwerk's MIDI player with the "
-             f"Paramount 332 loaded (see `../docs/paramount332-mapping.md`).\n")
+             f"Paramount 332 loaded (see `../docs/paramount332-mapping.md`). The 58-note player tracks also have "
+             f"`<slot>-<name>-friesach.mid`, for the classical Friesach organ: the roll on the Hauptwerk, "
+             f"its lowest note in the bottom two octaves on the Pedal, with II/I and III/I drawn so stops added on the "
+             f"Schwellwerk and Solowerk play along (see `../system-monitor/friesach.py`).\n")
     L.append("| | |\n|---|---|")
     L.append(f"| Image sets found | {summary['disks']} |")
     L.append(f"| System disks | {summary['system_disks']} |")
@@ -556,6 +570,8 @@ def write_index(path, disks, summary, images_roots):
                 slot += f" ([ranks]({md(files['-ranks']['path'])}))"
             if "-paramount" in files:
                 slot += f" ([paramount]({md(files['-paramount']['path'])}))"
+            if "-friesach" in files:
+                slot += f" ([friesach]({md(files['-friesach']['path'])}))"
             dur = fmt_duration(t["last_time"]) if t.get("last_time") is not None else ""
             defn = f"`{md(t['definition'])}`, {md(t['definition_from'])}" if t["definition"] else ""
             kb = ",".join(str(k) for k in t.get("keyboards", []))

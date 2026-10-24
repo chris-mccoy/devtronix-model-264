@@ -48,19 +48,16 @@ What cannot be matched is counted and reported, never guessed at silently.
 """
 import re
 
+from hauptwerk import AUTO
+
+ORGAN, SHORT = "Paramount 332", "Paramount"
 KEYBOARD_CHANNELS = {"Ped": 0, "Acc": 1, "Gt": 2, "Solo": 3, "Acc2T": 12}    # 0-based
 KEYBOARD_NAMES = {"Ped": "Pedal", "Acc": "Accompaniment", "Acc2T": "Accompaniment 2nd touch",
                   "Gt": "Great", "Solo": "Solo"}
 NRPN_CHANNEL = 1
-SWELLS = {"main": (3, 11), "solo": (2, 11), "percussion": (1, 11)}           # chamber -> (channel, CC)
-
-FEET = {"32": -24, "16": -12, "10 2/3": -5, "8": 0, "5 1/3": 7, "4": 12, "3 1/5": 16,
-        "2 2/3": 19, "2": 24, "1 3/5": 28, "1 1/3": 31, "1": 36}
-PITCH_FEET = {v: k for k, v in FEET.items()}
-
-def feet(pitch):
-    """Footage of a pitch offset from 8', e.g. -12 -> "16'"."""
-    return PITCH_FEET[pitch] + "'" if pitch in PITCH_FEET else f"{pitch:+d}"
+# (channel, CC) -> chambers whose shades it follows; Percussions follows Solo
+# where the definition has no percussion shades
+SWELLS = {(3, 11): ["main"], (2, 11): ["solo"], (1, 11): ["percussion", "solo"]}
 
 # Stop tabs: (switch, NRPN, voice, footage).  The voice is the Paramount rank
 # behind the tab ("Tibia Clausa" where the tab does not say which); tuned
@@ -382,11 +379,7 @@ def stop_division(switch):
     m = re.match(r"Stop: ?(Ped|Acc2T|Acc|Gt|Solo):", switch)
     return m.group(1) if m else None
 
-STOP_INDEX = {(stop_division(name), voice, FEET[ft] if ft else None): name
-              for name, _, voice, ft in STOPS}
-
 # ----------------------------------------------------------------------------- the mapping
-AUTO = "auto"
 AUTO_CHOICES = ("Gt", "Solo")           # tie goes to the first
 
 # Devtronix keyboard -> Paramount keyboard.  None: no Paramount keyboard, the
@@ -554,6 +547,8 @@ NEAR = {
     "VDO": ["Strings", "Gamba"], "Gamba": ["Strings", "VDO"], "Strings": ["Gamba", "VDO"],
     "Kinura": ["Krumet"], "Krumet": ["Kinura"],
 }
+# Tibia tabs that do not say which tibia serve either.
+PARENT_VOICES = {"Tibia Clausa (M)": "Tibia Clausa", "Tibia Clausa (S)": "Tibia Clausa"}
 
 # Trap units struck from a division's keys -> Paramount trap tabs, first one
 # the manual has.
@@ -612,273 +607,3 @@ TREMULANT_FOLLOWS = {
     "Tremulant: Solo Strings": "Tremulant: Solo",
     "Tremulant: Tibia": "Tremulant: Main", "Tremulant: Vox": "Tremulant: Main",
 }
-
-def norm(name):
-    return " ".join(name.lower().replace("’", "'").split())
-
-def parse_voice(spec):
-    """'Tibia Clausa? @32' -> [(voice, fixed pitch or None, stand-in?)]"""
-    out = []
-    for part in spec.split("|"):
-        part = part.strip()
-        fixed = None
-        if "@" in part:
-            part, ft = part.split("@")
-            fixed = FEET[ft.strip()]
-        part = part.strip()
-        guess = part.endswith("?")
-        out.append((part.rstrip("?"), fixed, guess))
-    return out
-
-RANK_SPECS = {norm(k): (parse_voice(v) if v else None) for k, v in RANKS.items()}
-KEYBOARD_SPECS = {norm(k): v for k, v in KEYBOARDS.items()}
-TRAP_SPECS = {norm(k): v for k, v in TRAPS.items()}
-EFFECT_SPECS = {norm(k): v for k, v in EFFECTS.items()}
-
-# ----------------------------------------------------------------------------- console
-class Console:
-    """The Paramount switches and swells wanted for the state of a
-    dev2midi.Organ, with a tally of how each registered rank was matched.
-
-    assign: Devtronix keyboard number -> Paramount keyboard (AUTO resolved
-    by choose()), or None."""
-
-    def __init__(self, organ, assign=None):
-        self.o = organ
-        d = organ.d
-        self.d = d
-        self.kbd_names = {k.number: k.name for k in d.lists.get("Kbd", [])}
-        self.assign = dict(assign) if assign is not None else keyboard_assignment(d)
-        self.rank_names = {r.number: r.name for r in d.lists.get("Rnk", [])}
-        self.units = organ.units
-        self.trem_units = {}
-        for u in self.units.values():
-            if re.search(r"trem|temolo", u.name, re.I):
-                self.trem_units[u.number] = self._trem_targets(u)
-        mapped = {s for ts in self.trem_units.values() for s in ts}
-        self.trem_follow = {p: f for p, f in TREMULANT_FOLLOWS.items() if p not in mapped}
-        chambers = set(organ.shade_units)
-        self.swell_source = {ch: ch for ch in SWELLS if ch in chambers}
-        if "percussion" not in chambers and "solo" in chambers:
-            self.swell_source["percussion"] = "solo"
-        self.cache = {}
-        self.tally = {}                     # (status, kbd, rank, feet, switch) -> key-ons
-        self.dirty = True
-        self._requests = {}
-
-    def _trem_targets(self, u):
-        name = u.name.lower()
-        for rx, targets in TREMULANTS:
-            if re.search(rx, name):
-                if targets == "strings":
-                    ch = self.o.chamber_of(u.name)
-                    return STRING_TREMULANTS.get(ch, STRING_TREMULANTS["main"] + STRING_TREMULANTS["solo"])
-                return targets
-        return []
-
-    # -- relay state
-    def couplers(self):
-        out, unison_off = [], set()
-        for n in self.o.active:
-            f = self.o.fncs.get(n)
-            if f is None:
-                continue
-            if f.type == 1:
-                out.append(f)
-            elif f.type == 6:
-                unison_off.add(f.w(2))
-        return out, unison_off
-
-    def reach(self, kbd):
-        """({(division, pitch offset)} that the keys of keyboard kbd sound on,
-        [Paramount couplers that play the rest])."""
-        couplers, unison_off = self.couplers()
-        here = self.assign.get(kbd)
-        native = {}
-        for c in couplers:
-            if c.w(2) != kbd or c.b(12):
-                continue
-            div = c.w(4)
-            if div == kbd:
-                s = None if kbd in unison_off else NATIVE_COUPLERS.get((here, here, c.s(6)))
-            else:
-                there = self.assign.get(div)
-                s = NATIVE_COUPLERS.get((here, there, c.s(6))) if there != here else None
-            if s:
-                native[id(c)] = s
-        out = set() if kbd in unison_off else {(kbd, 0)}
-        out |= {(c.w(4), c.s(6)) for c in couplers
-                if c.w(2) == kbd and not c.b(12) and id(c) not in native}
-        todo = list(out)
-        while todo:                           # couplers that couple the couplers
-            div, off = todo.pop()
-            for c in couplers:
-                if c.b(12) and c.w(2) == div:
-                    nxt = (c.w(4), off + c.s(6))
-                    if nxt not in out and abs(nxt[1]) <= 36:
-                        out.add(nxt); todo.append(nxt)
-        return out, sorted(set(native.values()))
-
-    def requests(self, kbd):
-        """What keyboard kbd registers: [("rank", rank number, pitch, reiterate?) or
-        ("trap", unit number, None, False)], cached until the registration changes."""
-        if self.dirty:
-            self._requests = {}
-            self.dirty = False
-        if kbd in self._requests:
-            return self._requests[kbd]
-        by_div = self._by_div()
-        out = []
-        reach, native = self.reach(kbd)
-        for div, off in sorted(reach):
-            for f, mod in by_div.get(div, ()):
-                if f.type == 3:
-                    out.append(("rank", f.w(4), f.s(6) + off, mod is not None and mod.type == 14))
-                elif f.type == 4:
-                    out.append(("trap", f.w(4), None, False))
-        out += [("coupler", s, None, False) for s in native]
-        self._requests[kbd] = out
-        return out
-
-    def _by_div(self):
-        if "_by_div" not in self._requests:
-            by = {}
-            for f, mod in self.o.rank_functions():
-                by.setdefault(f.w(2), []).append((f, mod))
-            for n in self.o.active:
-                f = self.o.fncs.get(n)
-                if f is not None and f.type == 4 and f.w(4):
-                    by.setdefault(f.w(2), []).append((f, None))
-            self._requests["_by_div"] = by
-        return self._requests["_by_div"]
-
-    def changed(self):
-        self.dirty = True
-
-    # -- matching
-    def resolve(self, div, req):
-        """(switch or None, status); status is exact, stand-in, near, missing,
-        silent (the table says so) or unknown (not in the table)."""
-        key = (div, req[0], req[1], req[2])
-        if key in self.cache:
-            return self.cache[key]
-        kind, what, pitch, _ = req
-        if kind == "coupler":
-            res = (what, "exact")
-        elif kind == "trap":
-            u = self.units.get(what)
-            voices = TRAP_SPECS.get(norm(u.name), "unknown") if u else "unknown"
-            if voices == "unknown":
-                res = (None, "unknown")
-            elif voices is None:
-                res = (None, "silent")
-            else:
-                res = (None, "missing")
-                for v in voices:
-                    s = STOP_INDEX.get((div, "trap:" + v, None))
-                    if s:
-                        res = (s, "exact"); break
-        else:
-            spec = RANK_SPECS.get(norm(self.rank_names.get(what, "")), "unknown")
-            if spec == "unknown":
-                res = (None, "unknown")
-            elif spec is None:
-                res = (None, "silent")
-            else:
-                res = (None, "missing")
-                for voice, fixed, guess in spec:
-                    p = None if voice.startswith("trap:") else (fixed if fixed is not None else pitch)
-                    s = self._tab(div, voice, p)
-                    if s:
-                        res = (s, "stand-in" if guess else "exact"); break
-                else:
-                    voice, fixed, _ = spec[0]
-                    p = fixed if fixed is not None else pitch
-                    for alt in NEAR.get(voice, ()):
-                        s = self._tab(div, alt, p)
-                        if s:
-                            res = (s, "near"); break
-        self.cache[key] = res
-        return res
-
-    @staticmethod
-    def _tab(div, voice, pitch):
-        s = STOP_INDEX.get((div, voice, pitch))
-        if s is None and voice.startswith("Tibia Clausa ("):
-            s = STOP_INDEX.get((div, "Tibia Clausa", pitch))
-        return s
-
-    def choose(self, seen):
-        """Paramount manual for an AUTO keyboard, from the requests it made."""
-        best, score = AUTO_CHOICES[0], -1
-        for div in AUTO_CHOICES:
-            n = sum(1 for r in seen if self.resolve(div, r)[1] in ("exact", "stand-in"))
-            if n > score:
-                best, score = div, n
-        return best
-
-    # -- output
-    def switches(self):
-        """Paramount switches that should be on now."""
-        on = set()
-        for kbd, div in self.assign.items():
-            if div is None:
-                continue
-            for req in self.requests(kbd):
-                s, _ = self.resolve(div, req)
-                if s:
-                    on.add(s)
-                    if req[0] == "rank":
-                        voice = STOP_VOICE.get(s)
-                        if voice in REITERATE and (req[3] or self.rank_names.get(req[1]) in REITERATING_RANKS):
-                            on.add(REITERATE[voice])
-        direct = self.direct_units()
-        for u in direct:
-            on.update(self.trem_units.get(u, ()))
-            unit = self.units.get(u)
-            e = unit and EFFECT_SPECS.get(norm(unit.name))
-            if e:
-                on.add(e)
-        for target, source in self.trem_follow.items():
-            if source in on:
-                on.add(target)
-        return on
-
-    def direct_units(self):
-        return {self.o.fncs[n].w(2) for n in self.o.active
-                if n in self.o.fncs and self.o.fncs[n].type == 5 and self.o.fncs[n].w(2)}
-
-    def swells(self):
-        """{(channel, controller): value} for the Paramount swell pedals."""
-        levels = self.o.shade_levels(self.direct_units())
-        out = {}
-        for ch, (chan, ctl) in SWELLS.items():
-            src = self.swell_source.get(ch)
-            out[(chan, ctl)] = int(round(127 * levels.get(src, 0))) if src else 127
-        return out
-
-    def count_key(self, kbd):
-        """Tally what a key-on on keyboard kbd sounds through."""
-        div = self.assign.get(kbd)
-        for req in self.requests(kbd):
-            s, status = self.resolve(div, req) if div else (None, "no keyboard")
-            if req[0] == "rank":
-                name, ft = self.rank_names.get(req[1], f"rank {req[1]}"), feet(req[2])
-            elif req[0] == "trap":
-                u = self.units.get(req[1]); name, ft = (u.name if u else f"unit {req[1]}"), ""
-            else:
-                name, ft = req[1], ""
-            k = (status, self.kbd_names.get(kbd, str(kbd)), name.strip(), ft, s)
-            self.tally[k] = self.tally.get(k, 0) + 1
-
-STOP_VOICE = {name: voice for name, _, voice, _ in STOPS}
-
-def fits(d):
-    """True for a definition whose keyboards all appear in KEYBOARDS (the
-    theatre-organ definitions of Jerry's Disc, the Tour Disc and New Console)."""
-    kbds = d.lists.get("Kbd", [])
-    return bool(kbds) and all(norm(k.name) in KEYBOARD_SPECS for k in kbds)
-
-def keyboard_assignment(d):
-    """Devtronix keyboard number -> Paramount keyboard, AUTO or None."""
-    return {k.number: KEYBOARD_SPECS.get(norm(k.name)) for k in d.lists.get("Kbd", [])}

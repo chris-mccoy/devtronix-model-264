@@ -145,7 +145,10 @@ KryoFlux streams or HFE files into sector images.
   pizzicato and reiterate timing tables. With `--paramount` it writes a file
   for Hauptwerk's MIDI player with the Paramount 332 virtual theatre organ,
   mapping the registration onto that organ's stops
-  ([paramount332-mapping.md](paramount332-mapping.md)).
+  ([paramount332-mapping.md](paramount332-mapping.md)). With `--friesach` it
+  writes one for the classical Friesach organ. That is how the 58-note player
+  rolls are rendered: the roll on the Hauptwerk, its lowest note in the bottom
+  two octaves on the Pedal.
 
 ## The collection
 
@@ -160,7 +163,7 @@ KryoFlux streams or HFE files into sector images.
   versions and the same two definitions as `cmm-backup`) and `startupa` is
   "Startup A" (monitor 180 and one small four-keyboard definition); neither holds
   a recording.
-- **844 track files**, all rendered: 1664 MIDI files in `renders/`, 41 tracks
+- **844 track files**, all rendered: 2442 MIDI files in `renders/`, 41 tracks
   flagged for decode problems, 12 directory entries that are corrupt. Jerry's
   tour disc holds twelve named tunes (Danny Boy, Joy To The World, Stars And
   Stripes Forever, ...); the eighteen "58 Note Player" disks hold unnamed

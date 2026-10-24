@@ -20,8 +20,11 @@ the format of the music on the disks in `../disk-images/`.
 | `devcomb.py` | Combination (`C`) file decoder: pistons, ranges, stops drawn |
 | `devdef.py` | Organ definition (`D` file) reader: lists keyboards, ranks, stops, links, functions as the editor shows them |
 | `dev2midi.py` | Renders a Track/Song file to a standard MIDI file using its definition |
+| `hauptwerk.py` | What the Hauptwerk renderings share: reads an organ's tables and matches the relay's registration onto its stops (`dev2midi.py --paramount`, `--friesach`) |
 | `paramount332.py` | Hauptwerk Paramount 332 MIDI implementation and the mapping of the theatre-organ definitions onto it (`dev2midi.py --paramount`) |
-| `render_all.py` | Renders every `T` file on every disk image to MIDI (plain, `--ranks`, and `--paramount` for the theatre organs) and writes `../renders/INDEX.md` |
+| `friesach.py` | Hauptwerk Friesach (classical, Eisenbarth 2000) MIDI implementation and the mapping onto it, with the 58 Note Player on the Hauptwerk and its lowest note in the bottom two octaves on the Pedal (`dev2midi.py --friesach`) |
+| `friesach-spec.xml` | Hauptwerk's MIDI implementation export for the Friesach |
+| `render_all.py` | Renders every `T` file on every disk image to MIDI (plain, `--ranks`, `--paramount` for the theatre organs, `--friesach` for the 58-note player tracks) and writes `../renders/INDEX.md` |
 | `fluxdecode.py` | Decodes the KryoFlux stream dumps and the HxC `.hfe` to sector images in `../decoded-images/` (own MFM decoder, no external tools) |
 | `COMMANDS.md` | Reference of every command in every mode (Idle, Edit, Run, RunEdit) |
 | `monitor-189.*` | The same for "System Monitor Ver 189" (`A2` of the v189 disk), see the comparison section |
@@ -537,6 +540,7 @@ uv run devdef.py --file def.bin --list Kbd         # from bytes extracted with d
 uv run dev2midi.py SIDE0 SIDE1 -t T8 -d D1 -o danny-boy.mid           # one MIDI channel per keyboard
 uv run dev2midi.py SIDE0 SIDE1 -t T8 -d D1 --ranks -o danny-boy-ranks.mid   # through stops and ranks
 uv run dev2midi.py SIDE0 SIDE1 -t T8 -d D1 --paramount -v              # for Hauptwerk's Paramount 332
+uv run dev2midi.py SIDE0 SIDE1 -t T1 -d D2 --friesach -v               # for Hauptwerk's Friesach
 ```
 
 `--paramount` writes a file for Hauptwerk's MIDI player with the Paramount 332
@@ -549,6 +553,31 @@ and the rest are folded into the registration. With `-v` it lists every
 stand-in, near substitute and pitch the Paramount has no tab for. How the
 mapping comes out over the theatre-organ disks is in
 [`../docs/paramount332-mapping.md`](../docs/paramount332-mapping.md).
+
+`--friesach` does the same for Hauptwerk's Friesach, Piotr Grabowski's free
+sample set of the Eisenbarth organ in Friesach, Austria: Hauptwerk, Schwellwerk
+(enclosed), Solowerk and Pedal, 44 stops, MIDI implementation in
+`friesach-spec.xml`. It is a classical organ, so `friesach.py` gives every rank
+of the collection a voice family (Principal, Flute, Gedackt, String, Celeste,
+Dolce, Trumpet, Oboe, English Horn, Mixture) and plays the stop of that family
+at that pitch on that manual, or the nearest family where the manual has none.
+Great plays the Hauptwerk, Swell and Accompaniment the Schwellwerk, Choir and
+Solo the Solowerk, and any keyboard the table does not know plays the
+Hauptwerk. The Friesach has no percussion, so traps, tuned percussion and
+pianos are silent. The rolls are what it is for. The 58 Note Player plays the
+Hauptwerk, and its lowest held key also plays the Pedal (Subbaß 16' and
+Octavbaß 8') while it is in the bottom two octaves, C–b. The player
+definitions send the roll to a MIDI organ's Great (channel 2; `Midi 8'`,
+`Midi Great`) and only their bottom octave to its Pedal (channel 1;
+`Midi 16"`, `Midi Pedal`). `58-note-01`'s
+`D10` gives its bottom octave a 16' Diapason (`Voice 1`) instead. Those bass
+ranks sound on the Pedal only. Every roll also draws the couplers II/I and
+III/I, so stops drawn by hand on the Schwellwerk and Solowerk play along with
+the Hauptwerk, and only keyboards a track plays draw their registration, so
+those two manuals start empty. `D2` comes out as Principal 8' on the
+Hauptwerk, `58-note-01` `D10` as Holzflöte 8', Principal 8' and Octave 4',
+and the `58-note-16-2`/`-17`/`-18` `D2` (whose `Midi Swell` plays at 4') as
+Principal 8' and Spitzflöte 4'. The tracks record no registration of their own.
 
 `dev2midi.py` writes a format-1 file with 96 ticks per beat (one tick per
 pulse) at 120 BPM unless `--tempo` says otherwise. In `--ranks` mode it also
