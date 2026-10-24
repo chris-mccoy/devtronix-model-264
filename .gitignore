@@ -1,6 +1,7 @@
 disk-images/
 renders/
 decoded-images/
+disklavier/
 .DS_Store
 .venv/
 __pycache__/
