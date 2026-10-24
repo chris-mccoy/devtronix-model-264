@@ -53,7 +53,7 @@ Arensky, Armstrong, Ascher and the like. Keys are as they sound on the roll;
 
 | Track | Length | Keys | Identification | Confidence | Evidence |
 |---|---:|---|---|---|---|
-| T1 | 4:46 | G minor → C | Not identified | | Fast-moving G-minor piece; opening line D' E♭' D' C' B♭ A G A B♭ G |
+| T1 | 4:46 | G minor → C | Not identified | | Fast-moving G-minor piece; opening line D' E♭' D' C' B♭ A G A B♭ G. Same roll as 58-note-02 T14 |
 | T2 | 3:33 | F minor → F | Not identified | | Opens with fast rising scales (C D E F G A♭ B♭ C'), then F minor |
 | T3 | 11:32 | G minor | J. S. Bach, Fantasia and Fugue in G minor, BWV 542 ("the Great") | Probable | Same roll as T11 and T31. A free, widely modulating fantasia ends on a long G-minor chord at 4:35, then a fugue begins with one voice alone (D5 \| B♭ C A B♭ G \| G5 \| F♯ G E F♯ D …) and its entries alternate G minor and D minor. Length fits; Aeolian roll 182. Not checked against a score |
 | T4 | 4:53 | A minor | Grieg, "Anitra's Dance" (*Peer Gynt* Suite No. 1) | Strong | A-minor mazurka with the ornamented turn E–D♯–E, C–B–C, A–G♯–A–B. Out of composer order |
@@ -85,6 +85,84 @@ Arensky, Armstrong, Ascher and the like. Keys are as they sound on the roll;
 | T30 | 5:43 | F♯ → G | Aviles, *La Media Noche*? | Guess | Position only; slow, but no tango rhythm found. Roll 707 |
 | T31 | 10:02 | G minor | Same roll as T3 (Bach, BWV 542) | Probable | In its catalogue place, after Aviles |
 | T32 | 3:22 | D minor → D | A Bach piece in D minor? | Guess | Baroque-sounding sequences; follows T31. Cut short: the disk is full |
+
+## 58-note-02
+
+If the composer order holds, this disk carries on from the end of disk 01 (Bach)
+through the early B composers. In Aeolian's 1919 catalogue the next names are
+Bach (more organ works), Bache, Bachmann, Bairstow, Balfe, Bargiel, Batiste and
+Beethoven (songs, sonatas, the Leonore Overture and movements of Symphonies 1,
+2, 3, 5, 6, 7 and 9), then Bendix, Bellini, Berger, Berlioz, Best and Bizet.
+Disk 02's many long tracks (6–12 minutes) fit a run of Beethoven symphony
+movements and overtures. Only one track matched a catalogue description
+closely enough to name it.
+
+| Track | Length | Keys | Identification | Confidence | Evidence |
+|---|---:|---|---|---|---|
+| T1 | 3:09 | G (D → G) | Not identified | | Quick G-major piece: D5 G4 G4 G5 G5 F♯5 D5 B4 C5 … |
+| T2 | 12:12 | D major (D ↔ A) | Not identified | | Long; opens D A D F♯ E F♯ E D E F♯ D F♯ G A G F♯ G A. A Bach prelude and fugue in D (BWV 532) would fit the position |
+| T3 | 3:48 | E♭ | Bach, Trio Sonata No. 1 in E♭, BWV 525? | Guess | Opens with a rising E♭ arpeggio (E♭ G B♭ E♭ A♭ C') and a falling scale; the trio sonata is the last Bach roll in Aeolian's order |
+| T4 | 5:59 | D → A | Not identified | | |
+| T5 | 5:01 | C♯ minor → B♭ minor | Not identified | | |
+| T6 | 7:09 | F → F♯, many keys | Balfe, *The Bohemian Girl* — Selections? | Guess | A medley's string of unrelated keys; Balfe falls here in the order |
+| T7 | 3:03 | B♭ → E♭ | Not identified | | |
+| T8 | 5:13 | C → F | Not identified | | Opens with a rising F-major arpeggio to a held C6 |
+| T9 | 8:39 | F♯ / D♭ | Not identified | | Slow (beat about 1.2 s) |
+| T10 | 4:06 | A → A | Not identified | | |
+| T11 | 7:43 | G minor → G | Bargiel, Suite in G minor — Marcia Fantastica? | Guess | G minor, opens with repeated D's like a fanfare; Bargiel falls here |
+| T12 | 2:10 | E♭ / G minor | Not identified | | |
+| T13 | 6:15 | A♭, many keys | Not identified | | Sparse (1,127 notes) and slow |
+| T14 | 4:00 | G minor → C | Same roll as 58-note-01 T1 | | Same key path and material, a little faster |
+| T15 | 4:25 | E minor → E | Batiste, Communion in E? | Guess | Position and key |
+| T16 | 4:31 | G major throughout | Batiste, Communion in G? | Guess | Slow G-major melody: D \| G A B D' \| G E' G' … (Beethoven's Minuet in G is the other G-major roll nearby) |
+| T17 | 5:17 | D minor → D | Not identified (same roll as T19) | | Slow, dignified: D C♯ D F E D \| D C♯ D A G F \| F G A F D' C' B♭ A … |
+| T18 | 3:56 | B minor → G | Not identified | | |
+| T19 | 4:57 | D minor → D | Same roll as T17 | | |
+| T20 | 6:09 | A / D, many keys | Not identified | | |
+| T21 | 5:08 | C minor → C | Batiste, Offertoire de Ste. Cécile in C minor | Probable | Aeolian: "With an impetuously ascending scale and a crashing of decisive chords this Offertoire makes its beginning", repeated several times. T21 opens with a rising C-minor run up a diminished chord (C E♭ F♯ A C E♭ …), crashing chords, then the run again. Aeolian roll 284 |
+| T22 | 6:37 | F minor → F | Not identified | | |
+| T23 | 7:07 | A minor | Not identified | | A C D E C D C A E …; key and length would fit Beethoven 7, Allegretto, but the opening isn't its ostinato |
+| T24 | 5:15 | D minor | Not identified | | |
+| T25 | 6:25 | F → E♭ | Not identified | | |
+| T26 | 6:38 | B♭ | Not identified | | Beethoven's *Adelaide* (B♭) falls in this stretch |
+| T27 | 5:37 | B♭ | Not identified | | As T26 |
+| T28 | 8:24 | E major / C♯ minor | Not identified | | Slow, chorale-like E-major chords. Not "Moonlight" (no triplets) |
+| T29 | 6:54 | C minor | Not identified | | Held high A♭, B, E♭ over a repeated C, then C E♭ D G \| C E♭ D G … in octaves |
+| T30 | 8:35 | F minor → F | Not identified | | |
+| T31 | 10:06 | C major | Not identified | | Overture-length; Beethoven's Leonore Overture No. 3 (C) falls in this stretch |
+| T32 | 9:47 | D major | Not identified | | Slow, stepwise: F♯ F♯ \| E E D \| D E F♯ \| G G \| F♯ F♯ E \| E F♯ G \| A A \| B C♯ … |
+| T33 | 11:55 | C major, C-minor middle | Not identified | | Opens with C chords and a rapid C-major scale to a held D'; development through E♭, F minor, C minor |
+
+## 58-note-03
+
+Disk 03 is mostly long tracks (9–12 minutes) and, from what could be
+identified, sits in the middle of Beethoven, after the run that seemed to
+start at the end of disk 02. Within Beethoven the rolls are not in the
+1919 catalogue's title order (the sonatas come after the overture here), so
+the 58-note catalogue evidently ordered or titled them differently. The image
+is byte-identical to `cmm/cmm2`; `cmm/cmm1` is a damaged copy of the same floppy.
+
+| Track | Length | Keys | Identification | Confidence | Evidence |
+|---|---:|---|---|---|---|
+| T1 | 11:47 | G / C, many keys | Not identified | | E D C C \| E E D C C \| E E D C C B A G \| G A F♯ G … |
+| T2 | 11:18 | C minor → C | Not identified | | C E♭ G F E♭ D C \| D' F' A♭' G' F' E♭' D' … Not the Fifth Symphony's opening |
+| T3 | 9:21 | C minor → C | Not identified | | B B B C D C B C D D E♭ E♭ D E♭ E F F♯ G A♭ … |
+| T4 | 11:09 | A major/minor, ends A minor | A Beethoven Symphony No. 7 movement? | Guess | Opens with long-held chords and a slow line A F♯ D B E G♯ A; key and length fit the Seventh |
+| T5 | 11:46 | C / F | Not identified | | F E E \| D E C C \| D E D E F F♯ G … |
+| T6 | 9:34 | A major | A Beethoven Symphony No. 7 movement? | Guess | Very busy; dotted repeated C♯ (6/8), then A F♯ E D E D C♯ D C♯ B … |
+| T7 | 11:15 | G → C | Beethoven, *Leonore* Overture No. 3 | Strong | Opens with a long-held G and a slow descending scale G F E D C B A G F♯, the overture's unmistakable start; an A-flat section (Florestan's air) and a C-major Allegro follow. Aeolian roll 426 |
+| T8 | 9:37 | A minor → G | Not identified | | Opens with A-major arpeggio chords high on the keyboard |
+| T9 | 5:20 | G / C | Not identified | | |
+| T10 | 8:10 | F♯ minor → A | Not identified | | |
+| T11 | 10:18 | G♯ / C♯ minor | Not identified | | Very slow, long-held notes |
+| T12 | 6:21 | G major | Not identified (same piece as T13, slower) | | Slow, legato 3/4: G F♯ \| G . A \| B D'. C' \| B A \| B . B \| G E' D' \| C♯' D' … Not Boccherini's Minuet (that is quick and staccato) |
+| T13 | 5:20 | G major | Same piece as T12 | | |
+| T14 | 7:15 | E♭ | Beethoven, Piano Concerto No. 5 "Emperor", first movement (abridged)? | Probable | Held E♭ chord, then a flourish ending in a descending scale, then A♭ and diminished chords each followed by a flourish, as the concerto opens. Aeolian's 1919 "Emperor" roll (587) is the later movements, so this would be a different roll |
+| T15 | 6:53 | G / D | Not identified | | B A B C D \| G F♯ G A C B … |
+| T16 | 8:58 | A♭ / E♭ / C minor | Not identified | | |
+| T17 | 4:16 | A♭ minor | Beethoven, Piano Sonata Op. 26 — Funeral March ("Marcia funebre sulla morte d'un eroe") | Strong | Dotted rhythm on repeated E♭ in A-flat minor, moving to C-flat (B) major, as the march does. Aeolian roll 961 |
+| T18 | 12:09 | C♯ minor → D♭ → C♯ minor | Beethoven, Piano Sonata Op. 27 No. 2 "Moonlight", probably complete | Strong | The slow triplet figure G♯–C♯–E over a C♯ bass, then the D-major and G♯⁷ harmonies of bars 3–4; a D-flat middle (the Allegretto) and a C♯-minor end (the Presto). Aeolian roll 559 |
+| T19 | 4:59 | A♭ / E♭ | Not identified | | Slow A-flat melody: E♭ E♭ A♭ A♭ A♭ G G F G E♭ … |
 
 ## Other disks
 
