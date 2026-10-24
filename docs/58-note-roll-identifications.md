@@ -168,5 +168,7 @@ is byte-identical to `cmm/cmm2`; `cmm/cmm1` is a damaged copy of the same floppy
 
 | Track | Identification | Confidence | Evidence |
 |---|---|---|---|
+| 58-note-06 T16 | Liszt, Hungarian Rhapsody No. 2 | Probable | Found by predicting Liszt's place in the composer order (Aeolian 1919 rolls 722 and neighbours). Opens slowly in C♯ minor with an ornamental turn (G♯ C♯ G♯ C♯ G♯ \| A F♯ B A G♯ F♯ G♯), grows steadily denser, and ends with sweeping F♯-major arpeggios and an F♯ cadence: the *lassan*–*friska* shape. Track 135 of the set. Neighbouring tracks may be other Liszt rolls; T15 is not "Liebestraum" in texture |
+| 58-note-17 T1 | Liszt, "La Campanella" (Grandes études de Paganini No. 3) | Strong | Found by scanning all 470 tracks for a fixed high "bell" note alternating quickly with a melody. Opens with the octave bell introduction on D♯ (D♯5 ×3, D♯6 ×3), then the theme D♯ C♯ B A♯ G♯ … G G♯ A♯ with the D♯6 bell between every note, in Liszt's key of G♯ minor. 4:02. Disk 17 is one of the short later disks (with 16-2 and 18) recorded with the player-plus-keyboards definition, outside the alphabetical run |
 | 58-note-09 T1 | Offenbach, Barcarolle "Belle nuit, ô nuit d'amour" (*Les contes d'Hoffmann*) | Confirmed | A six-minute paraphrase; the tune returns in seven keys between ornamental interludes. Aeolian roll 892 |
 | 58-note-15 T4 | Not identified | | 6/8 march form in C: second strain in G, trio in F with a break strain. Not *Funiculì, Funiculà* (checked against the 1880 score). Its position points to Sousa |
