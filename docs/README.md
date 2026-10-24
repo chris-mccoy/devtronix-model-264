@@ -167,7 +167,9 @@ KryoFlux streams or HFE files into sector images.
   flagged for decode problems, 12 directory entries that are corrupt. Jerry's
   tour disc holds twelve named tunes (Danny Boy, Joy To The World, Stars And
   Stripes Forever, ...); the eighteen "58 Note Player" disks hold unnamed
-  recordings for a one-keyboard roll player. "Danny Boy" and "Joy To The
+  recordings for a one-keyboard roll player, apparently in Aeolian's catalogue
+  order. The rolls identified so far are in
+  [58-note-roll-identifications.md](58-note-roll-identifications.md). "Danny Boy" and "Joy To The
   World" were checked note by note, and the renders have been listened to and
   sound right, which also confirms the 120 BPM tempo assumption.
 - **94 definition entries, 50 distinct by content**, about eight real organs:
