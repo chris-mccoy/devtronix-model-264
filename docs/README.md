@@ -158,7 +158,8 @@ KryoFlux streams or HFE files into sector images.
   on every good sector.
 - 58 image sets, 56 of them Devtronix system disks (many are duplicate dumps of
   the same floppy). Two are MS-DOS disks, not Devtronix (Yamaha Disklavier piano
-  recordings). The two disks that existed
+  recordings, listed in [last-player-tracks.md](last-player-tracks.md#the-disklavier-floppies);
+  none of them matches a recording on the Devtronix disks). The two disks that existed
   only as HFE images are now decoded too: `os-backup` is "CMM 2" (both monitor
   versions and the same two definitions as `cmm-backup`) and `startupa` is
   "Startup A" (monitor 180 and one small four-keyboard definition); neither holds
@@ -169,7 +170,10 @@ KryoFlux streams or HFE files into sector images.
   Stripes Forever, ...); the eighteen "58 Note Player" disks hold unnamed
   recordings for a one-keyboard roll player, apparently in Aeolian's catalogue
   order. The rolls identified so far are in
-  [58-note-roll-identifications.md](58-note-roll-identifications.md). "Danny Boy" and "Joy To The
+  [58-note-roll-identifications.md](58-note-roll-identifications.md). The eleven
+  unnamed tracks on the McCoy Organ disk (`last-player`) are described, with
+  their openings, in [last-player-tracks.md](last-player-tracks.md); none is
+  identified yet. "Danny Boy" and "Joy To The
   World" were checked note by note, and the renders have been listened to and
   sound right, which also confirms the 120 BPM tempo assumption.
 - **94 definition entries, 50 distinct by content**, about eight real organs:
