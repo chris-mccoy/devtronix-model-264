@@ -27,6 +27,7 @@ the format of the music on the disks in `../disk-images/`.
 | `render_all.py` | Renders every `T` file on every disk image to MIDI (plain, `--ranks`, `--paramount` for the theatre organs, `--friesach` for the 58-note player tracks) and writes `../renders/INDEX.md` |
 | `fluxdecode.py` | Decodes the KryoFlux stream dumps and the HxC `.hfe` to sector images in `../decoded-images/` (own MFM decoder, no external tools) |
 | `dosdisk.py` | Not a Devtronix tool: interleaves the per-side DTC images of the two 720 KB MS-DOS disks (Yamaha Disklavier, `new-images/fenelon-tarantelle` and `new-images/midi-piano-selections`) into a standard `.img` and copies their files to `../disklavier/<disk>/` |
+| `eseq2midi.py` | Converts the Disklavier's E-SEQ songs (`DRC_NN.MDA`) to standard MIDI files beside them, on a General MIDI grand piano (bank 0, program 0) |
 | `COMMANDS.md` | Reference of every command in every mode (Idle, Edit, Run, RunEdit) |
 | `monitor-189.*` | The same for "System Monitor Ver 189" (`A2` of the v189 disk), see the comparison section |
 
