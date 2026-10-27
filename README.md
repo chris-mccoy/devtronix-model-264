@@ -98,6 +98,8 @@ found, with links to the detailed write-ups:
 - [boot-rom/](boot-rom/README.md): the boot ROM, annotated disassembly, memory and I/O maps
 - [system-monitor/](system-monitor/README.md): the operating software, the file system,
   the Track, Definition and Combination file formats, and the tools that read them
+- [disklavier/](disklavier/README.md): tools for the two Yamaha Disklavier floppies found among the
+  disks, which are not Devtronix disks
 
 ## Acknowledgements
 
@@ -134,8 +136,9 @@ uv run system-monitor/devfs.py SIDE0 SIDE1   # run any tool
 
 The floppy disk images, the flux dumps, the HFE images, the decoded sector images
 and the rendered MIDI files are deliberately left out (`disk-images/`,
-`decoded-images/`, `renders/`) until permission to publish the recordings is
-settled. Links into those folders from the write-ups will not resolve here. The
+`decoded-images/`, `renders/`, the song folders in `disklavier/`) until
+permission to publish the recordings is settled. Links into those folders from
+the write-ups will not resolve here. The
 tools work on a local copy that has them.  Publishing the artists' work to the
 world wouldn't be a good move on my part.  
 
