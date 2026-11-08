@@ -60,11 +60,10 @@ with the [Peterson System](https://www.petersonemp.com/) and a
 heavily modified Kennedy 9000 transport.  This was eventually imported to
 the Devtronix.
 
-![A Kennedy Model 9000 9-track tape transport](img/kennedy-9000.jpg)
+![Kennedy Model 9000 9-track tape transports and Peterson](img/kennedy-9000.jpg)
 
-*A Kennedy Model 9000, the same model as the transport the Sylmar recordings were
-first captured on: Credit: 
-[Tektronix 8560 still going strong](https://hydraraptor.blogspot.com/2016/01/tektronix-8560-still-going-strong.html) on the HydraRaptor blog.*
+*Two Kennedy Model 9000s, the transport the Sylmar encodings were
+first captured on.*
 
 The aim is to recover and preserve the performances recorded on the Devtronix
 diskettes I have from several different pipe organs, and that has mostly been
